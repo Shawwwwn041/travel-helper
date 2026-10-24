@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sqzamIoCxygYyDxkYeZSgQY1KaXavpXBJ/2mlhbl77Y=' 'sha256-x6dLyySMvERxUfvbNOQmKkrK+rOxKg/aP13qAnzzUzM=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.googleusercontent.com; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sCTLEUWy9vKsNXdeRYWoZ43YEotWJ70kuOwMtDZgA3Y=' 'sha256-x6dLyySMvERxUfvbNOQmKkrK+rOxKg/aP13qAnzzUzM=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>旅遊小幫手（測試版）</title>
 <meta name="description" content="出國記帳、預算、統計與匯率換算的旅遊小幫手。">
@@ -118,6 +118,19 @@ button.offline:active{transform:scale(.96)}
 /* ===== 卡片與列 ===== */
 .card{background:#fff;border-radius:18px;padding:6px 22px;min-width:0}
 .stack{display:grid;gap:16px}
+/* 首頁：依狀態分成「準備中／旅途中／已結束」三區，用分割線隔開；寬螢幕並排成三欄 */
+.phases{display:grid;gap:34px}
+.sec-h{display:flex;align-items:center;gap:10px;margin:0 4px 14px;font-size:1.0625rem;font-weight:600;color:var(--ink);animation:rise .6s var(--ease) both}
+.sec-h .n{color:var(--muted);font-weight:400;font-size:.9375rem}
+.sec-h::after{content:"";flex:1;height:1px;background:#d2d2d7;margin-left:4px}
+.sec-none{margin:0 4px;color:var(--faint);font-size:.9375rem;animation:rise .6s var(--ease) both}
+@media (min-width:960px){
+  .home .col{max-width:1100px}
+  .phases{grid-template-columns:repeat(3,minmax(0,1fr));gap:48px}
+  .phases > section{position:relative}
+  .phases > section + section::before{content:"";position:absolute;left:-24px;top:0;bottom:0;width:1px;background:#d2d2d7}
+  .sec-h::after{display:none}
+}
 .rise{animation:rise .55s var(--ease) both;animation-delay:calc(var(--i,0) * 50ms)}
 .pill{display:inline-block;padding:1px 10px;border-radius:999px;font-size:.8125rem;white-space:nowrap;line-height:1.6}
 .pill.before{background:var(--sage-soft);color:var(--sage)}
@@ -197,12 +210,17 @@ button.offline:active{transform:scale(.96)}
 .orb .in{fill:#fff}
 .st-body{margin-top:16px;padding:16px 22px 18px}
 .mini-wrap{display:flex;justify-content:center;margin-bottom:6px}
-.mini-seg{position:relative;display:inline-flex;padding:3px;border-radius:980px;background:rgba(120,120,128,.14);box-shadow:inset 0 1px 2px rgba(0,0,0,.05)}
+.mini-seg{position:relative;display:inline-flex;padding:3px;border-radius:980px;background:rgba(120,120,128,.14);box-shadow:inset 0 1px 2px rgba(0,0,0,.05);touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:background .25s}
 .mini-seg .thumb{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:980px;pointer-events:none;background:linear-gradient(180deg,#fff,rgba(255,255,255,.88));box-shadow:0 3px 10px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.08),inset 0 1px 0 #fff,inset 0 0 0 .5px rgba(0,0,0,.08)}
-.mini-seg .thumb.ready{transition:translate .42s var(--ease),width .42s var(--ease)}
+.mini-seg .thumb.ready{transition:translate .42s var(--ease),width .42s var(--ease),scale .3s var(--ease),box-shadow .3s var(--ease)}
+/* 小滑塊也能按住左右拖（跟上方分頁列同一種手感） */
+.mini-seg.drag{background:rgba(120,120,128,.18)}
+.mini-seg.drag .thumb{transition:scale .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s var(--ease);scale:1.08;box-shadow:0 8px 20px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.10),inset 0 1px 0 #fff,inset 0 0 0 .5px rgba(0,0,0,.08)}
+.mini-seg.drag button[aria-selected="true"]:not(.over){color:var(--muted);font-weight:400}
+.mini-seg button.over{color:var(--ink);font-weight:600}
 .mini-seg button{position:relative;z-index:1;height:30px;min-width:72px;padding:0 14px;border:0;border-radius:980px;background:transparent;color:var(--muted);font-size:.875rem;letter-spacing:.04em;cursor:pointer;transition:color .3s}
 .mini-seg button[aria-selected="true"]{color:var(--ink);font-weight:600}
-.st-pane.fade-in{animation:fadeIn .35s var(--ease)}
+.st-pane.fade-in,.ls-pane.fade-in{animation:fadeIn .35s var(--ease)}
 .crow{padding:12px 0 10px;border-bottom:1px solid var(--hair);animation:rise .45s var(--ease) both;animation-delay:calc(var(--i) * 40ms)}
 .ctop{display:flex;align-items:center;gap:12px}
 .ctop .ico{color:var(--muted);width:22px}
@@ -252,8 +270,9 @@ button.offline:active{transform:scale(.96)}
 .ref b{font-weight:600}
 
 /* 旅程頁分頁：玻璃膠囊（同貓咪網站） */
-.seg-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;justify-content:center;margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));background:rgba(245,245,247,.82);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);transition:box-shadow .3s}
-.seg-nav.stuck{box-shadow:0 1px 0 rgba(0,0,0,.06)}
+.seg-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;justify-content:center;margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));background:transparent;transition:box-shadow .3s,background-color .3s}
+/* 毛玻璃只在捲動、黏在頂端時才開，平常不開（模糊邊緣會在寬螢幕上留下一條淡淡的框） */
+.seg-nav.stuck{background:rgba(245,245,247,.82);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 1px 0 rgba(0,0,0,.06)}
 .seg-nav .cap{position:relative;display:inline-flex;padding:4px;border-radius:980px;background:rgba(120,120,128,.16);box-shadow:inset 0 1px 2px rgba(0,0,0,.06);touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:background .25s}
 .seg-nav .thumb{position:absolute;top:4px;bottom:4px;left:0;width:0;border-radius:980px;pointer-events:none;background:linear-gradient(180deg,#fff,rgba(255,255,255,.88));box-shadow:0 4px 14px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.10),inset 0 1px 0 #fff,inset 0 -1px 0 rgba(0,0,0,.04),inset 0 0 0 .5px rgba(0,0,0,.08)}
 .seg-nav .thumb.ready{transition:translate .45s var(--ease),width .45s var(--ease),scale .3s var(--ease),box-shadow .3s var(--ease)}
@@ -386,9 +405,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 /* 金額 */
 .amount-box{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:6px;padding:18px 0 4px}
-.cur-seg{display:inline-flex;padding:3px;border-radius:980px;background:rgba(120,120,128,.12)}
-.cur-seg button{min-width:64px;height:30px;padding:0 14px;border:0;border-radius:980px;background:transparent;color:var(--muted);font-size:.875rem;letter-spacing:.06em;cursor:pointer;transition:background .25s,color .25s,box-shadow .25s}
-.cur-seg button[aria-pressed="true"]{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,.08),0 0 0 .5px rgba(0,0,0,.04)}
+.cur-seg button{min-width:64px;letter-spacing:.06em}
+.mini-seg button[aria-pressed="true"]{color:var(--ink);font-weight:600}
+.mini-seg.drag button[aria-pressed="true"]:not(.over){color:var(--muted);font-weight:400}
 /* 金額：自己排版「符號＋數字＋游標」，真正的輸入框透明蓋在上面（各瀏覽器的輸入框游標位置不一致） */
 .amount{position:relative;min-width:0;max-width:100%;overflow:hidden;display:flex;align-items:baseline;justify-content:center;width:100%;margin-top:10px;--fs:3.25rem;cursor:text}
 .amount .sym{font-size:calc(var(--fs) * .5);font-weight:500;color:var(--muted);margin-right:.32em;white-space:nowrap;line-height:1}
@@ -426,7 +445,33 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 /* 帳號 */
 .me{display:flex;align-items:center;gap:14px;padding:16px}
-.me .me-btn{width:48px;height:48px;font-size:1.125rem;cursor:default}
+button.me{width:100%;border:0;background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:background .2s}
+button.me:active{background:var(--soft)}
+.me .grow{flex:1;min-width:0}
+.me .grow b,.me .grow .e{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.me .chev{flex:none;color:var(--faint)}
+.pf-lede span{display:block}
+.pf-lede{margin:22px 8px 0;text-align:center;color:var(--muted);font-size:.9375rem;line-height:1.6}
+.pf{display:grid;justify-items:center;gap:6px;padding:24px 0 0}
+.pf-pic{position:relative;display:grid;place-items:center;width:104px;height:104px;padding:0;border:0;border-radius:50%;background:#fff;color:var(--ink);font-size:2.5rem;font-weight:600;cursor:pointer;transition:transform .2s var(--ease),opacity .2s}
+.pf-pic:active{transform:scale(.96)}
+.pf-pic.busy{opacity:.5;pointer-events:none}
+.pf-pic img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.pf-pic .ph{color:var(--faint);display:grid}
+.pf-pic .badge{position:absolute;right:0;bottom:0;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;box-shadow:0 0 0 3px var(--band)}
+.pf .text-btn{height:36px;font-size:.875rem}
+/* 第一次登入：全白的「設定個人資料」頁（跟登入頁同一種排版） */
+.setup h1{font-size:clamp(2.1rem,8vw,2.75rem)}
+.setup .pf{padding-top:34px;animation:rise .7s .12s var(--ease) both}
+.setup .pf-pic{background:var(--band)}
+.setup .pf-pic .badge{box-shadow:0 0 0 3px var(--bg)}
+.setup-in{display:block;width:min(100%,300px);height:52px;margin-top:18px;padding:0 16px;border:0;border-radius:14px;background:var(--band);color:var(--ink);font-size:1.0625rem;text-align:center;outline:none;transition:background .2s,box-shadow .2s;animation:rise .7s .16s var(--ease) both}
+.setup-in::placeholder{color:var(--faint)}
+.setup-in:focus{background:#ececf0}
+.setup .g-btn{margin-top:28px;min-width:160px}
+.setup small{margin-top:16px}
+.g-btn:disabled{background:#d2d2d7;color:#fff;cursor:default;transform:none}   /* 不用 opacity：進場動畫會蓋掉 */
+.me .me-btn{width:48px;height:48px;font-size:1.125rem}
 .me b{display:block;font-weight:600}
 .me span.e{color:var(--muted);font-size:.875rem}
 .menu-btn{display:block;width:100%;height:52px;padding:0 16px;border:0;border-top:1px solid var(--hair);background:transparent;text-align:left;font-size:1rem;color:var(--link);cursor:pointer}
@@ -449,10 +494,90 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .wide-btn:disabled{opacity:.3;cursor:default;transform:none}
 .menu-btn:active{background:var(--soft)}
 
-.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:60;padding:10px 20px;border-radius:980px;background:rgba(29,29,31,.92);color:#fff;font-size:.9375rem;transform:translate(-50%,8px);opacity:0;transition:opacity .25s,transform .35s var(--spring);pointer-events:none}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:70;width:max-content;max-width:calc(100vw - 48px);padding:10px 20px;text-align:center;line-height:1.45;border-radius:980px;background:rgba(29,29,31,.92);color:#fff;font-size:.9375rem;transform:translate(-50%,8px);opacity:0;transition:opacity .25s,transform .35s var(--spring);pointer-events:none}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
 @media (max-width:360px){.card,.trip{padding-left:18px;padding-right:18px}.sum{padding:20px 18px}.sum .big{font-size:2.125rem}.amount{--fs:2.75rem}.cat .ico{width:38px;height:38px}.seg-nav button{min-width:64px;padding:0 14px}.line > label,.line > .k{width:4em}.line input,.line select{font-size:.9375rem}.line .bname{width:5em}}
+/* ---- 清單 ---- */
+.ls-top{padding:16px 22px 20px;text-align:left}
+.ls-top .mini-wrap{margin-bottom:18px}
+.ls-k{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.ls-k b{font-size:1.25rem;font-weight:600}
+.ls-k .num{color:var(--muted);font-size:1rem}
+.ls-k .num em{font-style:normal;color:var(--ink);font-weight:600;font-size:1.25rem}
+.pbar{height:6px;margin-top:12px;border-radius:3px;background:var(--hair);overflow:hidden}
+.pbar i{display:block;height:100%;width:0;border-radius:3px;background:var(--ink);transition:width .6s var(--ease),background .4s}
+.pbar.full i{background:#2f8f5b}
+.lcat{margin-top:26px;animation:rise .55s var(--ease) backwards}   /* 用 backwards：動畫結束就放掉圖層，拖到別的類別時才不會被蓋住 */
+.lcat-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 6px 8px;font-size:.9375rem;font-weight:600}
+.lcat-h span{color:var(--muted);font-weight:400;font-size:.8125rem}
+.lgrp{background:#fff;border-radius:16px;padding:0 8px 0 16px}
+.li{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 6px 8px 0;border-top:1px solid var(--hair);background:#fff;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.lgrp > .li:first-child{border-top:0}
+.ck{flex:none;display:grid;place-items:center;width:38px;height:38px;margin:-8px -6px -8px -9px;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ck i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1.5px #c7c7cc;color:#fff;transition:background .25s,box-shadow .25s,transform .35s var(--spring)}
+.ck i svg{opacity:0;transform:scale(.4);transition:opacity .2s,transform .35s var(--spring)}
+.ck:active i{transform:scale(.86)}
+.li.done .ck i{background:var(--ink);box-shadow:none}
+.li.done .ck i svg{opacity:1;transform:none}
+.li .tx{flex:1;min-width:0;padding:4px 0;border:0;background:none;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.li .tx b{display:block;font-weight:400;font-size:1rem;line-height:1.4;overflow-wrap:anywhere;transition:color .25s}
+.li .tx span{display:block;margin-top:1px;color:var(--muted);font-size:.8125rem;line-height:1.4;overflow-wrap:anywhere}
+.li.done .tx b{color:var(--faint);text-decoration:line-through;text-decoration-color:rgba(0,0,0,.2)}
+.li .pic{flex:none;width:44px;height:44px;padding:0;border:0;border-radius:10px;background:var(--soft);overflow:hidden;cursor:zoom-in}
+.li .pic img{display:block;width:100%;height:100%;object-fit:cover}
+.li.add .plus{flex:none;display:grid;place-items:center;width:22px;color:var(--link)}
+.li.add input{flex:1;min-width:0;height:38px;padding:0;border:0;background:transparent;font-size:1rem;color:var(--ink);outline:none}
+.li.add input::placeholder{color:var(--link);opacity:.85}
+.li.add input:focus::placeholder{color:var(--faint)}
+.ls-tools{display:flex;justify-content:center;margin-top:18px}
+/* 長按拖動（沿用貓咪小幫手的做法） */
+body.is-dragging,body.is-dragging *{cursor:grabbing !important;-webkit-user-select:none;user-select:none}
+.li.pressing{scale:.985;transition:scale .38s var(--ease)}
+.ced.dragging{position:relative;z-index:5;border-radius:12px;border-top-color:transparent;box-shadow:0 12px 32px rgba(0,0,0,.14),0 2px 6px rgba(0,0,0,.06);scale:1.02;transition:scale .2s var(--ease),box-shadow .2s var(--ease)}
+.shifting{transition:transform .22s var(--ease)}
+/* 清單項目拖動：拿起的項目浮在手指下，放開後會落的地方空出一格（可以跨類別） */
+.li.ph{min-height:0;padding:0;border-top-color:transparent;background:transparent}
+.li.lifted{position:fixed;z-index:50;margin:0;padding-left:12px;padding-right:14px;border-radius:14px;border-top-color:transparent;box-shadow:0 14px 34px rgba(0,0,0,.16),0 2px 6px rgba(0,0,0,.06);scale:1.03;transition:scale .2s var(--ease),box-shadow .2s var(--ease);pointer-events:none}
+.li.lifted.settling{transition:top .22s var(--ease),left .22s var(--ease),scale .22s var(--ease),box-shadow .22s var(--ease);scale:1;box-shadow:0 0 0 rgba(0,0,0,0)}
+.dragging.settling{transition:transform .22s var(--ease),scale .22s var(--ease),box-shadow .22s var(--ease);scale:1;box-shadow:0 0 0 rgba(0,0,0,0)}
+@keyframes movedFlash{0%{background:#eaf2fd}100%{background:#fff}}
+.li.moved{animation:movedFlash .8s var(--ease)}
+/* 類別編輯 */
+.ced{display:flex;align-items:center;gap:6px;min-height:52px;padding:0 8px 0 2px;border-top:1px solid var(--hair);background:#fff}
+.ced:first-child{border-top:0}
+.ced input{flex:1;min-width:0;height:50px;padding:0 4px;border:0;background:transparent;font-size:1rem;color:var(--ink);outline:none}
+.ced .handle{flex:none;display:grid;place-items:center;width:40px;height:44px;padding:0;border:0;background:none;color:var(--faint);cursor:grab;touch-action:none}
+.ced .cdel{flex:none;width:auto;height:32px;padding:0 10px;border:0;border-radius:8px;background:none;color:var(--bad);font-size:.875rem;cursor:pointer;white-space:nowrap}
+.ced .cdel.armed{background:var(--bad-soft);font-weight:600}
+/* 清單項目的照片 */
+.ph-box{display:flex;align-items:center;gap:14px;padding:12px 16px}
+.ph-box .pv{flex:none;display:grid;place-items:center;width:72px;height:72px;padding:0;border:0;border-radius:12px;background:var(--soft);color:var(--faint);overflow:hidden;cursor:pointer}
+.ph-box .pv img{display:block;width:100%;height:100%;object-fit:cover}
+.ph-box .acts{display:flex;flex-wrap:wrap;gap:4px 18px}
+/* 照片全螢幕（給店員看） */
+.viewer{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(0,0,0,.94);opacity:0;transition:opacity .25s;cursor:zoom-out}
+.viewer.on{opacity:1}
+.viewer img{max-width:100vw;max-height:82vh;object-fit:contain;transform:scale(.96);transition:transform .35s var(--ease)}
+.viewer.on img{transform:none}
+.viewer p{position:absolute;left:0;right:0;bottom:calc(26px + env(safe-area-inset-bottom,0px));margin:0;padding:0 24px;text-align:center;color:#fff;font-size:1.0625rem}
+.viewer .x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:16px;display:grid;place-items:center;width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;cursor:pointer}
+.trip-lists{margin:-6px 0 14px;color:var(--muted);font-size:.8125rem}
+/* ---- 登入後的歡迎動畫：一條線畫出地平線與雲，線條飛機從雲裡鑽出來帶出「歡迎」，再鑽進另一朵雲 ---- */
+.hello{position:fixed;inset:0;z-index:60;display:grid;place-items:center;overflow:hidden;background:var(--bg);cursor:pointer;transition:opacity .7s var(--ease)}
+.hello.out{opacity:0;pointer-events:none}
+.hello-stage{position:relative;width:360px;height:300px;flex:none}
+.hello svg.layer{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.hello-trail path{fill:none;stroke:#d2d2d7;stroke-width:1.2;stroke-linecap:round;transition:opacity .9s var(--ease)}
+.hello-land .fill{fill:var(--bg)}
+.hello-land .line{fill:none;stroke:#86868b;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.hello-word{position:absolute;inset:78px 0 auto;margin:0;text-align:center;font-size:72px;font-weight:600;letter-spacing:.08em;text-indent:.08em;line-height:1;color:var(--ink);-webkit-mask-image:linear-gradient(90deg,#000 -40px,transparent 0);mask-image:linear-gradient(90deg,#000 -40px,transparent 0)}
+.hello-sub{position:absolute;inset:236px 0 auto;margin:0;text-align:center;color:var(--muted);font-size:17px;letter-spacing:.04em;opacity:0;transform:translateY(8px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.hello-sub.on{opacity:1;transform:none}
+.hello-plane{position:absolute;left:0;top:0;width:38px;height:38px;offset-path:path("M 60 190 C 80 180 90 172 114 172 L 240 172 C 282 172 292 112 302 58");offset-rotate:auto;offset-anchor:center;offset-distance:0%}
+.hello-plane svg{display:block;width:100%;height:100%;overflow:visible;fill:var(--bg);stroke:var(--ink);stroke-width:1.3;stroke-linejoin:round}
+.hello.calm .hello-word{-webkit-mask-image:none;mask-image:none;opacity:0;transition:opacity .8s var(--ease)}
+.hello.calm .hello-word.on{opacity:1}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}}
 </style>
 
@@ -490,6 +615,11 @@ const P = {
   cloud:'<path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9Z"/>',
   clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
   user:'<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',
+  camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/>',
+  chev:'<path d="m9 18 6-6-6-6"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  grip:'<path d="M5 9h14M5 15h14"/>',
+  image:'<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',
   food:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
   shop:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
   fun:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>',
@@ -644,7 +774,7 @@ const Store = {
     if(CLOUD && !guest){ this.data = {user:null, trips:[]}; return; }
     try{ this.data = JSON.parse(localStorage.getItem(KEY)); }catch(e){ this.data = null; }
     if(!this.data || !Array.isArray(this.data.trips)) this.data = {user:null, trips:[]};
-    if(guest){ this.data.user = {name:"訪客", email:"", guest:true}; this.data.trips = this.data.trips.filter(t => !t.sample); }
+    if(guest){ const o = this.data.user || {}; this.data.user = {name:"訪客", email:"", guest:true, nick:o.nick || "", avatar:o.avatar || ""}; this.data.trips = this.data.trips.filter(t => !t.sample); }
   },
   get guest(){ return !!(this.data && this.data.user && this.data.user.guest); },
   save(){
@@ -665,7 +795,7 @@ const FIREBASE_CONFIG = {
 };
 const FB_VERSION = "10.14.1";                     // 鎖定版本，只從 Google 官方網址載入
 const Cloud = {
-  state:"loading",            // loading → out（未登入）／in（已登入）／error
+  state:"loading", ready:false,            // loading → out（未登入）／in（已登入）／error
   error:"", A:null, F:null, auth:null, db:null, uid:null,
   base:new Map(),             // 雲端目前的樣子：文件路徑 → 內容（JSON 字串），用來找出要寫哪些、刪哪些
   unsub:[], expUnsub:new Map(), gotTrips:false,
@@ -688,11 +818,13 @@ const Cloud = {
     if(!this.auth) return;
     const p = new this.A.GoogleAuthProvider();
     p.setCustomParameters({prompt:"select_account"});
+    try{ sessionStorage.setItem(HELLO_KEY, "1"); }catch(e){}           // 登入成功後播放歡迎動畫（換頁登入回來也記得）
     try{ await this.A.signInWithPopup(this.auth, p); }
     catch(e){
       if(e && (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment")){
-        try{ await this.A.signInWithRedirect(this.auth, p); return; }catch(e2){ this.fail(e2); return; }
+        try{ await this.A.signInWithRedirect(this.auth, p); return; }catch(e2){ try{ sessionStorage.removeItem(HELLO_KEY); }catch(x){} this.fail(e2); return; }
       }
+      try{ sessionStorage.removeItem(HELLO_KEY); }catch(x){}
       this.fail(e);
     }
   },
@@ -730,6 +862,8 @@ const Cloud = {
       for(const t of trips.docs){
         const ex = await F.getDocsFromServer(F.collection(db, "users", uid, "trips", t.id, "expenses"));
         ex.docs.forEach(d => refs.push(d.ref));
+        const its = await F.getDocsFromServer(F.collection(db, "users", uid, "trips", t.id, "items"));
+        its.docs.forEach(d => refs.push(d.ref));
         refs.push(t.ref);
       }
       refs.push(F.doc(db, "users", uid));
@@ -754,15 +888,29 @@ const Cloud = {
   path:(...p) => p.join("/"),
   onUser(u){
     if(!u && Store.guest){ this.state = "out"; this.uid = null; return; }          // 訪客：資料留在本機，不動
-    if(u && Store.guest){ try{ localStorage.removeItem(GUEST_KEY); }catch(e){} }  // 訪客綁定 Google：本機資料由 migrate() 搬上雲端
+    if(u && Store.guest){                                                            // 訪客綁定 Google：旅程由 migrate() 搬上雲端，暱稱頭貼也帶過去
+      try{ localStorage.removeItem(GUEST_KEY); }catch(e){}
+      const g = Store.data.user; this.carry = g.nick ? {nick:g.nick, avatar:g.avatar || ""} : null;
+    }
     this.stop(); this.base.clear(); this.gotTrips = false;
     if(!u){ this.state = "out"; this.uid = null; Store.data = {user:null, trips:[]}; render(); return; }
     this.state = "in"; this.uid = u.uid;
-    Store.data = {user:{name:u.displayName || "我", email:u.email || "", photo:u.photoURL || ""}, trips:[], lastPick:{}};
+    this.ready = false; clearTimeout(this._wait);
+    this._wait = setTimeout(() => { if(!this.ready){ this.ready = true; render(); } }, 6000);   // 網路太慢時最多等 6 秒
+    Store.data = {user:{name:u.displayName || "", email:u.email || "", nick:"", avatar:""}, trips:[], lastPick:{}};
     const F = this.F, db = this.db, uid = u.uid;
+    let first = true;
     this.unsub.push(F.onSnapshot(F.doc(db, "users", uid), snap => {
-      const d = snap.exists() ? snap.data() : null;
-      if(d){ Store.data.lastPick = d.lastPick || {}; this.base.set(this.path("users", uid), JSON.stringify(this.userDoc())); }
+      if(first && !snap.exists() && snap.metadata && snap.metadata.fromCache) return;   // 離線時手機上還沒有副本：等雲端回覆，不要誤以為是新帳號
+      const d = snap.exists() ? snap.data() : null, me = Store.data.user;
+      if(d){
+        Store.data.lastPick = d.lastPick || {};
+        me.nick = typeof d.nick === "string" ? d.nick.slice(0, 12) : "";
+        me.avatar = typeof d.avatar === "string" && AVATAR_RE.test(d.avatar) ? d.avatar : "";
+        this.base.set(this.path("users", uid), JSON.stringify(this.userDoc()));
+      }
+      if(first){ first = false; this.arrive(); }
+      this.renderSoon();
     }, () => {}));
     this.unsub.push(F.onSnapshot(F.collection(db, "users", uid, "trips"), snap => {
       const old = new Map(Store.data.trips.map(t => [t.id, t]));
@@ -772,6 +920,8 @@ const Cloud = {
         const x = d.data(), t = old.get(d.id) || {id:d.id, expenses:[]};
         Object.assign(t, {name:x.name, dest:x.dest || "", country:x.country || "", start:x.start, end:x.end, cur:x.cur,
           accounts:(x.accounts || []).map(a => ({...a})), sample:!!x.sample});
+        if(!t.items) t.items = [];
+        if(x.lists && typeof x.lists === "object") t.lists = Object.fromEntries(LISTS.map(([k]) => [k, (Array.isArray(x.lists[k]) ? x.lists[k] : []).map(c => ({id:String(c.id), name:String(c.name || "")}))]));
         if(!x.sample) delete t.sample;
         this.base.set(this.path("users", uid, "trips", d.id), JSON.stringify(this.tripDoc(t)));
         if(!this.expUnsub.has(d.id)) this.watchExpenses(d.id);
@@ -786,6 +936,17 @@ const Cloud = {
       this.renderSoon();
     }, e => { toast("讀取資料失敗，請重新整理"); }));
     render();
+  },
+  // 讀到使用者資料後：還沒設暱稱就先請他設定（設好再播歡迎動畫）；剛登入就播歡迎動畫
+  arrive(){
+    let fresh = false;
+    try{ fresh = sessionStorage.getItem(HELLO_KEY) === "1"; sessionStorage.removeItem(HELLO_KEY); }catch(e){}
+    const me = Store.data.user;
+    if(!me.nick && this.carry){ me.nick = this.carry.nick; me.avatar = this.carry.avatar; Store.save(); }
+    this.carry = null;
+    this.ready = true; clearTimeout(this._wait);
+    if(!me.nick) needSetup();
+    else{ render(); if(fresh) hello(nickOf(me)); }
   },
   watchExpenses(tid){
     const F = this.F, uid = this.uid;
@@ -802,14 +963,39 @@ const Cloud = {
       });
       this.renderSoon();
     }, () => {});
-    this.expUnsub.set(tid, off);
+    // 清單項目
+    const offI = F.onSnapshot(F.collection(this.db, "users", uid, "trips", tid, "items"), snap => {
+      const t = Store.trip(tid); if(!t) return;
+      const pre = this.path("users", uid, "trips", tid, "items") + "/";
+      for(const k of [...this.base.keys()]) if(k.startsWith(pre)) this.base.delete(k);
+      t.items = snap.docs.map(d => {
+        const x = d.data();
+        const it = {id:d.id, list:x.list, cat:x.cat, name:x.name || "", note:x.note || "", photo:typeof x.photo === "string" && AVATAR_RE.test(x.photo) ? x.photo : "", done:!!x.done, pos:+x.pos || 0};
+        this.base.set(pre + d.id, JSON.stringify(this.itemJson(it)));
+        return it;
+      });
+      this.renderSoon();
+    }, () => {});
+    this.expUnsub.set(tid, () => { off(); offI(); });
   },
   // ---- 雲端文件的樣子（欄位要跟資料庫規則一致） ----
-  userDoc(){ const lp = Store.data.lastPick || {}; return {name:(Store.data.user && Store.data.user.name || "").slice(0, 60), lastPick:{cat:lp.cat || "food", acct:lp.acct || ""}}; },
+  userDoc(){
+    const lp = Store.data.lastPick || {}, me = Store.data.user || {};
+    const d = {name:(me.name || "").slice(0, 60), lastPick:{cat:lp.cat || "food", acct:lp.acct || ""}};
+    if(me.nick) d.nick = me.nick.slice(0, 12);
+    if(me.avatar && AVATAR_RE.test(me.avatar)) d.avatar = me.avatar;
+    return d;
+  },
   tripDoc(t){
     const d = {name:t.name.slice(0, 24), dest:(t.dest || "").slice(0, 12), country:(t.country || "").slice(0, 20), start:t.start, end:t.end, cur:t.cur,
       accounts:t.accounts.slice(0, 20).map(a => ({id:a.id, name:a.name, method:a.method, cur:a.cur, budget:Math.round(a.budget) || 0}))};
     if(t.sample) d.sample = true;
+    if(t.lists) d.lists = Object.fromEntries(LISTS.map(([k]) => [k, (t.lists[k] || []).slice(0, 30).map(c => ({id:c.id, name:cleanText(c.name, 16)}))]));
+    return d;
+  },
+  itemJson(it){
+    const d = {list:it.list, cat:it.cat, name:cleanText(it.name, 60) || "未命名", note:cleanText(it.note, 120), done:!!it.done, pos:+it.pos || 0};
+    if(it.photo && AVATAR_RE.test(it.photo) && it.photo.length <= 380000) d.photo = it.photo;
     return d;
   },
   expJson(e){ return {title:(e.title || "").slice(0, 40), amount:Math.round(e.amount), cur:e.cur, rate:e.rate, acct:e.acct || null, cat:e.cat, time:new Date(e.time).toISOString(), excluded:!!e.excluded}; },
@@ -821,6 +1007,7 @@ const Cloud = {
     for(const t of Store.data.trips){
       want.set(this.path("users", uid, "trips", t.id), {kind:"trip", data:this.tripDoc(t)});
       for(const e of t.expenses) want.set(this.path("users", uid, "trips", t.id, "expenses", e.id), {kind:"exp", data:this.expJson(e)});
+      for(const it of t.items || []) want.set(this.path("users", uid, "trips", t.id, "items", it.id), {kind:"item", data:this.itemJson(it)});
     }
     const ops = [];
     for(const [path, w] of want){
@@ -833,9 +1020,10 @@ const Cloud = {
     }
     for(const path of [...this.base.keys()]) if(!want.has(path)){ this.base.delete(path); ops.push(["del", path]); }
     // 一批最多 450 筆，分批送出；沒網路時會先存在手機，連上後自動補傳
-    for(let i = 0; i < ops.length; i += 450){
+    // 照片比較大，一批最多 20 筆（Firestore 一批上限約 10MB）
+    for(let i = 0; i < ops.length; i += 20){
       const b = F.writeBatch(db);
-      for(const [op, path, data] of ops.slice(i, i + 450)){ const ref = F.doc(db, path); if(op === "set") b.set(ref, data); else b.delete(ref); }
+      for(const [op, path, data] of ops.slice(i, i + 20)){ const ref = F.doc(db, path); if(op === "set") b.set(ref, data); else b.delete(ref); }
       b.commit().catch(err => { toast(err && err.code === "permission-denied" ? "資料格式不對，這次修改沒有存到雲端" : "同步失敗，請重新整理再試"); });
     }
   },
@@ -886,6 +1074,25 @@ function sampleTrips(){
       ex("咖啡", 650, cash, "food", at(2, 10, 5))
     ]
   };
+  // 範例清單
+  const L = {todo:LIST_DEFAULT.todo, pack:LIST_DEFAULT.pack, shop:LIST_DEFAULT.shop};
+  tokyo.lists = Object.fromEntries(Object.entries(L).map(([k, names]) => [k, names.map(name => ({id:uid("c"), name}))]));
+  const C = (k, n) => tokyo.lists[k][n].id;
+  let pos = 0;
+  const it = (k, n, name, done, note = "") => ({id:uid("i"), list:k, cat:C(k, n), name, note, photo:"", done, pos:++pos});
+  tokyo.items = [
+    it("todo", 0, "護照效期確認", true), it("todo", 0, "Visit Japan Web 填寫", true, "入境、海關都要"),
+    it("todo", 1, "訂機場接送", true), it("todo", 1, "印飯店確認信", false),
+    it("todo", 2, "換日幣 4 萬", true), it("todo", 2, "信用卡開海外刷卡", false),
+    it("todo", 3, "網卡開通", false), it("todo", 3, "行動電源充飽", false),
+    it("pack", 0, "護照", true), it("pack", 0, "日幣現金", true), it("pack", 0, "信用卡", true),
+    it("pack", 1, "換洗衣物 5 套", true), it("pack", 1, "薄外套", false),
+    it("pack", 2, "牙刷牙膏", true), it("pack", 2, "保養品", false),
+    it("pack", 3, "手機充電線", true), it("pack", 3, "轉接頭", false, "日本是 A 型插座，不用轉也可以"),
+    it("pack", 4, "腸胃藥", false), it("pack", 4, "暈車藥", false),
+    it("shop", 0, "合利他命 EX Plus", false, "270 錠"), it("shop", 0, "曼秀雷敦護唇膏", true),
+    it("shop", 1, "東京香蕉", false, "公司同事 2 盒"), it("shop", 2, "薯條三兄弟", false), it("shop", 3, "Suica 企鵝周邊", false)
+  ];
   const os = addDays(today, 340);
   const osaka = {
     id:uid("t"), sample:true, name:"大阪京都五日遊", dest:"大阪", country:"日本", start:ymd(os), end:ymd(addDays(os, 4)), cur:"JPY",
@@ -913,7 +1120,7 @@ function barEl(spent, budget){
 }
 
 /* ================= 畫面 ================= */
-const S = {view:"home", tripId:null, tab:"ledger", fresh:null, prevTab:null, renamingTrip:null, statView:"cat"};
+const S = {view:"home", tripId:null, tab:"ledger", fresh:null, prevTab:null, renamingTrip:null, statView:"cat", setup:false, draft:null};
 let fab = null;
 function go(view, opts = {}){ Object.assign(S, {view, prevTab:null}, opts); render(); window.scrollTo(0, 0); }
 function render(){
@@ -921,6 +1128,8 @@ function render(){
   app.replaceChildren();
   if(fab){ fab.remove(); fab = null; }
   if(!Store.data.user){ app.append(renderLogin()); return; }   // 雲端模式：登入狀態確認前也顯示登入頁（按鈕先停用）
+  if(CLOUD && !Store.guest && !Cloud.ready){ app.append(el("main", {class:"screen login gut"})); return; }   // 讀到個人資料前先留白，不讓首頁閃一下
+  if(S.setup){ app.append(renderSetup()); return; }
   const t = S.view === "trip" ? Store.trip(S.tripId) : null;
   app.append(t ? renderTrip(t) : renderHome());
 }
@@ -939,7 +1148,86 @@ function signIn(){
   if(CLOUD){ Cloud.signIn(); return; }
   Store.data.user = {name:"示範使用者", email:"demo@example.com"};
   if(!Store.data.trips.length) Store.data.trips = sampleTrips();
-  Store.save(); go("home");
+  Store.save(); S.view = "home";
+  const me = Store.data.user;
+  if(!me.nick) needSetup(); else hello(nickOf(me));
+}
+
+/* ---------- 歡迎動畫：一條線畫出地平線和雲，飛機從雲裡鑽出來帶出「歡迎」，再鑽進另一朵雲（只在剛登入時播放，點一下可跳過） ---------- */
+const HELLO_KEY = "travelHelper.hello";
+function hello(name){
+  if(document.querySelector(".hello")) return;
+  const FLY = "M 60 190 C 80 180 90 172 114 172 L 240 172 C 282 172 292 112 302 58";
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches || !(window.CSS && CSS.supports("offset-path", "path('M0 0 L1 1')"));
+  const NS = "http://www.w3.org/2000/svg";
+  const layer = (cls, inner) => { const v = document.createElementNS(NS, "svg"); v.setAttribute("class", "layer " + cls); v.setAttribute("viewBox", "0 0 360 300"); v.setAttribute("aria-hidden", "true"); v.innerHTML = inner; return v; };
+  const trail = layer("hello-trail", `<path d="${FLY}" pathLength="1" style="stroke-dasharray:1 1;stroke-dashoffset:1"/>`);
+  // 雲的內部塗成背景色，擋住後面的飛機；上面再畫一條完整的線
+  // 下面一條線（左下的雲往上鼓）、上面一條線（右上的雲往下垂）；雲的內部塗成背景色，擋住後面的飛機
+  const land = layer("hello-land", `<path class="fill" d="M 8 205 A 13 13 0 0 1 30 196 A 26 26 0 0 1 76 176 A 18 18 0 0 1 106 190 A 12 12 0 0 1 120 205 Z"/><path class="fill" d="M 240 40 A 13 13 0 0 0 262 49 A 26 26 0 0 0 308 69 A 18 18 0 0 0 338 55 A 12 12 0 0 0 352 40 Z"/><path class="line" d="M -50 205 H 8 A 13 13 0 0 1 30 196 A 26 26 0 0 1 76 176 A 18 18 0 0 1 106 190 A 12 12 0 0 1 120 205 H 410" pathLength="1"/><path class="line" d="M 410 40 H 352 A 12 12 0 0 1 338 55 A 18 18 0 0 1 308 69 A 26 26 0 0 1 262 49 A 13 13 0 0 1 240 40 H -50" pathLength="1"/>`);
+  const line = trail.firstChild, horizons = [...land.querySelectorAll(".line")];
+  const plane = el("div", {class:"hello-plane", "aria-hidden":"true"});
+  plane.innerHTML = '<svg viewBox="0 0 32 32"><path d="M30 16c0-1.1-.9-2-2-2h-8.5L12 3H9l4 11H6.5L4 11H2l1.5 5L2 21h2l2.5-3H13L9 29h3l7.5-11H28c1.1 0 2-.9 2-2Z"/></svg>';
+  const word = el("p", {class:"hello-word", text:"歡迎"});
+  const sub = el("p", {class:"hello-sub", text:name ? `${name}，一起出發吧` : "一起出發吧"});
+  // 疊放順序：飛機雲 → 文字 → 飛機 → 雲與地平線（雲蓋在飛機上面）
+  const stage = el("div", {class:"hello-stage"}, trail, word, sub, plane, land);
+  const box = el("div", {class:"hello" + (calm ? " calm" : ""), role:"status", "aria-label":"歡迎"}, stage);
+  document.body.append(box);
+  render();                                                    // 動畫蓋住畫面後，底下換成我的旅程
+  const fit = () => { stage.style.scale = String(Math.min(1, (innerWidth - 32) / 360)); };
+  fit(); addEventListener("resize", fit);
+  const timers = [], anims = [];
+  let raf = 0, ended = false;
+  const finish = () => {
+    if(ended) return; ended = true;
+    timers.forEach(clearTimeout); cancelAnimationFrame(raf); removeEventListener("resize", fit);
+    const o = {duration:700, easing:"cubic-bezier(.4,0,.2,1)", fill:"forwards"};
+    anims.push(word.animate([{transform:"none"}, {transform:"translateY(-10px)"}], o));
+    if(!calm) horizons.forEach(h => { h.getAnimations().forEach(a => a.cancel()); anims.push(h.animate([{strokeDashoffset:"0"}, {strokeDashoffset:"-1"}], o)); });   // 兩條線順著畫的方向收掉，跟開頭呼應
+    box.classList.add("out"); render();                       // 重畫首頁，讓卡片的進場動畫在淡出時播放
+    setTimeout(() => { anims.forEach(a => a.cancel()); box.remove(); }, 750);
+  };
+  box.addEventListener("click", finish);
+  if(calm){
+    trail.remove(); plane.remove();
+    timers.push(setTimeout(() => word.classList.add("on"), 100), setTimeout(() => sub.classList.add("on"), 600), setTimeout(finish, 2600));
+    return;
+  }
+  // ① 下面的線從左往右、上面的線從右往左，同時畫出來
+  horizons.forEach(h => { h.style.strokeDasharray = "1 1"; anims.push(h.animate([{strokeDashoffset:"1"}, {strokeDashoffset:"0"}], {duration:1400, easing:"cubic-bezier(.45,.05,.3,1)", fill:"both"})); });
+  // ② 飛機：依路徑長度找出經過文字的區段——鑽出雲後滑入、經過文字等速、最後加速鑽進雲
+  let a = .2, b = .75;
+  try{
+    const total = line.getTotalLength();
+    const at = x => { let lo = 0, hi = total; for(let i = 0; i < 24; i++){ const m = (lo + hi) / 2; if(line.getPointAtLength(m).x < x) lo = m; else hi = m; } return lo / total; };
+    a = at(114); b = at(240);
+  }catch(e){}
+  const D = 2300, T = {duration:D, delay:700, fill:"both"};
+  const keys = f => [
+    {...f(0), easing:"cubic-bezier(.3,.2,.5,1)"},
+    {...f(a), offset:.22, easing:"linear"},
+    {...f(b), offset:.74, easing:"cubic-bezier(.5,0,.9,.6)"},
+    {...f(1)}];
+  anims.push(plane.animate(keys(d => ({offsetDistance:d * 100 + "%"})), T));
+  anims.push(line.animate(keys(d => ({strokeDashoffset:String(1 - d)})), T));
+  anims.push(plane.animate([{opacity:0}, {opacity:1, offset:.04}, {opacity:1, offset:.95}, {opacity:0}], T));   // 在雲裡才出現、進到雲裡就真的不見
+  anims.push(plane.firstChild.animate([{transform:"scale(.7)"}, {transform:"scale(1)", offset:.22}, {transform:"scale(1)", offset:.74}, {transform:"scale(.8)"}], {...T, easing:"ease-in-out"}));
+  // 「歡迎」跟著飛機的位置一點一點露出來
+  const reveal = () => {
+    const w = word.getBoundingClientRect(), p = plane.getBoundingClientRect();
+    const k = w.width / word.offsetWidth || 1;                 // 畫面縮放比例
+    const x = (p.left + p.width * .55 - w.left) / k;           // 飛機在文字上的位置（文字自己的座標）
+    const m = `linear-gradient(90deg,#000 ${x - 40}px,transparent ${x}px)`;   // 邊緣柔和地淡入，像墨水暈開
+    word.style.webkitMaskImage = m; word.style.maskImage = m;
+    if(x - 40 < word.offsetWidth && !ended) raf = requestAnimationFrame(reveal);
+    else { word.style.webkitMaskImage = "none"; word.style.maskImage = "none"; }
+  };
+  raf = requestAnimationFrame(reveal);
+  timers.push(
+    setTimeout(() => { line.style.opacity = "0"; }, 700 + D * .9),
+    setTimeout(() => sub.classList.add("on"), 700 + D * .8),
+    setTimeout(finish, 700 + D + 450));
 }
 
 // 訪客模式：先講清楚資料可能不見，使用者確認後才開始
@@ -957,19 +1245,119 @@ function startGuest(){
   ok.style.visibility = "hidden";
   go1.addEventListener("click", () => {
     try{ localStorage.setItem(GUEST_KEY, "1"); }catch(e){ toast("這個瀏覽器無法儲存資料，請改用 Google 登入"); return; }
-    Store.load(); Store.save(); close(); go("home");
+    Store.load(); Store.save(); close(); S.view = "home";
+    const me = Store.data.user;
+    if(!me.nick) needSetup(); else hello(nickOf(me));
   });
 }
 
 /* ---------- 我的旅程 ---------- */
-function avatarBtn(u){
-  const b = el("button", {type:"button", class:"me-btn", "aria-label":"帳號", onclick:openMe});
-  if(u.photo && /^https:\/\/[a-z0-9.-]+\.googleusercontent\.com\//.test(u.photo)){   // 只顯示 Google 的頭像網址
-    const img = el("img", {src:u.photo.replace(/=s\d+-c$/, "=s192-c"), alt:"", referrerPolicy:"no-referrer", width:36, height:36});
-    img.addEventListener("error", () => { img.remove(); b.textContent = u.name.slice(0, 1); });
-    b.append(img);
-  } else b.textContent = u.name.slice(0, 1);
+// 頭貼：只顯示使用者自己選、在手機上重新壓過的 JPEG；沒有就顯示暱稱第一個字
+const AVATAR_RE = /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/;
+const nickOf = u => (u && (u.nick || (u.guest ? "訪客" : u.name))) || "我";
+function avatarFace(u, b = el("span", {class:"me-btn", "aria-hidden":"true"})){
+  if(u.avatar && AVATAR_RE.test(u.avatar)) b.append(el("img", {src:u.avatar, alt:"", width:36, height:36}));
+  else b.textContent = [...nickOf(u)][0];
   return b;
+}
+const avatarBtn = u => avatarFace(u, el("button", {type:"button", class:"me-btn", "aria-label":"帳號", onclick:openMe}));
+// 暱稱：去掉看不見的控制字元（含會讓文字反向顯示的字元），最多 12 字
+const cleanText = (v, n) => [...String(v || "").replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/g, "").trim()].slice(0, n).join("");
+const cleanNick = v => cleanText(v, 12);
+// 選好的照片：只收 JPG／PNG → 置中裁成正方形 → 縮成 192×192 → 重新存成 JPEG
+// 重新畫一次就不會帶著原檔的拍攝地點（GPS）等資訊，原始照片也不會上傳
+// square：裁成正方形（頭貼）；否則保留比例，長邊縮到 max（清單照片）。limit 是存檔字數上限（要跟資料庫規則一致）
+async function makeImage(file, max, square, limit){
+  if(!file || !/^image\/(jpeg|png)$/.test(file.type)) throw "type";
+  if(file.size > 25 * 1024 * 1024) throw "size";
+  const url = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = no; r.readAsDataURL(file); });
+  const img = new Image(); img.src = url; await img.decode();
+  const w = img.naturalWidth, h = img.naturalHeight, side = Math.min(w, h);
+  if(!side) throw "decode";
+  for(const [m, q] of [[max, .82], [max, .68], [Math.round(max * .75), .62]]){
+    const k = square ? m / side : Math.min(1, m / Math.max(w, h));
+    const cw = square ? m : Math.round(w * k), ch = square ? m : Math.round(h * k);
+    const c = document.createElement("canvas"); c.width = cw; c.height = ch;
+    const g = c.getContext("2d");
+    g.fillStyle = "#fff"; g.fillRect(0, 0, cw, ch);           // 透明的 PNG 墊白底
+    g.imageSmoothingQuality = "high";
+    if(square) g.drawImage(img, (w - side) / 2, (h - side) / 2, side, side, 0, 0, cw, ch);
+    else g.drawImage(img, 0, 0, cw, ch);
+    const out = c.toDataURL("image/jpeg", q);
+    if(out.length <= limit && AVATAR_RE.test(out)) return out;
+  }
+  throw "big";
+}
+const makeAvatar = file => makeImage(file, 192, true, 60000);
+const makePhoto = file => makeImage(file, 1280, false, 380000);     // 清單照片：要能放大給店員看，留大一點
+// 個人資料的編輯元件：頭貼選擇＋暱稱輸入；D 是草稿（{nick, avatar}），畫面重畫也不會弄丟
+function profileEditor(D, nickProps){
+  const nick = el("input", {maxLength:12, placeholder:"大家怎麼叫你？", autocomplete:"nickname", enterkeyhint:"done", value:D.nick || "", ...nickProps});
+  const file = el("input", {type:"file", accept:"image/jpeg,image/png", hidden:true, "aria-hidden":"true", tabIndex:-1});
+  const pic = el("button", {type:"button", class:"pf-pic", "aria-label":"選擇頭貼照片", onclick:() => file.click()});
+  const pick = el("button", {type:"button", class:"text-btn", onclick:() => file.click()});
+  const rm = el("button", {type:"button", class:"text-btn", style:"color:var(--bad)", text:"移除照片", onclick:() => { D.avatar = ""; paint(); }});
+  const paint = () => {
+    const ch = [...cleanNick(nick.value)][0];
+    pic.replaceChildren(D.avatar ? el("img", {src:D.avatar, alt:""}) : ch ? el("span", {text:ch}) : el("span", {class:"ph"}, icon("user", 44, 1.3)),
+      el("span", {class:"badge", "aria-hidden":"true"}, icon("camera", 16, 1.8)));
+    pick.textContent = D.avatar ? "換一張照片" : "選擇照片";
+    rm.hidden = !D.avatar;
+  };
+  nick.addEventListener("input", () => { D.nick = nick.value; paint(); });
+  file.addEventListener("change", async () => {
+    const f = file.files && file.files[0]; file.value = "";
+    if(!f) return;
+    pic.classList.add("busy");
+    try{ D.avatar = await makeAvatar(f); paint(); }
+    catch(e){ toast(e === "type" ? "只能選 JPG 或 PNG 照片" : e === "size" ? "照片太大了，請換一張" : "這張照片讀不出來，請換一張"); }
+    finally{ pic.classList.remove("busy"); }
+  });
+  paint();
+  return {nick, file, pf:el("div", {class:"pf"}, pic, el("div", {style:"display:flex;gap:20px"}, pick, rm))};
+}
+// 之後修改個人資料：從帳號頁打開的表單
+function openProfile(){
+  const u = Store.data.user;
+  const D = {nick:u.nick || "", avatar:u.avatar && AVATAR_RE.test(u.avatar) ? u.avatar : ""};
+  const ed = profileEditor(D, {id:"p-nick"});
+  const body = el("div", null, ed.pf,
+    el("div", {class:"grp", style:"margin-top:14px"}, line("暱稱", ed.nick)),
+    el("p", {class:"hint", style:"margin:10px 16px 0", text:"照片會裁成正方形並縮小，拍攝地點等資訊不會留下。"}),
+    ed.file);
+  const save = () => {
+    const n = cleanNick(ed.nick.value);
+    if(!n){ toast("請輸入暱稱"); ed.nick.focus(); return; }
+    u.nick = n; u.avatar = D.avatar; Store.save(); close(); render(); toast("已更新個人資料");
+  };
+  const {close} = openSheet({title:"個人資料", done:"完成", body, onDone:save});
+  ed.nick.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); save(); } });
+}
+// 第一次登入：全白的設定頁 → 歡迎動畫 → 我的旅程
+function needSetup(){ S.setup = true; S.draft = null; render(); }
+function renderSetup(){
+  const u = Store.data.user;
+  const D = S.draft || (S.draft = {nick:u.nick || "", avatar:u.avatar && AVATAR_RE.test(u.avatar) ? u.avatar : ""});
+  const ed = profileEditor(D, {id:"p-nick", class:"setup-in", "aria-label":"暱稱"});
+  const next = el("button", {type:"button", class:"g-btn", text:"繼續"});
+  const check = () => { next.disabled = !cleanNick(ed.nick.value); };
+  const done = () => {
+    const n = cleanNick(ed.nick.value);
+    if(!n){ ed.nick.focus(); return; }
+    ed.nick.blur();
+    u.nick = n; u.avatar = D.avatar; S.setup = false; S.draft = null; Store.save();
+    hello(n);                                                  // 歡迎動畫先蓋上來，底下再換成我的旅程
+  };
+  ed.nick.addEventListener("input", check);
+  ed.nick.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); done(); } });
+  next.addEventListener("click", done);
+  check();
+  return el("main", {class:"screen login setup gut"},
+    el("h1", {text:"怎麼稱呼你？"}),
+    el("p", {class:"lede"}, el("span", {text:"選一張照片、取個暱稱，"}), el("span", {text:"旅遊小幫手會這樣稱呼你。"})),
+    ed.pf, ed.nick, next,
+    el("small", {text:"照片會裁成正方形並縮小，拍攝地點等資訊不會留下。"}),
+    ed.file);
 }
 
 function renderHome(){
@@ -979,11 +1367,20 @@ function renderHome(){
   const head = el("header", {class:"gut"}, el("div", {class:"col"},
     el("div", {class:"top"}, Store.guest ? el("button", {type:"button", class:"offline", onclick:openMe, text:"訪客模式・資料只在這台裝置"})
       : CLOUD && !navigator.onLine ? el("span", {class:"offline", text:"離線中，連上網路後自動同步"}) : el("span"), avatarBtn(u)),
-    el("div", {class:"head"}, el("h1", {text:"我的旅程"}), el("p", {text:trips.length ? `${trips.length} 趟旅程${trips.some(t => t.sample) ? "・含範例資料" : ""}` : `你好，${u.name}`}))));
+    el("div", {class:"head"}, el("h1", {text:"我的旅程"}), el("p", {text:trips.length ? `${trips.length} 趟旅程${trips.some(t => t.sample) ? "・含範例資料" : ""}` : `你好，${nickOf(u)}`}))));
+  // 三區：準備中 → 旅途中 → 已結束（順序照姊姊的建議），用分割線隔開
+  const SECS = [["before", "準備中", "沒有準備中的旅程"], ["during", "旅途中", "沒有正在進行的旅程"], ["after", "已結束", "沒有已結束的旅程"]];
+  let n = 0;
+  const phases = el("div", {class:"phases"}, SECS.map(([key, label, none]) => {
+    const list = trips.filter(t => phase(t).key === key);
+    return el("section", {"aria-label":label},
+      el("h2", {class:"sec-h"}, el("span", {text:label}), list.length ? el("span", {class:"n", text:String(list.length)}) : null),
+      list.length ? el("div", {class:"stack"}, list.map(t => tripCard(t, n++))) : el("p", {class:"sec-none", text:none}));
+  }));
   const band = el("section", {class:"band gut"}, el("div", {class:"col"},
-    el("div", {class:"stack"}, trips.length ? trips.map((t, i) => tripCard(t, i)) : el("div", {class:"card rise"}, el("div", {class:"empty"}, el("b", {text:"還沒有旅程"}), el("span", {text:"按下方「新增旅程」，開始記第一趟"})))),
+    trips.length ? phases : el("div", {class:"card rise"}, el("div", {class:"empty"}, el("b", {text:"還沒有旅程"}), el("span", {text:"按下方「新增旅程」，開始記第一趟"}))),
     el("div", {style:"margin-top:8px;padding-left:4px"}, el("button", {type:"button", class:"link-btn", onclick:() => openTripForm()}, icon("plus", 18, 1.8), el("span", {text:"新增旅程"})))));
-  return el("main", {class:"screen"}, head, band);
+  return el("main", {class:"screen home"}, head, band);
 }
 function tripCard(t, i){
   const ph = phase(t), tot = totals(t);
@@ -1005,6 +1402,7 @@ function tripCard(t, i){
     el("div", {class:"trip-top"},
       el("span", null, el("b", {text:t.name}), el("span", {class:"d", text:sub})),
       el("span", {class:"pill " + ph.key, text:ph.label})),
+    ph.key !== "after" && listSummary(t) ? el("div", {class:"trip-lists", text:listSummary(t)}) : null,
     el("div", {class:"trip-foot"}, el("span", {text:"剩餘預算"}), el("b", {class:"num", text:fmt(tot.left, "TWD")})));
   // 長按（或電腦按右鍵）：浮起卡片，跳出選單
   card.addEventListener("pointerdown", e => {
@@ -1064,7 +1462,7 @@ function renderTrip(t){
   if(S.tab === "ledger") body.append(...ledger(t));
   else if(S.tab === "stats") body.append(...stats(t));
   else if(S.tab === "conv") body.append(...converter(t));
-  else body.append(el("div", {class:"card rise"}, el("div", {class:"empty"}, el("b", {text:"清單會在第二階段加入"}), el("span", {text:"行前待辦、行李檢查、購物清單"}))));
+  else body.append(...lists(t));
   const band = el("section", {class:"band gut", style:"padding-top:0"}, segNav(), body);
   if(S.tab === "ledger"){
     fab = el("button", {type:"button", class:"fab", onclick:() => openExpense(t)}, icon("plus", 20, 2), el("span", {text:"記一筆"}));
@@ -1073,19 +1471,10 @@ function renderTrip(t){
   return el("main", {class:"screen"}, head, band);
 }
 // 分頁：玻璃膠囊＋白色滑塊，從上一個分頁滑到新的分頁
-function segNav(){
-  const tabs = [["ledger", "記帳"], ["lists", "清單"], ["stats", "統計"], ["conv", "換算"]];
-  const thumb = el("span", {class:"thumb", "aria-hidden":"true"});
-  let noSlide = false;
-  const cap = el("div", {class:"cap", role:"tablist", "aria-label":"旅程分頁"}, thumb, tabs.map(([id, label]) =>
-    el("button", {type:"button", role:"tab", "aria-selected":String(S.tab === id), "data-id":id, text:label, onclick:ev => {
-      if(cap._suppress && ev.isTrusted) return;
-      if(S.tab === id){ window.scrollTo({top:0, behavior:"smooth"}); return; }
-      const y = Math.min(scrollY, document.querySelector(".band").offsetTop);
-      S.prevTab = noSlide ? null : S.tab; noSlide = false; S.tab = id; render(); window.scrollTo(0, y);
-    }})));
+// 所有玻璃滑塊共用：按住滑塊左右拖，經過每一格輕震一下，放開切到最近的那一格（大的分頁列、小的分段都用這個）
+// pick(b)：放開時要切到的那一格；各按鈕的 onclick 要略過 cap._suppress 期間的真實點擊
+function segDrag(cap, thumb, pick){
   const put = b => { thumb.style.width = b.offsetWidth + "px"; thumb.style.translate = `${b.offsetLeft}px 0`; };
-  // 按住滑塊左右拖，放開時切到最近的那一格
   const btns = () => [...cap.querySelectorAll("button")];
   const tabAt = x => btns().reduce((best, b) => Math.abs(b.offsetLeft + b.offsetWidth / 2 - x) < Math.abs(best.offsetLeft + best.offsetWidth / 2 - x) ? b : best);
   let drag = null;
@@ -1110,9 +1499,23 @@ function segNav(){
     btns().forEach(t => t.classList.remove("over"));
     cap._suppress = true; setTimeout(() => { cap._suppress = false; }, 300);
     const b = d.over || tabAt(e.clientX - d.left);
-    if(b.dataset.id === S.tab) put(b); else { noSlide = true; b.click(); }
+    if(b.getAttribute("aria-selected") === "true" || b.getAttribute("aria-pressed") === "true") put(b); else pick(b);
   };
   cap.addEventListener("pointerup", endDrag); cap.addEventListener("pointercancel", endDrag);
+}
+// 玻璃滑塊分頁列（旅程頁、首頁共用）：點一下切換，或按住滑塊左右拖
+function segNav(tabs = [["ledger", "記帳"], ["lists", "清單"], ["stats", "統計"], ["conv", "換算"]], key = "tab", label = "旅程分頁"){
+  const thumb = el("span", {class:"thumb", "aria-hidden":"true"});
+  let noSlide = false;
+  const cap = el("div", {class:"cap", role:"tablist", "aria-label":label}, thumb, tabs.map(([id, text]) =>
+    el("button", {type:"button", role:"tab", "aria-selected":String(S[key] === id), "data-id":id, text, onclick:ev => {
+      if(cap._suppress && ev.isTrusted) return;
+      if(S[key] === id){ window.scrollTo({top:0, behavior:"smooth"}); return; }
+      const y = Math.min(scrollY, document.querySelector(".band").offsetTop);
+      S.prevTab = noSlide ? null : S[key]; noSlide = false; S[key] = id; render(); window.scrollTo(0, y);
+    }})));
+  const put = b => { thumb.style.width = b.offsetWidth + "px"; thumb.style.translate = `${b.offsetLeft}px 0`; };
+  segDrag(cap, thumb, b => { noSlide = true; b.click(); });
   const place = () => {
     const cur = cap.querySelector('[aria-selected="true"]'), prev = S.prevTab && cap.querySelector(`[data-id="${S.prevTab}"]`);
     if(prev && !thumb.classList.contains("ready")){ put(prev); thumb.getBoundingClientRect(); }
@@ -1188,7 +1591,8 @@ function stats(t){
   const pane = el("div", {class:"st-pane"});
   const thumb = el("span", {class:"thumb", "aria-hidden":"true"});
   const seg = el("div", {class:"mini-seg", role:"tablist", "aria-label":"統計方式"}, thumb, views.map(([id, label]) =>
-    el("button", {type:"button", role:"tab", "data-id":id, "aria-selected":String((S.statView || "cat") === id), text:label, onclick:() => show(id)})));
+    el("button", {type:"button", role:"tab", "data-id":id, "aria-selected":String((S.statView || "cat") === id), text:label, onclick:ev => { if(seg._suppress && ev.isTrusted) return; show(id); }})));
+  segDrag(seg, thumb, b => b.click());
   const place = anim => { const b = seg.querySelector('[aria-selected="true"]'); if(!b) return; if(anim) thumb.classList.add("ready"); thumb.style.width = b.offsetWidth + "px"; thumb.style.translate = `${b.offsetLeft}px 0`; };
   const show = id => {
     S.statView = id;
@@ -1544,8 +1948,17 @@ function openExpense(t, e){
   const shown = el("span", {class:"shown", "aria-hidden":"true"}), caret = el("span", {class:"caret", "aria-hidden":"true"});
   const conv = el("div", {class:"conv num", "aria-live":"polite"});
   const curs = [...new Set([t.cur, "TWD"])];
-  const seg = el("div", {class:"cur-seg", role:"group", "aria-label":"幣別"}, curs.map(c =>
-    el("button", {type:"button", "aria-pressed":String(st.cur === c), text:c, onclick:ev => { st.cur = c; seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b === ev.currentTarget))); update(); amt.focus(); }})));
+  // 幣別：跟其他地方一樣的玻璃滑塊，可以點也可以按住拖
+  const cthumb = el("span", {class:"thumb", "aria-hidden":"true"});
+  const seg = el("div", {class:"mini-seg cur-seg", role:"group", "aria-label":"幣別"}, cthumb, curs.map(c =>
+    el("button", {type:"button", "aria-pressed":String(st.cur === c), text:c, onclick:ev => {
+      if(seg._suppress && ev.isTrusted) return;
+      st.cur = c; seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b === ev.currentTarget))); cplace(true); update(); amt.focus();
+    }})));
+  const cplace = anim => { const b = seg.querySelector('[aria-pressed="true"]'); if(!b) return; if(anim) cthumb.classList.add("ready"); cthumb.style.width = b.offsetWidth + "px"; cthumb.style.translate = `${b.offsetLeft}px 0`; };
+  segDrag(seg, cthumb, b => b.click());
+  requestAnimationFrame(() => requestAnimationFrame(() => cplace(false)));
+  if(document.fonts) document.fonts.ready.then(() => cplace(false));
   const title = el("input", {id:"f-title", maxLength:40, placeholder:catOf(st.cat).name, autocomplete:"off"});
   if(e) title.value = e.title;
   const cats = el("div", {class:"cats", role:"group", "aria-label":"類別"}, CATS.map(c => {
@@ -1719,15 +2132,361 @@ function openAccountForm(t, a){
   });
 }
 
+/* ================= 清單（FR-L01–L05） ================= */
+const LISTS = [["todo", "行前待辦", "待辦"], ["pack", "行李檢查", "行李"], ["shop", "購物清單", "購物"]];
+const LIST_DEFAULT = {todo:["證件文件", "交通住宿", "金錢", "出發前一天"], pack:["證件錢包", "衣物", "盥洗保養", "3C", "藥品", "其他"], shop:["藥妝", "零食", "伴手禮", "其他"]};
+// 第一次打開清單時放入預設類別（之後完全可以自己改）
+function ensureLists(t){
+  let changed = false;
+  if(!t.lists || typeof t.lists !== "object"){ t.lists = {}; changed = true; }
+  for(const [k] of LISTS) if(!Array.isArray(t.lists[k]) || !t.lists[k].length){ t.lists[k] = LIST_DEFAULT[k].map(name => ({id:uid("c"), name})); changed = true; }
+  if(!Array.isArray(t.items)){ t.items = []; changed = true; }
+  return changed;
+}
+const itemsOf = (t, k) => (t.items || []).filter(i => i.list === k);
+const doneOf = a => a.filter(i => i.done).length;
+function listSummary(t){
+  const parts = LISTS.map(([k, , short]) => { const a = itemsOf(t, k); return a.length ? `${short} ${doneOf(a)}/${a.length}` : ""; }).filter(Boolean);
+  return parts.join(" · ");
+}
+function lists(t){
+  if(ensureLists(t)) Store.save();
+  let k = S.listKind || "todo";
+  const thumb = el("span", {class:"thumb", "aria-hidden":"true"});
+  const seg = el("div", {class:"mini-seg", role:"tablist", "aria-label":"清單"}, thumb, LISTS.map(([id, , short]) =>
+    el("button", {type:"button", role:"tab", "data-id":id, "aria-selected":String(k === id), text:short, onclick:ev => { if(seg._suppress && ev.isTrusted) return; show(id); }})));
+  segDrag(seg, thumb, b => b.click());
+  const place = anim => { const b = seg.querySelector('[aria-selected="true"]'); if(!b) return; if(anim) thumb.classList.add("ready"); thumb.style.width = b.offsetWidth + "px"; thumb.style.translate = `${b.offsetLeft}px 0`; };
+  const title = el("b"), num = el("span", {class:"num"}), bar = el("div", {class:"pbar", role:"progressbar", "aria-valuemin":"0", "aria-valuemax":"100"}, el("i"));
+  const top = el("div", {class:"card ls-top rise"}, el("div", {class:"mini-wrap"}, seg), el("div", {class:"ls-k"}, title, num), bar);
+  const pane = el("div", {class:"ls-pane"});
+  // 完成數、進度條：打勾後立刻更新（FR-L04）
+  const paintTop = () => {
+    const a = itemsOf(t, k), d = doneOf(a), p = a.length ? d / a.length : 0;
+    title.textContent = LISTS.find(x => x[0] === k)[1];
+    num.replaceChildren(el("em", {text:String(d)}), document.createTextNode(` / ${a.length}`));
+    bar.classList.toggle("full", a.length > 0 && d === a.length);
+    bar.setAttribute("aria-valuenow", String(Math.round(p * 100)));
+    requestAnimationFrame(() => { bar.firstChild.style.width = p * 100 + "%"; });
+    pane.querySelectorAll(".lcat").forEach(sec => {
+      const its = a.filter(i => i.cat === sec.dataset.cat);
+      sec.querySelector(".lcat-h span").textContent = its.length ? `${doneOf(its)}/${its.length}` : "";
+    });
+  };
+  const build = () => { pane.replaceChildren(listPane(t, k, paintTop, build)); paintTop(); };
+  const show = id => {
+    if(id === k){ place(true); return; }
+    k = S.listKind = id;
+    seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.id === id)));
+    place(true); build();
+    pane.classList.remove("fade-in"); void pane.offsetWidth; pane.classList.add("fade-in");
+  };
+  build();
+  requestAnimationFrame(() => place(false));
+  if(document.fonts) document.fonts.ready.then(() => place(false));
+  return [top, pane];
+}
+// 一個清單：依類別分組；每組最後一列可以直接打字新增
+function listPane(t, k, paintTop, rebuild){
+  const cats = t.lists[k], all = itemsOf(t, k);
+  for(const it of all) if(!cats.some(c => c.id === it.cat)) it.cat = cats[0].id;     // 類別被刪掉的項目放到第一類
+  const wrap = el("div", null, cats.map(c => {
+    const its = all.filter(i => i.cat === c.id).sort((a, b) => a.pos - b.pos);
+    const inp = el("input", {id:`add-${c.id}`, maxLength:60, placeholder:"新增項目", enterkeyhint:"done", autocomplete:"off", "aria-label":`在「${c.name}」新增項目`});
+    const commit = refocus => {
+      const v = cleanText(inp.value, 60); if(!v) return;
+      const pos = its.reduce((m, i) => Math.max(m, i.pos), 0) + 1;
+      t.items.push({id:uid("i"), list:k, cat:c.id, name:v, note:"", photo:"", done:false, pos});
+      inp.value = ""; Store.save(); rebuild();
+      if(refocus){ const n = document.getElementById(`add-${c.id}`); if(n) n.focus({preventScroll:true}); }
+    };
+    inp.addEventListener("keydown", e => { if(e.key === "Enter" && !e.isComposing){ e.preventDefault(); commit(true); } });
+    inp.addEventListener("blur", () => commit(false));
+    return el("section", {class:"lcat", "data-cat":c.id, "aria-label":c.name},
+      el("h3", {class:"lcat-h"}, document.createTextNode(c.name), el("span")),
+      el("div", {class:"lgrp"}, its.map(it => itemRow(t, it, paintTop)),
+        el("div", {class:"li add", "data-cat":c.id}, el("span", {class:"plus", "aria-hidden":"true"}, icon("plus", 18, 2)), inp)));
+  }), el("div", {class:"ls-tools"}, el("button", {type:"button", class:"link-btn", onclick:() => openCats(t, k)}, icon("sliders", 18, 1.8), el("span", {text:"編輯類別"}))));
+  // 長按拖動排序，可以拖到別的類別（FR-L03）
+  // 放開時：只有被拖的那一項換位置／換類別，其他項目不動
+  enableItemDrag(wrap, (row, target) => {
+    const movedId = row.dataset.id, moved = all.find(x => x.id === movedId);
+    if(!moved) return;
+    const order = [...wrap.querySelectorAll(".li.item")].map(r => r.dataset.id).filter(id => id !== movedId);
+    moved.cat = target ? target.dataset.cat : cats[cats.length - 1].id;
+    let at = order.length;
+    if(target && target.classList.contains("item")) at = order.indexOf(target.dataset.id);
+    else if(target){                                          // 落在某一類的「新增項目」上 → 放到那一類的最後
+      const ids = all.filter(x => x.cat === moved.cat && x.id !== movedId).map(x => x.id);
+      const last = order.reduce((m, id, n) => ids.includes(id) ? n : m, -1);
+      at = last >= 0 ? last + 1 : order.findIndex(id => cats.findIndex(c => c.id === all.find(x => x.id === id).cat) > cats.findIndex(c => c.id === moved.cat));
+      if(at < 0) at = order.length;
+    }
+    order.splice(at, 0, movedId);
+    order.forEach((id, n) => { const it = all.find(x => x.id === id); if(it) it.pos = n + 1; });
+    Store.save(); rebuild();
+    const landed = document.querySelector(`.li[data-id="${movedId}"]`);
+    if(landed && !matchMedia("(prefers-reduced-motion: reduce)").matches){ landed.classList.remove("moved"); void landed.offsetWidth; landed.classList.add("moved"); }
+  });
+  return wrap;
+}
+function itemRow(t, it, paintTop){
+  const row = el("div", {class:"li item" + (it.done ? " done" : ""), "data-id":it.id, "data-cat":it.cat});
+  const ck = el("button", {type:"button", class:"ck", role:"checkbox", "aria-checked":String(!!it.done), "aria-label":it.name}, el("i", null, icon("check", 14, 2.6)));
+  ck.addEventListener("click", () => {
+    it.done = !it.done;
+    row.classList.toggle("done", it.done); ck.setAttribute("aria-checked", String(it.done));
+    try{ if(it.done && navigator.vibrate) navigator.vibrate(8); }catch(e){}
+    Store.save(); paintTop();
+  });
+  const tx = el("button", {type:"button", class:"tx", onclick:() => openItem(t, it)}, el("b", {text:it.name}), it.note ? el("span", {text:it.note}) : null);
+  const pic = it.photo && AVATAR_RE.test(it.photo) ? el("button", {type:"button", class:"pic", "aria-label":`放大「${it.name}」的照片`, onclick:() => viewPhoto(it.photo, it.name)}, el("img", {src:it.photo, alt:""})) : null;
+  row.append(ck, tx); if(pic) row.append(pic);
+  return row;
+}
+// ---- 拖動排序的核心：拿起一列跟著手指走，其他列讓位，放開後交給 onMove（改寫自貓咪小幫手） ----
+function dragSession(list, rowSel, row, startY, onMove, cap, pointerId){
+  const rows = [...list.querySelectorAll(rowSel)], i = rows.indexOf(row);
+  if(i < 0) return;
+  const rects = rows.map(r => r.getBoundingClientRect());
+  const minDy = rects[0].top - rects[i].top, maxDy = rects[rects.length - 1].bottom - rects[i].bottom;
+  let j = i, moved = false;
+  row.classList.remove("pressing"); row.classList.add("dragging"); document.body.classList.add("is-dragging");
+  rows.forEach(r => { if(r !== row) r.classList.add("shifting"); });
+  try{ cap.setPointerCapture(pointerId); }catch(err){}
+  const move = ev => {
+    if(ev.pointerId !== pointerId) return;
+    moved = true;
+    const raw = ev.clientY - startY, dy = Math.max(minDy - 8, Math.min(maxDy + 8, raw));
+    row.style.transform = `translateY(${dy}px)`;
+    const c = (rects[i].top + rects[i].bottom) / 2 + raw;
+    j = i;
+    rects.forEach((r, k) => { const m = (r.top + r.bottom) / 2; if(k > i && c > m) j = Math.max(j, k); if(k < i && c < m) j = Math.min(j, k); });
+    // 讓位的每一列移到「上一列／下一列原本的位置」：跨類別時剛好跳進另一個區塊，不會壓到類別標題
+    rows.forEach((r, k) => { if(k === i) return; let sh = 0; if(j > i && k > i && k <= j) sh = rects[k - 1].top - rects[k].top; if(j < i && k >= j && k < i) sh = rects[k + 1].bottom - rects[k].bottom; r.style.transform = sh ? `translateY(${sh}px)` : ""; });
+  };
+  const up = ev => {
+    if(ev.pointerId !== pointerId) return;
+    cap.removeEventListener("pointermove", move); cap.removeEventListener("pointerup", up); cap.removeEventListener("pointercancel", up);
+    document.body.classList.remove("is-dragging");
+    setTimeout(() => { list._suppressClick = false; }, 400);
+    const reset = () => { row.classList.remove("dragging", "settling"); row.style.transform = ""; rows.forEach(r => { r.classList.remove("shifting"); r.style.transform = ""; }); };
+    if(!moved || j === i){ row.classList.add("settling"); row.style.transform = ""; setTimeout(reset, 230); return; }
+    const target = j > i ? rects[j].bottom - rects[i].bottom : rects[j].top - rects[i].top;
+    row.classList.add("settling"); row.style.transform = `translateY(${target}px)`;
+    setTimeout(() => onMove(i, j), matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 230);
+  };
+  cap.addEventListener("pointermove", move); cap.addEventListener("pointerup", up); cap.addEventListener("pointercancel", up);
+}
+document.addEventListener("touchmove", e => { if(document.body.classList.contains("is-dragging")) e.preventDefault(); }, {passive:false});
+// 清單項目的拖動：拿起的項目浮在手指下，放開後會落的地方空出一格，其他項目平滑讓位（可以跨類別）；靠近畫面上下緣會自動捲動
+function itemDrag(list, row, sy, pid, onDrop){
+  const r0 = row.getBoundingClientRect(), grab = sy - r0.top;
+  const ph = el("div", {class:"li ph", "aria-hidden":"true", style:`height:${r0.height}px`});
+  row.before(ph);
+  row.classList.remove("pressing"); row.classList.add("lifted");
+  Object.assign(row.style, {left:r0.left - 12 + "px", top:r0.top + "px", width:r0.width + 20 + "px"});   // 浮起來時左右多一點留白，像一張卡
+  document.body.classList.add("is-dragging");
+  const anim = () => !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // 移動空格：先記下每一列的位置，換位後用 transform 從舊位置滑到新位置（FLIP）
+  const flip = change => {
+    const els = [...list.querySelectorAll(".li:not(.lifted), .lcat-h")];
+    const before = new Map(els.map(e => [e, e.getBoundingClientRect().top]));
+    change();
+    if(!anim()) return;
+    for(const e of els){
+      const d = before.get(e) - e.getBoundingClientRect().top; if(!d) continue;
+      e.animate([{transform:`translateY(${d}px)`}, {transform:"none"}], {duration:200, easing:"cubic-bezier(.2,.8,.2,1)"});
+    }
+  };
+  let lastY = sy, raf = 0, last = null;
+  const place = () => {
+    const top = lastY - grab;
+    row.style.top = top + "px";
+    const c = top + r0.height / 2;
+    const cands = [...list.querySelectorAll(".li.item:not(.lifted), .li.add")];
+    let target = null;
+    for(const r of cands){
+      const b = r.getBoundingClientRect();
+      if(r.classList.contains("add") && c >= b.top && c <= b.bottom){ target = r; break; }   // 停在「新增項目」上 → 那一類的最後
+      if(c < b.top + b.height / 2){ target = r; break; }
+    }
+    if(!target) target = cands[cands.length - 1];          // 超過最下面 → 最後一類的最後
+    if(target !== last && ph.nextElementSibling !== target){
+      last = target;
+      flip(() => target.before(ph));
+      try{ if(navigator.vibrate) navigator.vibrate(4); }catch(err){}
+    }
+  };
+  const tick = () => {
+    const edge = 90; let v = 0;
+    if(lastY < edge) v = -Math.min(18, (edge - lastY) / 5); else if(lastY > innerHeight - edge) v = Math.min(18, (lastY - (innerHeight - edge)) / 5);
+    if(v){ const b = scrollY; scrollBy(0, v); if(scrollY !== b) place(); }
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+  const move = ev => { if(ev.pointerId !== pid) return; lastY = ev.clientY; place(); };
+  const up = ev => {
+    if(ev.pointerId !== pid) return;
+    removeEventListener("pointermove", move); removeEventListener("pointerup", up); removeEventListener("pointercancel", up);
+    cancelAnimationFrame(raf); document.body.classList.remove("is-dragging");
+    setTimeout(() => { list._suppressClick = false; }, 400);
+    const target = ph.nextElementSibling, home = row.nextElementSibling === ph || ph.nextElementSibling === row;
+    const to = ph.getBoundingClientRect();
+    row.classList.add("settling"); row.style.top = to.top + "px"; row.style.left = to.left - 12 + "px";
+    setTimeout(() => {
+      if(ev.type === "pointercancel" || home || target === row){
+        ph.remove(); row.classList.remove("lifted", "settling"); row.removeAttribute("style"); return;
+      }
+      onDrop(row, target);
+    }, anim() ? 220 : 0);
+  };
+  addEventListener("pointermove", move); addEventListener("pointerup", up); addEventListener("pointercancel", up);
+  place();
+}
+// 長按一列約 0.4 秒就能拖（像 iPhone）；手指先移動就當作捲動
+function enableItemDrag(list, onDrop){
+  list.querySelectorAll(".li.item").forEach(row => {
+    row.addEventListener("pointerdown", e => {
+      if(e.button > 0 || !e.isPrimary || e.target.closest(".ck, .pic")) return;
+      const sx = e.clientX, sy = e.clientY, pid = e.pointerId;
+      let timer;
+      const stop = () => {
+        clearTimeout(timer); row.classList.remove("pressing");
+        row.removeEventListener("pointermove", mv); row.removeEventListener("pointerup", stop); row.removeEventListener("pointercancel", stop);
+      };
+      const mv = ev => { if(ev.pointerId === pid && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 8) stop(); };
+      row.addEventListener("pointermove", mv); row.addEventListener("pointerup", stop); row.addEventListener("pointercancel", stop);
+      row.classList.add("pressing");
+      timer = setTimeout(() => {
+        stop(); list._suppressClick = true;
+        try{ if(navigator.vibrate) navigator.vibrate(12); }catch(err){}
+        if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+        itemDrag(list, row, sy, pid, onDrop);
+      }, 380);
+    });
+  });
+  // 拖完放開時，不要順便打開編輯
+  list.addEventListener("click", e => { if(list._suppressClick){ e.preventDefault(); e.stopPropagation(); list._suppressClick = false; } }, true);
+  list.addEventListener("contextmenu", e => { if(e.target.closest(".li.item")) e.preventDefault(); });
+}
+// 編輯一個項目：名稱、備註、類別、照片、刪除
+function openItem(t, it){
+  const cats = t.lists[it.list];
+  let photo = it.photo && AVATAR_RE.test(it.photo) ? it.photo : "";
+  const name = el("input", {id:"li-name", maxLength:60, value:it.name, autocomplete:"off"});
+  const note = el("input", {id:"li-note", maxLength:120, value:it.note || "", placeholder:it.list === "shop" ? "尺寸、顏色、幾個" : "選填", autocomplete:"off"});
+  const cat = el("select", {id:"li-cat"}, cats.map(c => el("option", {value:c.id, text:c.name, selected:c.id === it.cat})));
+  const file = el("input", {type:"file", accept:"image/jpeg,image/png", hidden:true, "aria-hidden":"true", tabIndex:-1});
+  const pv = el("button", {type:"button", class:"pv", "aria-label":"照片"});
+  const pick = el("button", {type:"button", class:"text-btn", onclick:() => file.click()});
+  const rm = el("button", {type:"button", class:"text-btn", style:"color:var(--bad)", text:"移除照片", onclick:() => { photo = ""; paint(); }});
+  const paint = () => {
+    pv.replaceChildren(photo ? el("img", {src:photo, alt:""}) : icon("image", 26, 1.4));
+    pick.textContent = photo ? "換一張照片" : "加照片"; rm.hidden = !photo;
+  };
+  pv.addEventListener("click", () => { if(photo) viewPhoto(photo, cleanText(name.value, 60)); else file.click(); });
+  file.addEventListener("change", async () => {
+    const f = file.files && file.files[0]; file.value = "";
+    if(!f) return;
+    pv.style.opacity = ".5";
+    try{ photo = await makePhoto(f); paint(); }
+    catch(e){ toast(e === "type" ? "只能選 JPG 或 PNG 照片" : e === "size" ? "照片太大了，請換一張" : "這張照片讀不出來，請換一張"); }
+    finally{ pv.style.opacity = ""; }
+  });
+  const del = el("button", {type:"button", class:"menu-btn red", style:"border-top:0", text:"刪除項目"});
+  let armed = false, tm;
+  del.addEventListener("click", () => {
+    if(!armed){ armed = true; del.classList.add("armed"); del.textContent = "再按一次確認刪除"; tm = setTimeout(() => { armed = false; del.classList.remove("armed"); del.textContent = "刪除項目"; }, 3000); return; }
+    clearTimeout(tm); t.items = t.items.filter(x => x !== it); Store.save(); close(); render(); toast("已刪除");
+  });
+  const body = el("div", null,
+    el("div", {class:"grp"}, line("名稱", name), line("備註", note), line("類別", cat)),
+    el("p", {class:"grp-lab", text:"照片"}),
+    el("div", {class:"grp"}, el("div", {class:"ph-box"}, pv, el("div", null, el("div", {class:"acts"}, pick, rm), el("span", {class:"hint", text:it.list === "shop" ? "到店裡點照片就能全螢幕給店員看" : "點照片可以放大"})))),
+    el("div", {class:"grp"}, del), file);
+  paint();
+  const {close} = openSheet({title:"項目", done:"完成", body, onDone:() => {
+    const n = cleanText(name.value, 60);
+    if(!n){ toast("請輸入名稱"); name.focus(); return; }
+    if(cat.value !== it.cat){ it.cat = cat.value; it.pos = itemsOf(t, it.list).filter(x => x.cat === it.cat).reduce((m, x) => Math.max(m, x.pos), 0) + 1; }
+    it.name = n; it.note = cleanText(note.value, 120); it.photo = photo;
+    Store.save(); close(); render();
+  }});
+}
+// 類別：新增、改名、刪除、排序（FR-L02）
+function openCats(t, k){
+  const work = t.lists[k].map(c => ({...c}));
+  const count = id => itemsOf(t, k).filter(i => i.cat === id).length;
+  const box = el("div", {class:"grp"});
+  const paint = focusLast => {
+    box.replaceChildren(...work.map(c => {
+      const inp = el("input", {value:c.name, maxLength:16, placeholder:"類別名稱", autocomplete:"off", "aria-label":"類別名稱"});
+      inp.addEventListener("input", () => { c.name = inp.value; });
+      const handle = el("button", {type:"button", class:"handle", "aria-label":`調整「${c.name}」的順序`}, icon("grip", 18, 1.8));
+      const del = el("button", {type:"button", class:"cdel", text:"刪除"});
+      let armed = false, tm;
+      del.addEventListener("click", () => {
+        if(work.length <= 1){ toast("至少要留一個類別"); return; }
+        const n = count(c.id);
+        if(!armed){ armed = true; del.classList.add("armed"); del.textContent = n ? `連同 ${n} 項刪除？` : "確認刪除"; tm = setTimeout(() => { armed = false; del.classList.remove("armed"); del.textContent = "刪除"; }, 3000); return; }
+        clearTimeout(tm); work.splice(work.indexOf(c), 1); paint();
+      });
+      const row = el("div", {class:"ced"}, handle, inp, del);
+      handle.addEventListener("pointerdown", e => { if(e.button > 0) return; e.preventDefault(); dragSession(box, ".ced", row, e.clientY, (i, j) => { work.splice(j, 0, work.splice(i, 1)[0]); paint(); }, handle, e.pointerId); });
+      handle.addEventListener("keydown", e => {
+        if(e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+        e.preventDefault();
+        const i = work.indexOf(c), j = e.key === "ArrowUp" ? i - 1 : i + 1;
+        if(j >= 0 && j < work.length){ work.splice(j, 0, work.splice(i, 1)[0]); paint(); box.querySelectorAll(".handle")[j].focus(); }
+      });
+      return row;
+    }));
+    if(focusLast){ const ins = box.querySelectorAll("input"); ins[ins.length - 1].focus(); }
+  };
+  paint();
+  const add = el("button", {type:"button", class:"link-btn", onclick:() => {
+    if(work.length >= 30){ toast("類別最多 30 個"); return; }
+    work.push({id:uid("c"), name:"", fresh:true}); paint(true);
+  }}, icon("plus", 18, 1.8), el("span", {text:"新增類別"}));
+  const body = el("div", null, el("p", {class:"grp-lab", text:LISTS.find(x => x[0] === k)[1]}), box,
+    el("div", {style:"padding:6px 4px 0"}, add),
+    el("p", {class:"hint", style:"margin:6px 16px 0", text:"按住左邊的 ≡ 上下拖可以調整順序。刪除類別會一併刪除裡面的項目。"}));
+  const {close} = openSheet({title:"編輯類別", done:"完成", body, onDone:() => {
+    const old = new Map(t.lists[k].map(c => [c.id, c.name]));
+    const next = work.map(c => ({id:c.id, name:cleanText(c.name, 16) || old.get(c.id) || ""})).filter(c => c.name);
+    if(!next.length){ toast("至少要留一個類別"); return; }
+    const keep = new Set(next.map(c => c.id));
+    t.lists[k] = next;
+    t.items = t.items.filter(i => i.list !== k || keep.has(i.cat));
+    Store.save(); close(); render();
+  }});
+}
+// 照片全螢幕：點一下或按 Esc 關閉（給店員看，FR-L05）
+function viewPhoto(src, caption){
+  if(!AVATAR_RE.test(src)) return;
+  const x = el("button", {type:"button", class:"x", "aria-label":"關閉"}, icon("x", 20, 2));
+  const v = el("div", {class:"viewer", role:"dialog", "aria-modal":"true", "aria-label":caption || "照片"}, el("img", {src, alt:caption || ""}), caption ? el("p", {text:caption}) : null, x);
+  document.body.append(v);
+  const prev = document.documentElement.style.overflow; document.documentElement.style.overflow = "hidden";
+  requestAnimationFrame(() => v.classList.add("on"));
+  const close = () => { document.removeEventListener("keydown", onKey); v.classList.remove("on"); document.documentElement.style.overflow = prev; setTimeout(() => v.remove(), 260); };
+  const onKey = e => { if(e.key === "Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  v.addEventListener("click", close);
+  x.focus({preventScroll:true});
+}
+
 /* ---------- 帳號 ---------- */
 function openMe(){
   if(Store.guest){ openGuestMe(); return; }
   const u = Store.data.user;
   const reset = CLOUD ? null : el("button", {type:"button", class:"menu-btn", text:"重設範例資料"});
   const out = el("button", {type:"button", class:"menu-btn red", text:"登出"});
-  const pic = avatarBtn(u); pic.disabled = true; pic.removeAttribute("aria-label");
+  const pic = avatarFace(u);
   const body = el("div", null, el("div", {class:"grp"},
-    el("div", {class:"me"}, pic, el("div", null, el("b", {text:u.name}), el("span", {class:"e", text:u.email}))),
+    el("button", {type:"button", class:"me", "aria-label":"編輯個人資料", onclick:() => openProfile()}, pic,
+      el("div", {class:"grow"}, el("b", {text:nickOf(u)}), el("span", {class:"e", text:u.email})), el("span", {class:"chev"}, icon("chev", 18, 2))),
     reset, out),
     CLOUD ? el("p", {class:"hint", style:"margin:10px 16px 0", text:"登出時會一併清除這台裝置上的資料副本，雲端的資料不受影響。"}) : null,
     CLOUD ? el("div", {class:"grp"}, el("button", {type:"button", class:"menu-btn red", style:"border-top:0", onclick:openDeleteAccount, text:"刪除帳號"})) : null,
@@ -1744,10 +2503,11 @@ function openMe(){
 function openGuestMe(){
   const bind = el("button", {type:"button", class:"menu-btn", text:"綁定 Google 帳號"});
   const leave = el("button", {type:"button", class:"menu-btn red", text:"清除資料並離開"});
-  const pic = avatarBtn(Store.data.user); pic.disabled = true; pic.removeAttribute("aria-label");
+  const pic = avatarFace(Store.data.user);
   const n = Store.data.trips.length;
   const body = el("div", null,
-    el("div", {class:"grp"}, el("div", {class:"me"}, pic, el("div", null, el("b", {text:"訪客"}), el("span", {class:"e", text:"資料只存在這台裝置"}))), bind),
+    el("div", {class:"grp"}, el("button", {type:"button", class:"me", "aria-label":"編輯個人資料", onclick:() => openProfile()}, pic,
+      el("div", {class:"grow"}, el("b", {text:nickOf(Store.data.user)}), el("span", {class:"e", text:"訪客・資料只存在這台裝置"})), el("span", {class:"chev"}, icon("chev", 18, 2))), bind),
     el("p", {class:"hint", style:"margin:10px 16px 0", text:"綁定後，這台裝置上的旅程會一起搬上雲端，換手機也不會不見。"}),
     el("div", {class:"grp"}, Object.assign(leave, {style:"border-top:0"})),
     el("p", {class:"hint", style:"margin:10px 16px 0", text:n ? `訪客資料沒有備份，清除後這 ${n} 趟旅程會永久消失。` : "訪客資料沒有備份，清除後無法復原。"}));

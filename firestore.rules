@@ -33,8 +33,13 @@ service cloud.firestore {
       allow create, update: if isOwner(uid) && validUser(request.resource.data);
 
       function validUser(d) {
-        return d.keys().hasOnly(['name', 'lastPick', 'updatedAt'])
+        return d.keys().hasOnly(['name', 'nick', 'avatar', 'lastPick', 'updatedAt'])
           && text(d.get('name', ''), 60)
+          // 暱稱：最多 12 字
+          && text(d.get('nick', ''), 12)
+          // 頭貼：只能是手機上重新壓過的小張 JPEG（data URL），不能是外部網址
+          && (!('avatar' in d) || (d.avatar is string && d.avatar.size() <= 60000
+                && d.avatar.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')))
           && d.get('lastPick', {}) is map
           && d.get('lastPick', {}).size() <= 4
           && (d.get('updatedAt', null) == null || d.updatedAt is timestamp);
@@ -47,16 +52,43 @@ service cloud.firestore {
 
         function validTrip(d) {
           return d.keys().hasAll(['name', 'start', 'end', 'cur', 'accounts'])
-            && d.keys().hasOnly(['name', 'dest', 'country', 'start', 'end', 'cur', 'accounts', 'sample', 'createdAt', 'updatedAt'])
+            && d.keys().hasOnly(['name', 'dest', 'country', 'start', 'end', 'cur', 'accounts', 'lists', 'sample', 'createdAt', 'updatedAt'])
             && d.name is string && d.name.size() >= 1 && d.name.size() <= 24
             && text(d.get('dest', ''), 12)
             && text(d.get('country', ''), 20)
             && day(d.start) && day(d.end) && d.end >= d.start
             && curCode(d.cur)
             && d.accounts is list && d.accounts.size() <= 20
+            // 清單的類別：三個清單（行前待辦、行李、購物）各自最多 30 類
+            && (!('lists' in d) || (d.lists is map && d.lists.keys().hasOnly(['todo', 'pack', 'shop'])
+                  && d.lists.get('todo', []) is list && d.lists.get('todo', []).size() <= 30
+                  && d.lists.get('pack', []) is list && d.lists.get('pack', []).size() <= 30
+                  && d.lists.get('shop', []) is list && d.lists.get('shop', []).size() <= 30))
             && d.get('sample', false) is bool
             && (d.get('createdAt', null) == null || d.createdAt is timestamp)
             && (d.get('updatedAt', null) == null || d.updatedAt is timestamp);
+        }
+
+        // ---- 清單項目 ----
+        match /items/{itemId} {
+          allow read, delete: if isOwner(uid);
+          allow create, update: if isOwner(uid) && idOk(itemId) && validItem(request.resource.data);
+
+          function validItem(d) {
+            return d.keys().hasAll(['list', 'cat', 'name', 'done', 'pos'])
+              && d.keys().hasOnly(['list', 'cat', 'name', 'note', 'photo', 'done', 'pos', 'createdAt', 'updatedAt'])
+              && d.list in ['todo', 'pack', 'shop']
+              && d.cat is string && d.cat.size() >= 1 && d.cat.size() <= 40
+              && d.name is string && d.name.size() >= 1 && d.name.size() <= 60
+              && text(d.get('note', ''), 120)
+              && d.done is bool
+              && d.pos is number
+              // 照片：只能是手機上重新壓過的 JPEG（data URL），不能是外部網址
+              && (!('photo' in d) || (d.photo is string && d.photo.size() <= 380000
+                    && d.photo.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')))
+              && (d.get('createdAt', null) == null || d.createdAt is timestamp)
+              && (d.get('updatedAt', null) == null || d.updatedAt is timestamp);
+          }
         }
 
         // ---- 記帳 ----
