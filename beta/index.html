@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-4xOOzBzVYnQ1FOYF8mDZMY6N2vgtC2Qh5wAoBQxAAvg=' 'sha256-x6dLyySMvERxUfvbNOQmKkrK+rOxKg/aP13qAnzzUzM=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.googleusercontent.com; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tV4+VwuMRFiFpH4bOfM0kQYH64PStTNpTFi/3EUhS4A=' 'sha256-x6dLyySMvERxUfvbNOQmKkrK+rOxKg/aP13qAnzzUzM=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.googleusercontent.com; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>旅遊小幫手（測試版）</title>
 <meta name="description" content="出國記帳、預算、統計與匯率換算的旅遊小幫手。">
@@ -102,9 +102,9 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
 .opt[aria-selected="true"] .ck{opacity:1}
 .opt[aria-selected="true"] .nm{font-weight:600}
 .no-hit{padding:32px 0;text-align:center;color:var(--muted)}
-.me-btn{display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;background:var(--soft);color:var(--ink);font-weight:600;font-size:.9375rem;cursor:pointer;transition:transform .2s var(--ease),background .2s}
+.me-btn{position:relative;display:grid;place-items:center;flex:none;width:36px;height:36px;min-width:0;padding:0;margin:0;border:0;overflow:hidden;aspect-ratio:1;-webkit-appearance:none;appearance:none;border-radius:50%;background:var(--soft);color:var(--ink);font-weight:600;font-size:.9375rem;cursor:pointer;transition:transform .2s var(--ease),background .2s}
 .me-btn:active{transform:scale(.92)}
-.me-btn img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.me-btn img{position:absolute;inset:0;width:100%;height:100%;max-width:none;border-radius:50%;object-fit:cover;object-position:center;display:block}
 .offline{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:980px;background:var(--soft);color:var(--muted);font-size:.75rem}
 .offline::before{content:"";width:6px;height:6px;border-radius:50%;background:#c4870f}
 .head{padding-block:8px 32px}
@@ -872,7 +872,7 @@ function signIn(){
 function avatarBtn(u){
   const b = el("button", {type:"button", class:"me-btn", "aria-label":"帳號", onclick:openMe});
   if(u.photo && /^https:\/\/[a-z0-9.-]+\.googleusercontent\.com\//.test(u.photo)){   // 只顯示 Google 的頭像網址
-    const img = el("img", {src:u.photo, alt:"", referrerPolicy:"no-referrer", width:36, height:36});
+    const img = el("img", {src:u.photo.replace(/=s\d+-c$/, "=s192-c"), alt:"", referrerPolicy:"no-referrer", width:36, height:36});
     img.addEventListener("error", () => { img.remove(); b.textContent = u.name.slice(0, 1); });
     b.append(img);
   } else b.textContent = u.name.slice(0, 1);
