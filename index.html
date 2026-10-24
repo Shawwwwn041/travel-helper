@@ -792,7 +792,7 @@ function renderTrip(t){
 }
 // 分頁：玻璃膠囊＋白色滑塊，從上一個分頁滑到新的分頁
 function segNav(){
-  const tabs = [["ledger", "記帳"], ["stats", "統計"], ["conv", "換算"], ["lists", "清單"]];
+  const tabs = [["ledger", "記帳"], ["lists", "清單"], ["stats", "統計"], ["conv", "換算"]];
   const thumb = el("span", {class:"thumb", "aria-hidden":"true"});
   let noSlide = false;
   const cap = el("div", {class:"cap", role:"tablist", "aria-label":"旅程分頁"}, thumb, tabs.map(([id, label]) =>
