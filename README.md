@@ -6,3 +6,5 @@
 - 修改紀錄：見 [CHANGELOG.md](CHANGELOG.md)
 
 目前是第一階段（M1）：資料存在這台裝置的瀏覽器。第二階段（M2）會加上 Google 登入與雲端同步。
+
+網站部署於 GitHub Pages（main 分支根目錄）。
