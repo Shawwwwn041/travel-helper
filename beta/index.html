@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sCTLEUWy9vKsNXdeRYWoZ43YEotWJ70kuOwMtDZgA3Y=' 'sha256-x6dLyySMvERxUfvbNOQmKkrK+rOxKg/aP13qAnzzUzM=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-CtUErDZxqAPC+EkjCVldn6VF67VVWgkGg5Q6nVpYB3I=' 'sha256-x6dLyySMvERxUfvbNOQmKkrK+rOxKg/aP13qAnzzUzM=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>旅遊小幫手（測試版）</title>
 <meta name="description" content="出國記帳、預算、統計與匯率換算的旅遊小幫手。">
@@ -42,6 +42,7 @@
 }
 /* 刻意只用白底黑字的淺色主題，和貓咪照顧小幫手一致 */
 *{box-sizing:border-box}
+[hidden]{display:none !important}
 html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
@@ -136,8 +137,17 @@ button.offline:active{transform:scale(.96)}
 .pill.before{background:var(--sage-soft);color:var(--sage)}
 .pill.during{background:var(--blue-soft);color:var(--link)}
 .pill.after{background:var(--soft);color:var(--muted)}
-.link-btn{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0;border:0;background:transparent;color:var(--link);font-size:1rem;cursor:pointer;transition:opacity .2s}
+.link-btn{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0;border:0;background:transparent;color:var(--muted);font-size:1rem;cursor:pointer;transition:opacity .2s}
 .link-btn:active{opacity:.5}
+@media (hover:hover){.link-btn:hover{color:var(--ink)}}
+/* 新增旅程：虛線空白卡（像「這裡還可以再放一趟」） */
+.add-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;min-height:96px;padding:16px;border:1.5px dashed #c7c7cc;border-radius:18px;background:transparent;color:var(--muted);font-size:1rem;cursor:pointer;transition:border-color .25s,color .25s,background .25s,transform .2s var(--ease)}
+.add-card .t{display:inline-flex;align-items:center;gap:8px}
+.add-card small{color:var(--faint);font-size:.8125rem}
+.add-card.big{min-height:168px}
+.add-card.big .t{font-size:1.0625rem;color:var(--ink)}
+@media (hover:hover){.add-card:hover{border-color:#8e8e93;color:var(--ink);background:rgba(255,255,255,.55)}}
+.add-card:active{transform:scale(.98);background:rgba(255,255,255,.7)}
 .foot-note{margin:28px 4px 0;color:var(--muted);font-size:.8125rem;line-height:1.7}
 
 /* 旅程卡 */
@@ -512,7 +522,7 @@ button.me:active{background:var(--soft)}
 .lcat-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 6px 8px;font-size:.9375rem;font-weight:600}
 .lcat-h span{color:var(--muted);font-weight:400;font-size:.8125rem}
 .lgrp{background:#fff;border-radius:16px;padding:0 8px 0 16px}
-.li{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 6px 8px 0;border-top:1px solid var(--hair);background:#fff;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.li{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 6px 8px 0;border-top:1px solid var(--hair);background:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 .lgrp > .li:first-child{border-top:0}
 .ck{flex:none;display:grid;place-items:center;width:38px;height:38px;margin:-8px -6px -8px -9px;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .ck i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1.5px #c7c7cc;color:#fff;transition:background .25s,box-shadow .25s,transform .35s var(--spring)}
@@ -526,9 +536,10 @@ button.me:active{background:var(--soft)}
 .li.done .tx b{color:var(--faint);text-decoration:line-through;text-decoration-color:rgba(0,0,0,.2)}
 .li .pic{flex:none;width:44px;height:44px;padding:0;border:0;border-radius:10px;background:var(--soft);overflow:hidden;cursor:zoom-in}
 .li .pic img{display:block;width:100%;height:100%;object-fit:cover}
-.li.add .plus{flex:none;display:grid;place-items:center;width:22px;color:var(--link)}
+.li.add .plus{flex:none;display:grid;place-items:center;width:22px;color:var(--faint);transition:color .2s}
+.li.add:focus-within .plus{color:var(--ink)}
 .li.add input{flex:1;min-width:0;height:38px;padding:0;border:0;background:transparent;font-size:1rem;color:var(--ink);outline:none}
-.li.add input::placeholder{color:var(--link);opacity:.85}
+.li.add input::placeholder{color:var(--muted)}
 .li.add input:focus::placeholder{color:var(--faint)}
 .ls-tools{display:flex;justify-content:center;margin-top:18px}
 /* 長按拖動（沿用貓咪小幫手的做法） */
@@ -538,10 +549,10 @@ body.is-dragging,body.is-dragging *{cursor:grabbing !important;-webkit-user-sele
 .shifting{transition:transform .22s var(--ease)}
 /* 清單項目拖動：拿起的項目浮在手指下，放開後會落的地方空出一格（可以跨類別） */
 .li.ph{min-height:0;padding:0;border-top-color:transparent;background:transparent}
-.li.lifted{position:fixed;z-index:50;margin:0;padding-left:12px;padding-right:14px;border-radius:14px;border-top-color:transparent;box-shadow:0 14px 34px rgba(0,0,0,.16),0 2px 6px rgba(0,0,0,.06);scale:1.03;transition:scale .2s var(--ease),box-shadow .2s var(--ease);pointer-events:none}
+.li.lifted{position:fixed;z-index:50;margin:0;background:#fff;padding-left:12px;padding-right:14px;border-radius:14px;border-top-color:transparent;box-shadow:0 14px 34px rgba(0,0,0,.16),0 2px 6px rgba(0,0,0,.06);scale:1.03;transition:scale .2s var(--ease),box-shadow .2s var(--ease);pointer-events:none}
 .li.lifted.settling{transition:top .22s var(--ease),left .22s var(--ease),scale .22s var(--ease),box-shadow .22s var(--ease);scale:1;box-shadow:0 0 0 rgba(0,0,0,0)}
 .dragging.settling{transition:transform .22s var(--ease),scale .22s var(--ease),box-shadow .22s var(--ease);scale:1;box-shadow:0 0 0 rgba(0,0,0,0)}
-@keyframes movedFlash{0%{background:#eaf2fd}100%{background:#fff}}
+@keyframes movedFlash{0%{background:#eef0f3}100%{background:transparent}}
 .li.moved{animation:movedFlash .8s var(--ease)}
 /* 類別編輯 */
 .ced{display:flex;align-items:center;gap:6px;min-height:52px;padding:0 8px 0 2px;border-top:1px solid var(--hair);background:#fff}
@@ -563,6 +574,20 @@ body.is-dragging,body.is-dragging *{cursor:grabbing !important;-webkit-user-sele
 .viewer p{position:absolute;left:0;right:0;bottom:calc(26px + env(safe-area-inset-bottom,0px));margin:0;padding:0 24px;text-align:center;color:#fff;font-size:1.0625rem}
 .viewer .x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:16px;display:grid;place-items:center;width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;cursor:pointer}
 .trip-lists{margin:-6px 0 14px;color:var(--muted);font-size:.8125rem}
+/* 代買／伴手禮：給誰、金額、收錢了沒 */
+.li .tx .who{display:inline;margin:0;color:var(--ink)}
+.li .meta{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:1px;text-align:right;font-size:.75rem;color:var(--muted)}
+.li .meta b{font-weight:500;font-size:.9375rem;color:var(--ink)}
+.li .meta .due{color:#b8741a}
+.li .meta .ok{color:#2f8f5b}
+.lcat-sub{margin:-2px 6px 10px;color:var(--muted);font-size:.8125rem;line-height:1.5}
+.lcat-sub b{font-weight:500;color:#b8741a}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px}
+.chip{height:34px;padding:0 15px;border:0;border-radius:980px;background:var(--soft);color:var(--ink);font-size:.9375rem;cursor:pointer;transition:background .2s,color .2s,transform .2s var(--ease)}
+.chip:active{transform:scale(.95)}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff}
+.chip.add{display:inline-flex;align-items:center;gap:4px;background:transparent;color:var(--muted);box-shadow:inset 0 0 0 1px #d2d2d7}
+.chip-in{height:34px;width:110px;padding:0 14px;border:0;border-radius:980px;background:#fff;box-shadow:inset 0 0 0 1.5px var(--ink);font-size:1rem;color:var(--ink);outline:none}
 /* ---- 登入後的歡迎動畫：一條線畫出地平線與雲，線條飛機從雲裡鑽出來帶出「歡迎」，再鑽進另一朵雲 ---- */
 .hello{position:fixed;inset:0;z-index:60;display:grid;place-items:center;overflow:hidden;background:var(--bg);cursor:pointer;transition:opacity .7s var(--ease)}
 .hello.out{opacity:0;pointer-events:none}
@@ -810,7 +835,6 @@ const Cloud = {
       // 離線副本：沒網路也能讀寫，連上後自動補傳；多個分頁共用
       try{ this.db = fsM.initializeFirestore(app, {localCache:fsM.persistentLocalCache({tabManager:fsM.persistentMultipleTabManager()})}); }
       catch(e){ this.db = fsM.getFirestore(app); }
-      try{ await authM.getRedirectResult(this.auth); }catch(e){ this.fail(e); }
       authM.onAuthStateChanged(this.auth, u => this.onUser(u));
     }catch(e){ this.state = "error"; this.error = "連不上登入服務，請檢查網路後重新整理"; render(); }
   },
@@ -821,8 +845,11 @@ const Cloud = {
     try{ sessionStorage.setItem(HELLO_KEY, "1"); }catch(e){}           // 登入成功後播放歡迎動畫（換頁登入回來也記得）
     try{ await this.A.signInWithPopup(this.auth, p); }
     catch(e){
-      if(e && (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment")){
-        try{ await this.A.signInWithRedirect(this.auth, p); return; }catch(e2){ try{ sessionStorage.removeItem(HELLO_KEY); }catch(x){} this.fail(e2); return; }
+      // 不再改用「跳轉登入」：網頁不是放在 Firebase 上，新的瀏覽器會把跳轉前後的資料隔開，回來時找不到登入狀態
+      // 登入視窗被擋（多半是 LINE、Facebook 或 App 內建的瀏覽器）→ 教使用者改用 Safari／Chrome 開
+      if(e && /popup-blocked|operation-not-supported|web-storage-unsupported/.test(e.code || "")){
+        try{ sessionStorage.removeItem(HELLO_KEY); }catch(x){}
+        openBrowserHelp(); return;
       }
       try{ sessionStorage.removeItem(HELLO_KEY); }catch(x){}
       this.fail(e);
@@ -921,7 +948,7 @@ const Cloud = {
         Object.assign(t, {name:x.name, dest:x.dest || "", country:x.country || "", start:x.start, end:x.end, cur:x.cur,
           accounts:(x.accounts || []).map(a => ({...a})), sample:!!x.sample});
         if(!t.items) t.items = [];
-        if(x.lists && typeof x.lists === "object") t.lists = Object.fromEntries(LISTS.map(([k]) => [k, (Array.isArray(x.lists[k]) ? x.lists[k] : []).map(c => ({id:String(c.id), name:String(c.name || "")}))]));
+        if(x.lists && typeof x.lists === "object") t.lists = Object.fromEntries(LISTS.map(([k]) => [k, (Array.isArray(x.lists[k]) ? x.lists[k] : []).map(c => KINDS.includes(c.kind) ? {id:String(c.id), name:String(c.name || ""), kind:c.kind} : {id:String(c.id), name:String(c.name || "")})]));
         if(!x.sample) delete t.sample;
         this.base.set(this.path("users", uid, "trips", d.id), JSON.stringify(this.tripDoc(t)));
         if(!this.expUnsub.has(d.id)) this.watchExpenses(d.id);
@@ -970,7 +997,8 @@ const Cloud = {
       for(const k of [...this.base.keys()]) if(k.startsWith(pre)) this.base.delete(k);
       t.items = snap.docs.map(d => {
         const x = d.data();
-        const it = {id:d.id, list:x.list, cat:x.cat, name:x.name || "", note:x.note || "", photo:typeof x.photo === "string" && AVATAR_RE.test(x.photo) ? x.photo : "", done:!!x.done, pos:+x.pos || 0};
+        const it = {id:d.id, list:x.list, cat:x.cat, name:x.name || "", note:x.note || "", photo:typeof x.photo === "string" && AVATAR_RE.test(x.photo) ? x.photo : "", done:!!x.done, pos:+x.pos || 0,
+          who:typeof x.who === "string" ? x.who : "", price:Number.isInteger(x.price) && x.price > 0 ? x.price : 0, paid:!!x.paid};
         this.base.set(pre + d.id, JSON.stringify(this.itemJson(it)));
         return it;
       });
@@ -990,12 +1018,15 @@ const Cloud = {
     const d = {name:t.name.slice(0, 24), dest:(t.dest || "").slice(0, 12), country:(t.country || "").slice(0, 20), start:t.start, end:t.end, cur:t.cur,
       accounts:t.accounts.slice(0, 20).map(a => ({id:a.id, name:a.name, method:a.method, cur:a.cur, budget:Math.round(a.budget) || 0}))};
     if(t.sample) d.sample = true;
-    if(t.lists) d.lists = Object.fromEntries(LISTS.map(([k]) => [k, (t.lists[k] || []).slice(0, 30).map(c => ({id:c.id, name:cleanText(c.name, 16)}))]));
+    if(t.lists) d.lists = Object.fromEntries(LISTS.map(([k]) => [k, (t.lists[k] || []).slice(0, 30).map(c => KINDS.includes(c.kind) ? {id:c.id, name:cleanText(c.name, 16), kind:c.kind} : {id:c.id, name:cleanText(c.name, 16)})]));
     return d;
   },
   itemJson(it){
     const d = {list:it.list, cat:it.cat, name:cleanText(it.name, 60) || "未命名", note:cleanText(it.note, 120), done:!!it.done, pos:+it.pos || 0};
     if(it.photo && AVATAR_RE.test(it.photo) && it.photo.length <= 380000) d.photo = it.photo;
+    if(it.who) d.who = cleanText(it.who, 12);
+    if(Number.isInteger(it.price) && it.price > 0) d.price = it.price;
+    if(it.paid) d.paid = true;
     return d;
   },
   expJson(e){ return {title:(e.title || "").slice(0, 40), amount:Math.round(e.amount), cur:e.cur, rate:e.rate, acct:e.acct || null, cat:e.cat, time:new Date(e.time).toISOString(), excluded:!!e.excluded}; },
@@ -1076,10 +1107,10 @@ function sampleTrips(){
   };
   // 範例清單
   const L = {todo:LIST_DEFAULT.todo, pack:LIST_DEFAULT.pack, shop:LIST_DEFAULT.shop};
-  tokyo.lists = Object.fromEntries(Object.entries(L).map(([k, names]) => [k, names.map(name => ({id:uid("c"), name}))]));
+  tokyo.lists = Object.fromEntries(Object.entries(L).map(([k, names]) => [k, names.map(newCat)]));
   const C = (k, n) => tokyo.lists[k][n].id;
   let pos = 0;
-  const it = (k, n, name, done, note = "") => ({id:uid("i"), list:k, cat:C(k, n), name, note, photo:"", done, pos:++pos});
+  const it = (k, n, name, done, note = "", extra = {}) => ({id:uid("i"), list:k, cat:C(k, n), name, note, photo:"", done, pos:++pos, ...extra});
   tokyo.items = [
     it("todo", 0, "護照效期確認", true), it("todo", 0, "Visit Japan Web 填寫", true, "入境、海關都要"),
     it("todo", 1, "訂機場接送", true), it("todo", 1, "印飯店確認信", false),
@@ -1091,7 +1122,9 @@ function sampleTrips(){
     it("pack", 3, "手機充電線", true), it("pack", 3, "轉接頭", false, "日本是 A 型插座，不用轉也可以"),
     it("pack", 4, "腸胃藥", false), it("pack", 4, "暈車藥", false),
     it("shop", 0, "合利他命 EX Plus", false, "270 錠"), it("shop", 0, "曼秀雷敦護唇膏", true),
-    it("shop", 1, "東京香蕉", false, "公司同事 2 盒"), it("shop", 2, "薯條三兄弟", false), it("shop", 3, "Suica 企鵝周邊", false)
+    it("shop", 1, "合利他命 EX Plus", true, "", {who:"媽媽", price:5980, paid:true}), it("shop", 1, "東京香蕉", true, "2 盒", {who:"同事", price:2592}),
+    it("shop", 1, "Kit Kat 抹茶", false, "", {who:"小美"}),
+    it("shop", 2, "薯條三兄弟", false, "", {who:"媽媽"}), it("shop", 2, "Suica 企鵝周邊", false, "", {who:"小美"})
   ];
   const os = addDays(today, 340);
   const osaka = {
@@ -1144,7 +1177,28 @@ function renderLogin(){
     CLOUD ? el("button", {type:"button", class:"alt", onclick:startGuest, text:"先以訪客身分使用"}) : null,
     el("small", {text:CLOUD ? (Cloud.state === "error" ? Cloud.error : "登入後資料存在雲端，換手機也不會不見") : "框架示範：按下會用範例帳號進入，資料只存在這台裝置"}));
 }
+// App 內建的瀏覽器（LINE、Facebook、Instagram、微信、Android WebView）常會擋掉 Google 登入視窗
+const IN_APP = /\bLine\/|FBAN|FBAV|Instagram|MicroMessenger|; wv\)/i.test(navigator.userAgent);
+function openBrowserHelp(){
+  const copy = el("button", {type:"button", class:"wide-btn", text:"複製網址"});
+  const body = el("div", null,
+    el("div", {class:"alert"}, el("div", {class:"ic"}, icon("alert", 26, 1.6)), el("h3", {text:"請用 Safari 或 Chrome 開啟"}),
+      el("p", {text:"App 內建的瀏覽器會擋住 Google 登入視窗。"})),
+    el("div", {class:"grp"},
+      el("div", {class:"fact"}, el("b", {text:"1", style:"flex:none;width:20px;text-align:center"}), el("span", {text:"點畫面角落的「⋯」或分享按鈕"})),
+      el("div", {class:"fact"}, el("b", {text:"2", style:"flex:none;width:20px;text-align:center"}), el("span", {text:"選「用 Safari 開啟」或「在瀏覽器中開啟」"})),
+      el("div", {class:"fact"}, el("b", {text:"3", style:"flex:none;width:20px;text-align:center"}), el("span", {text:"在 Safari／Chrome 裡再按一次登入"}))),
+    el("p", {class:"hint", style:"margin:10px 16px 0", text:"找不到這個選項的話，先複製網址，再貼到 Safari 或 Chrome 的網址列。"}),
+    copy);
+  const {ok} = openSheet({title:"沒辦法在這裡登入", body});
+  ok.style.visibility = "hidden";
+  copy.addEventListener("click", async () => {
+    try{ await navigator.clipboard.writeText(location.href); toast("已複製網址"); }
+    catch(e){ toast("請長按網址列手動複製"); }
+  });
+}
 function signIn(){
+  if(CLOUD && IN_APP){ openBrowserHelp(); return; }
   if(CLOUD){ Cloud.signIn(); return; }
   Store.data.user = {name:"示範使用者", email:"demo@example.com"};
   if(!Store.data.trips.length) Store.data.trips = sampleTrips();
@@ -1371,15 +1425,19 @@ function renderHome(){
   // 三區：準備中 → 旅途中 → 已結束（順序照姊姊的建議），用分割線隔開
   const SECS = [["before", "準備中", "沒有準備中的旅程"], ["during", "旅途中", "沒有正在進行的旅程"], ["after", "已結束", "沒有已結束的旅程"]];
   let n = 0;
+  // 新增旅程：虛線空白卡，放在「準備中」的最後（新旅程一開始一定是準備中）
+  const addCard = big => el("button", {type:"button", class:"add-card rise" + (big ? " big" : ""), style:`--i:${n}`, onclick:() => openTripForm()},
+    el("span", {class:"t"}, icon("plus", 18, 1.8), el("span", {text:big ? "新增第一趟旅程" : "新增旅程"})),
+    big ? el("small", {text:"設定目的地、日期和預算"}) : null);
   const phases = el("div", {class:"phases"}, SECS.map(([key, label, none]) => {
     const list = trips.filter(t => phase(t).key === key);
+    const cards = list.map(t => tripCard(t, n++));
+    if(key === "before") cards.push(addCard(false));
     return el("section", {"aria-label":label},
       el("h2", {class:"sec-h"}, el("span", {text:label}), list.length ? el("span", {class:"n", text:String(list.length)}) : null),
-      list.length ? el("div", {class:"stack"}, list.map(t => tripCard(t, n++))) : el("p", {class:"sec-none", text:none}));
+      cards.length ? el("div", {class:"stack"}, cards) : el("p", {class:"sec-none", text:none}));
   }));
-  const band = el("section", {class:"band gut"}, el("div", {class:"col"},
-    trips.length ? phases : el("div", {class:"card rise"}, el("div", {class:"empty"}, el("b", {text:"還沒有旅程"}), el("span", {text:"按下方「新增旅程」，開始記第一趟"}))),
-    el("div", {style:"margin-top:8px;padding-left:4px"}, el("button", {type:"button", class:"link-btn", onclick:() => openTripForm()}, icon("plus", 18, 1.8), el("span", {text:"新增旅程"})))));
+  const band = el("section", {class:"band gut"}, el("div", {class:"col"}, trips.length ? phases : addCard(true)));
   return el("main", {class:"screen home"}, head, band);
 }
 function tripCard(t, i){
@@ -2134,12 +2192,17 @@ function openAccountForm(t, a){
 
 /* ================= 清單（FR-L01–L05） ================= */
 const LISTS = [["todo", "行前待辦", "待辦"], ["pack", "行李檢查", "行李"], ["shop", "購物清單", "購物"]];
-const LIST_DEFAULT = {todo:["證件文件", "交通住宿", "金錢", "出發前一天"], pack:["證件錢包", "衣物", "盥洗保養", "3C", "藥品", "其他"], shop:["藥妝", "零食", "伴手禮", "其他"]};
+const LIST_DEFAULT = {todo:["證件文件", "交通住宿", "金錢", "出發前一天"], pack:["證件錢包", "衣物", "盥洗保養", "3C", "藥品", "其他"],
+  shop:[{name:"自己", kind:"self"}, {name:"代買", kind:"proxy"}, {name:"伴手禮", kind:"gift"}]};   // 購物照用途分（參考探險熊熊）
+// 類別的種類：代買（要收錢）、伴手禮（送人）會多出「給誰」等欄位
+const KINDS = ["self", "proxy", "gift"];
+const newCat = x => typeof x === "string" ? {id:uid("c"), name:x} : {id:uid("c"), ...x};
+const catKind = (t, it) => { const c = (t.lists && t.lists[it.list] || []).find(c => c.id === it.cat); return c && c.kind || ""; };
 // 第一次打開清單時放入預設類別（之後完全可以自己改）
 function ensureLists(t){
   let changed = false;
   if(!t.lists || typeof t.lists !== "object"){ t.lists = {}; changed = true; }
-  for(const [k] of LISTS) if(!Array.isArray(t.lists[k]) || !t.lists[k].length){ t.lists[k] = LIST_DEFAULT[k].map(name => ({id:uid("c"), name})); changed = true; }
+  for(const [k] of LISTS) if(!Array.isArray(t.lists[k]) || !t.lists[k].length){ t.lists[k] = LIST_DEFAULT[k].map(newCat); changed = true; }
   if(!Array.isArray(t.items)){ t.items = []; changed = true; }
   return changed;
 }
@@ -2202,8 +2265,17 @@ function listPane(t, k, paintTop, rebuild){
     };
     inp.addEventListener("keydown", e => { if(e.key === "Enter" && !e.isComposing){ e.preventDefault(); commit(true); } });
     inp.addEventListener("blur", () => commit(false));
+    // 代買：標題下面列出還沒收的錢（依人）
+    let sub = null;
+    if(c.kind === "proxy"){
+      const priced = its.filter(i => i.price > 0), due = new Map();
+      for(const i of priced) if(!i.paid) due.set(i.who || "未填", (due.get(i.who || "未填") || 0) + i.price);
+      if(due.size){ sub = el("p", {class:"lcat-sub"}, document.createTextNode("還沒收："));
+        [...due].forEach(([w, v], n) => { if(n) sub.append(document.createTextNode("・")); sub.append(document.createTextNode(`${w} `), el("b", {text:fmt(v, t.cur)})); }); }
+      else if(priced.length) sub = el("p", {class:"lcat-sub", text:"代買的錢都收齊了"});
+    }
     return el("section", {class:"lcat", "data-cat":c.id, "aria-label":c.name},
-      el("h3", {class:"lcat-h"}, document.createTextNode(c.name), el("span")),
+      el("h3", {class:"lcat-h"}, document.createTextNode(c.name), el("span")), sub,
       el("div", {class:"lgrp"}, its.map(it => itemRow(t, it, paintTop)),
         el("div", {class:"li add", "data-cat":c.id}, el("span", {class:"plus", "aria-hidden":"true"}, icon("plus", 18, 2)), inp)));
   }), el("div", {class:"ls-tools"}, el("button", {type:"button", class:"link-btn", onclick:() => openCats(t, k)}, icon("sliders", 18, 1.8), el("span", {text:"編輯類別"}))));
@@ -2239,9 +2311,14 @@ function itemRow(t, it, paintTop){
     try{ if(it.done && navigator.vibrate) navigator.vibrate(8); }catch(e){}
     Store.save(); paintTop();
   });
-  const tx = el("button", {type:"button", class:"tx", onclick:() => openItem(t, it)}, el("b", {text:it.name}), it.note ? el("span", {text:it.note}) : null);
+  const kind = catKind(t, it);
+  const subParts = [];
+  if((kind === "proxy" || kind === "gift") && it.who) subParts.push(el("span", {class:"who", text:`給${it.who}`}));
+  if(it.note) subParts.push(document.createTextNode((subParts.length ? " · " : "") + it.note));
+  const tx = el("button", {type:"button", class:"tx", onclick:() => openItem(t, it)}, el("b", {text:it.name}), subParts.length ? el("span", null, ...subParts) : null);
   const pic = it.photo && AVATAR_RE.test(it.photo) ? el("button", {type:"button", class:"pic", "aria-label":`放大「${it.name}」的照片`, onclick:() => viewPhoto(it.photo, it.name)}, el("img", {src:it.photo, alt:""})) : null;
-  row.append(ck, tx); if(pic) row.append(pic);
+  const meta = kind === "proxy" && it.price > 0 ? el("span", {class:"meta"}, el("b", {class:"num", text:fmt(it.price, t.cur)}), el("span", {class:it.paid ? "ok" : "due", text:it.paid ? "已收" : "未收"})) : null;
+  row.append(ck, tx); if(meta) row.append(meta); if(pic) row.append(pic);
   return row;
 }
 // ---- 拖動排序的核心：拿起一列跟著手指走，其他列讓位，放開後交給 onMove（改寫自貓咪小幫手） ----
@@ -2279,6 +2356,13 @@ function dragSession(list, rowSel, row, startY, onMove, cap, pointerId){
   cap.addEventListener("pointermove", move); cap.addEventListener("pointerup", up); cap.addEventListener("pointercancel", up);
 }
 document.addEventListener("touchmove", e => { if(document.body.classList.contains("is-dragging")) e.preventDefault(); }, {passive:false});
+// 點空白處收起鍵盤：iPhone 的數字鍵盤沒有「完成」鍵，網頁點空白處預設也不會收鍵盤
+document.addEventListener("pointerdown", e => {
+  const a = document.activeElement;
+  if(!a || !/^(INPUT|TEXTAREA)$/.test(a.tagName) || /^(checkbox|radio|range|file)$/.test(a.type)) return;
+  if(e.target.closest("input, textarea, select, button, label, a, [contenteditable], .pick, .wheel")) return;
+  a.blur();
+}, true);
 // 清單項目的拖動：拿起的項目浮在手指下，放開後會落的地方空出一格，其他項目平滑讓位（可以跨類別）；靠近畫面上下緣會自動捲動
 function itemDrag(list, row, sy, pid, onDrop){
   const r0 = row.getBoundingClientRect(), grab = sy - r0.top;
@@ -2377,6 +2461,32 @@ function openItem(t, it){
   const name = el("input", {id:"li-name", maxLength:60, value:it.name, autocomplete:"off"});
   const note = el("input", {id:"li-note", maxLength:120, value:it.note || "", placeholder:it.list === "shop" ? "尺寸、顏色、幾個" : "選填", autocomplete:"off"});
   const cat = el("select", {id:"li-cat"}, cats.map(c => el("option", {value:c.id, text:c.name, selected:c.id === it.cat})));
+  // 給誰：用過的名字都會出現在這裡（從所有旅程的購物清單收集，不另外存）
+  let who = it.who || "";
+  const names = [...new Set(Store.data.trips.flatMap(x => (x.items || []).map(i => i.who)).filter(Boolean))];
+  if(who && !names.includes(who)) names.push(who);
+  const chips = el("div", {class:"chips", role:"group", "aria-label":"給誰"});
+  const paintChips = () => {
+    const add = el("button", {type:"button", class:"chip add"}, icon("plus", 14, 2), el("span", {text:"新增"}));
+    add.addEventListener("click", () => {
+      const inp = el("input", {class:"chip-in", maxLength:12, placeholder:"名字", autocomplete:"off", enterkeyhint:"done", "aria-label":"新增名字"});
+      let ended = false;                                   // Enter 之後會再觸發一次 blur，只處理第一次
+      const done = () => { if(ended) return; ended = true; const v = cleanText(inp.value, 12); if(v){ if(!names.includes(v)) names.push(v); who = v; } paintChips(); };
+      inp.addEventListener("keydown", e => { if(e.key === "Enter" && !e.isComposing){ e.preventDefault(); done(); } if(e.key === "Escape"){ ended = true; paintChips(); } });
+      inp.addEventListener("blur", done);
+      add.replaceWith(inp); inp.focus();
+    });
+    chips.replaceChildren(...names.map(n => el("button", {type:"button", class:"chip", "aria-pressed":String(n === who), text:n, onclick:() => { who = who === n ? "" : n; paintChips(); }})), add);
+  };
+  paintChips();
+  const price = el("input", {id:"li-price", inputmode:"decimal", autocomplete:"off", placeholder:"0", value:it.price ? plain(it.price, t.cur) : ""});
+  price.addEventListener("input", () => cleanAmount(price, t.cur));
+  const paid = el("input", {type:"checkbox", class:"switch", id:"li-paid", checked:!!it.paid});
+  const whoBox = el("div", null, el("p", {class:"grp-lab", text:"給誰"}), el("div", {class:"grp"}, chips));
+  const moneyBox = el("div", {class:"grp"}, line("金額", price, el("span", {style:"color:var(--muted)", text:t.cur})), el("div", {class:"line"}, el("label", {for:"li-paid", text:"已收錢"}), el("span", {style:"flex:1"}), paid));
+  const kindOf = id => (cats.find(c => c.id === id) || {}).kind || "";
+  const showKind = () => { const k = kindOf(cat.value); whoBox.hidden = !(k === "proxy" || k === "gift"); moneyBox.hidden = k !== "proxy"; };
+  cat.addEventListener("change", showKind);
   const file = el("input", {type:"file", accept:"image/jpeg,image/png", hidden:true, "aria-hidden":"true", tabIndex:-1});
   const pv = el("button", {type:"button", class:"pv", "aria-label":"照片"});
   const pick = el("button", {type:"button", class:"text-btn", onclick:() => file.click()});
@@ -2402,15 +2512,20 @@ function openItem(t, it){
   });
   const body = el("div", null,
     el("div", {class:"grp"}, line("名稱", name), line("備註", note), line("類別", cat)),
+    whoBox, moneyBox,
     el("p", {class:"grp-lab", text:"照片"}),
     el("div", {class:"grp"}, el("div", {class:"ph-box"}, pv, el("div", null, el("div", {class:"acts"}, pick, rm), el("span", {class:"hint", text:it.list === "shop" ? "到店裡點照片就能全螢幕給店員看" : "點照片可以放大"})))),
     el("div", {class:"grp"}, del), file);
-  paint();
+  paint(); showKind();
   const {close} = openSheet({title:"項目", done:"完成", body, onDone:() => {
     const n = cleanText(name.value, 60);
     if(!n){ toast("請輸入名稱"); name.focus(); return; }
     if(cat.value !== it.cat){ it.cat = cat.value; it.pos = itemsOf(t, it.list).filter(x => x.cat === it.cat).reduce((m, x) => Math.max(m, x.pos), 0) + 1; }
     it.name = n; it.note = cleanText(note.value, 120); it.photo = photo;
+    const k = kindOf(it.cat);
+    it.who = k === "proxy" || k === "gift" ? who : "";                 // 改到「自己」就不留給誰／金額
+    it.price = k === "proxy" ? (parseAmount(price.value, t.cur) || 0) : 0;
+    it.paid = k === "proxy" ? paid.checked : false;
     Store.save(); close(); render();
   }});
 }
