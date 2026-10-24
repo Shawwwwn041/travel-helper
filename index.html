@@ -1,0 +1,1459 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>旅遊小幫手</title>
+<meta name="description" content="出國記帳、預算、統計與匯率換算的旅遊小幫手。">
+<meta name="apple-mobile-web-app-title" content="旅遊小幫手">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: 與「貓咪照顧小幫手」同一套設計語言——白底標題區＋淺灰色帶，白色卡片不加框不加陰影，細線分隔，藍色只用在可以按的東西 */
+:root{
+  color-scheme:light;
+  --bg:#ffffff;
+  --band:#f5f5f7;
+  --ink:#1d1d1f;
+  --muted:#6e6e73;
+  --faint:#a1a1a6;
+  --line:#d2d2d7;
+  --hair:#e8e8ed;
+  --soft:#f5f5f7;
+  --blue:#0071e3;
+  --link:#0066cc;
+  --blue-soft:rgba(0,113,227,.09);
+  --sage:#4f8a74;--sage-soft:#dfeee8;
+  --bad:#b83226;--bad-soft:#f9e0dd;
+  --font:"Noto Serif TC","Source Han Serif TC","Noto Serif CJK TC","PMingLiU",serif;
+  --ease:cubic-bezier(.28,.11,.32,1);
+  --spring:cubic-bezier(.34,1.36,.64,1);
+  --col:640px;
+}
+/* 刻意只用白底黑字的淺色主題，和貓咪照顧小幫手一致 */
+*{box-sizing:border-box}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums lining-nums}
+.ico{display:inline-grid;place-items:center;flex:none}
+.ico svg{display:block}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.col{max-width:var(--col);margin:0 auto}
+.band{background:var(--band);padding-block:28px calc(120px + env(safe-area-inset-bottom,0px))}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.screen{display:flex;flex-direction:column;min-height:100vh;animation:fadeIn .35s var(--ease)}
+.screen > .band{flex:1}
+
+/* ===== 登入 ===== */
+.login{min-height:100vh;display:grid;align-content:center;justify-items:center;text-align:center;padding-block:64px 48px}
+.login h1{font-size:clamp(2.6rem,9vw,3.5rem);font-weight:600;letter-spacing:-.015em;line-height:1.1;margin:0;animation:rise .7s var(--ease) both}
+.login .lede{margin:22px 0 0;font-size:1.1875rem;line-height:1.8;animation:rise .7s .08s var(--ease) both}
+.login .lede span{display:block}
+.g-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;margin-top:44px;height:50px;padding:0 28px;border:0;border-radius:980px;background:var(--ink);color:#fff;font-size:1rem;font-weight:500;letter-spacing:.02em;cursor:pointer;transition:transform .2s var(--ease),background .2s;animation:rise .7s .16s var(--ease) both}
+@media (hover:hover){.g-btn:hover{background:#000}}
+.g-btn:active{transform:scale(.96)}
+.login small{display:block;margin-top:16px;color:var(--muted);font-size:.8125rem;animation:rise .7s .22s var(--ease) both}
+
+/* ===== 頂部 ===== */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px}
+.back{display:inline-flex;align-items:center;gap:2px;height:44px;margin-left:-6px;padding:0 8px 0 2px;border:0;border-radius:10px;background:transparent;color:var(--link);font-size:1rem;cursor:pointer;transition:opacity .2s}
+.back:active{opacity:.5}
+.text-btn{height:44px;padding:0 2px;border:0;background:transparent;color:var(--link);font-size:1rem;cursor:pointer;transition:opacity .2s}
+.text-btn:active{opacity:.5}
+/* 選單列（按下去進到下一頁） */
+.line.go{width:100%;border-left:0;border-right:0;border-bottom:0;background:transparent;text-align:left;cursor:pointer;transition:background .2s}
+.line.go:first-child{border-top:0}
+.line.go:active{background:var(--soft)}
+.line.go .val{flex:1;min-width:0;text-align:right;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.line.go .chev{color:var(--faint);transform:rotate(180deg)}
+.line.go:disabled{cursor:default}
+.line.go:disabled .val{color:var(--muted)}
+/* 第二層頁面：從右邊滑進來（iOS 的導覽方式） */
+.subpage{position:fixed;left:50%;bottom:0;z-index:43;display:flex;flex-direction:column;width:min(100%,var(--col));height:min(86vh,calc(100vh - 28px - env(safe-area-inset-top,0px)));background:var(--band);border-radius:16px 16px 0 0;transform:translate(calc(-50% + 100vw),0);transition:transform .45s cubic-bezier(.22,1,.36,1);box-shadow:-10px 0 30px rgba(0,0,0,.06)}
+.subpage.on{transform:translate(-50%,0)}
+.subpage .sheet-h{position:static;margin:0;padding:0 max(16px,env(safe-area-inset-left,0px));border-radius:16px 16px 0 0}
+.subpage .back{margin-left:-6px;justify-self:start}
+.search{position:relative;margin:2px max(16px,env(safe-area-inset-left,0px)) 6px}
+.search .ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.search input{width:100%;height:38px;padding:0 12px 0 34px;border:0;border-radius:10px;background:rgba(120,120,128,.12);font-size:16px;color:var(--ink)}
+.search input:focus{outline:none}
+.search input::placeholder{color:var(--muted)}
+.sub-list{flex:1;overflow:auto;overscroll-behavior:contain;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sub-list .grp-lab{margin:18px 16px -14px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:0 16px;border:0;border-top:1px solid var(--hair);background:transparent;text-align:left;cursor:pointer;transition:background .2s}
+.opt:first-child{border-top:0}
+.opt:active{background:var(--soft)}
+.opt .nm{flex:1;min-width:0}
+.opt .cd{color:var(--muted);font-size:.875rem;letter-spacing:.04em}
+.opt .ck{width:20px;color:var(--blue);opacity:0;transition:opacity .2s}
+.opt[aria-selected="true"] .ck{opacity:1}
+.opt[aria-selected="true"] .nm{font-weight:600}
+.no-hit{padding:32px 0;text-align:center;color:var(--muted)}
+.me-btn{display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;background:var(--soft);color:var(--ink);font-weight:600;font-size:.9375rem;cursor:pointer;transition:transform .2s var(--ease),background .2s}
+.me-btn:active{transform:scale(.92)}
+.head{padding-block:8px 32px}
+.head h1{font-size:clamp(2.2rem,7vw,2.75rem);font-weight:600;letter-spacing:-.012em;line-height:1.15;margin:0;text-wrap:balance;animation:rise .6s var(--ease) both}
+.head p{margin:8px 0 0;color:var(--muted);font-size:1.0625rem;animation:rise .6s .06s var(--ease) both}
+
+/* ===== 卡片與列 ===== */
+.card{background:#fff;border-radius:18px;padding:6px 22px;min-width:0}
+.stack{display:grid;gap:16px}
+.rise{animation:rise .55s var(--ease) both;animation-delay:calc(var(--i,0) * 50ms)}
+.pill{display:inline-block;padding:1px 10px;border-radius:999px;font-size:.8125rem;white-space:nowrap;line-height:1.6}
+.pill.before{background:var(--sage-soft);color:var(--sage)}
+.pill.during{background:var(--blue-soft);color:var(--link)}
+.pill.after{background:var(--soft);color:var(--muted)}
+.link-btn{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0;border:0;background:transparent;color:var(--link);font-size:1rem;cursor:pointer;transition:opacity .2s}
+.link-btn:active{opacity:.5}
+.foot-note{margin:28px 4px 0;color:var(--muted);font-size:.8125rem;line-height:1.7}
+
+/* 旅程卡 */
+.trip{display:block;width:100%;padding:0 22px;border:0;border-radius:18px;background:#fff;text-align:left;cursor:pointer;transition:transform .45s var(--spring),box-shadow .35s var(--ease)}
+@media (hover:hover){.trip:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(0,0,0,.10),0 2px 8px rgba(0,0,0,.05)}}
+.trip:active{transform:scale(.985)}
+.trip-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 0 16px}
+.trip-top b{display:block;font-size:1.1875rem;font-weight:600;line-height:1.35}
+.trip-top span.d{display:block;margin-top:2px;color:var(--muted);font-size:.875rem}
+.trip-top .pill{margin-top:2px}
+.trip-foot{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:14px 0 18px;border-top:1px solid var(--hair);color:var(--muted);font-size:.875rem}
+.trip-foot b{color:var(--ink);font-size:1.0625rem;font-weight:600}
+
+/* 長按旅程卡：浮起＋選單（同貓咪網站的長按） */
+.trip{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.trip.pressing{transform:scale(.97);transition-duration:.38s}
+.trip.held{transform:scale(1.02);box-shadow:0 18px 44px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.06);position:relative;z-index:46}
+.ctx-scrim{position:fixed;inset:0;z-index:45;background:rgba(245,245,247,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .25s var(--ease)}
+.ctx-scrim.on{opacity:1}
+.ctx{position:fixed;z-index:47;min-width:230px;padding:6px;border-radius:16px;background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);box-shadow:0 12px 40px rgba(0,0,0,.14),0 2px 6px rgba(0,0,0,.06),inset 0 0 0 .5px rgba(0,0,0,.08);transform-origin:top left;animation:ctxIn .26s var(--spring)}
+.ctx.up{transform-origin:bottom left}
+.ctx.out{animation:ctxOut .16s var(--ease) forwards}
+@keyframes ctxIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+@keyframes ctxOut{to{opacity:0;transform:scale(.96)}}
+.ctx button{display:flex;align-items:center;gap:12px;width:100%;height:46px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:var(--ink);font-size:1rem;text-align:left;cursor:pointer;transition:background .15s}
+.ctx button:hover,.ctx button:focus-visible{background:var(--soft);outline:none}
+.ctx button .ico{color:var(--muted)}
+.ctx .sep{height:1px;margin:4px 10px;background:var(--hair)}
+.ctx button.danger,.ctx button.danger .ico{color:var(--bad)}
+.ctx button.armed{background:var(--bad-soft);font-weight:600}
+.trip.renaming{cursor:default}
+.trip.renaming input{width:100%;height:40px;margin:-4px 0 0;padding:0 10px;border:1px solid var(--blue);border-radius:10px;background:#fff;font-size:1.0625rem;font-weight:600;color:var(--ink);box-shadow:0 0 0 3px rgba(0,113,227,.15)}
+.trip.renaming input:focus{outline:none}
+/* 總覽裡的各帳戶剩餘 */
+.split{margin-top:16px;border-top:1px solid var(--hair)}
+.split button{display:block;width:100%;min-height:46px;padding:0;border:0;border-bottom:1px solid var(--hair);background:transparent;text-align:left;cursor:pointer;transition:opacity .2s}
+.split button:last-child{border-bottom:0;margin-bottom:-6px}
+.split button:active{opacity:.55}
+.split .sp-top{display:flex;align-items:center;gap:12px}
+.split .bar{height:5px;margin:8px 0 2px 34px}
+.split .ico{color:var(--muted);width:22px}
+.split .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.split .n small{display:block;color:var(--muted);font-size:.75rem;line-height:1.3}
+.split button{padding-block:10px 9px}
+.split .v{text-align:right;font-weight:500}
+.split .v small{display:block;color:var(--muted);font-size:.75rem;font-weight:400;line-height:1.3}
+.split .neg{color:var(--bad)}
+
+/* ===== 統計 ===== */
+.st-top{padding:20px 22px}
+.st-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.st-row .r{text-align:right}
+.st-row .lab{display:block;color:var(--muted);font-size:.8125rem}
+.st-row b{display:block;font-size:1.125rem;font-weight:600}
+.st-row b.neg{color:var(--bad)}
+.st-row .off{display:block;color:var(--muted);font-size:.875rem}
+.orb{width:min(220px,62vw);margin:6px auto 4px}
+.orb svg{display:block;width:100%;height:auto;filter:drop-shadow(0 14px 28px rgba(0,0,0,.10)) drop-shadow(0 2px 4px rgba(0,0,0,.06))}
+.orb .lv{transform:translateY(200px);transition:transform 1.6s cubic-bezier(.22,1,.36,1)}
+.orb.fill .lv{transform:translateY(var(--y))}
+.orb .wv{animation:wave 5s linear infinite}
+.orb .wv.b{fill:rgba(72,72,74,.2);animation-duration:7s;animation-direction:reverse}
+.orb .wv.f{fill:rgba(72,72,74,.66)}
+.orb.over .wv.f{fill:rgba(184,50,38,.7)}
+@keyframes wave{from{transform:translateX(0)}to{transform:translateX(-120px)}}
+.orb .wv.b{animation-name:waveB}
+@keyframes waveB{from{transform:translateX(0)}to{transform:translateX(-150px)}}
+.orb .pc{font:600 34px var(--font);fill:var(--ink);text-anchor:middle;font-variant-numeric:tabular-nums}
+.orb .pl{font:400 12px var(--font);fill:var(--muted);text-anchor:middle;letter-spacing:.1em}
+.orb .in{fill:#fff}
+.st-body{margin-top:16px;padding:16px 22px 18px}
+.mini-wrap{display:flex;justify-content:center;margin-bottom:6px}
+.mini-seg{position:relative;display:inline-flex;padding:3px;border-radius:980px;background:rgba(120,120,128,.14);box-shadow:inset 0 1px 2px rgba(0,0,0,.05)}
+.mini-seg .thumb{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:980px;pointer-events:none;background:linear-gradient(180deg,#fff,rgba(255,255,255,.88));box-shadow:0 3px 10px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.08),inset 0 1px 0 #fff,inset 0 0 0 .5px rgba(0,0,0,.08)}
+.mini-seg .thumb.ready{transition:translate .42s var(--ease),width .42s var(--ease)}
+.mini-seg button{position:relative;z-index:1;height:30px;min-width:72px;padding:0 14px;border:0;border-radius:980px;background:transparent;color:var(--muted);font-size:.875rem;letter-spacing:.04em;cursor:pointer;transition:color .3s}
+.mini-seg button[aria-selected="true"]{color:var(--ink);font-weight:600}
+.st-pane.fade-in{animation:fadeIn .35s var(--ease)}
+.crow{padding:12px 0 10px;border-bottom:1px solid var(--hair);animation:rise .45s var(--ease) both;animation-delay:calc(var(--i) * 40ms)}
+.ctop{display:flex;align-items:center;gap:12px}
+.ctop .ico{color:var(--muted);width:22px}
+.ctop .cn{flex:1}
+.ctop b{font-weight:600}
+.ctop .cv{color:var(--muted);font-size:.875rem;min-width:6.5em;text-align:right}
+.cbar{height:5px;margin:8px 0 0 34px;border-radius:5px;background:var(--soft);overflow:hidden}
+.cbar i{display:block;height:100%;width:0;border-radius:5px;background:linear-gradient(90deg,#3a3a3c,#1d1d1f);transition:width .9s var(--ease)}
+.ctotal{display:flex;justify-content:space-between;padding:14px 0 2px;font-weight:600}
+.rank{width:24px;text-align:center;color:var(--muted);font-weight:600}
+.trend{display:flex;align-items:flex-end;gap:6px;height:190px;padding-top:10px}
+.tcol{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
+.tv{font-size:.6875rem;color:var(--muted);white-space:nowrap}
+.tb{flex:1;width:100%;max-width:34px;display:flex;align-items:flex-end;border-radius:8px;background:rgba(120,120,128,.08)}
+.tb i{display:block;width:100%;height:0;border-radius:8px;background:linear-gradient(180deg,#48484a,#1d1d1f);animation:grow .9s var(--ease) forwards;animation-delay:calc(var(--i) * 50ms)}
+@keyframes grow{to{height:var(--h)}}
+.td{font-size:.6875rem;color:var(--muted);white-space:nowrap}
+.tcol.now .td{color:var(--ink);font-weight:700}
+.trend.dense .tv{display:none}
+.trend.dense .td{font-size:.5625rem}
+
+/* ===== 換算 ===== */
+.cv{position:relative;display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.cv-card{min-width:0;background:#fff;border-radius:18px;padding:12px 20px 14px}
+.cv-cur{display:inline-flex;align-items:center;gap:6px;height:32px;margin-left:-8px;padding:0 8px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:.9375rem;cursor:pointer;transition:background .2s}
+.cv-cur:active{background:var(--soft)}
+.cv-cur b{color:var(--ink);font-weight:600}
+.cv-cur .ico{transform:rotate(-90deg);color:var(--faint)}
+.cv-row{display:flex;align-items:baseline;gap:10px;margin-top:2px}
+.cv-row .sym{flex:none;color:var(--muted);font-size:1.25rem;font-weight:500}
+.cv-row input{flex:1;min-width:0;width:0;height:56px;padding:0;border:0;background:transparent;color:var(--ink);font-size:2.375rem;font-weight:600;letter-spacing:-.015em;text-align:right;font-variant-numeric:tabular-nums lining-nums}
+.cv-row input:focus{outline:none}
+.cv-row input::placeholder{color:var(--line)}
+.cv-card.out .cv-row input{color:var(--ink)}
+.swap{position:absolute;left:50%;top:50%;z-index:2;display:grid;place-items:center;width:46px;height:46px;margin:-23px 0 0 -23px;border:0;border-radius:50%;color:var(--ink);cursor:pointer;
+  background:linear-gradient(180deg,#fff,rgba(255,255,255,.9));box-shadow:0 6px 18px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.1),inset 0 1px 0 #fff,inset 0 0 0 .5px rgba(0,0,0,.08);transition:transform .45s var(--spring)}
+.swap:active{transform:scale(.9)}
+.swap.spin .ico{animation:spin .45s var(--ease)}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(180deg)}}
+.cv-rate{white-space:pre-line;margin:14px 4px 0;text-align:center;color:var(--muted);font-size:.8125rem;line-height:1.7}
+.cv-ref{margin-top:16px;padding:6px 22px}
+.cv-ref h3{margin:12px 0 4px;font-size:.8125rem;font-weight:500;color:var(--muted)}
+.ref{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:46px;padding:0;border:0;border-bottom:1px solid var(--hair);background:transparent;cursor:pointer;font-size:1rem;transition:opacity .2s}
+.ref:last-child{border-bottom:0}
+.ref:active{opacity:.5}
+.ref span:first-child{color:var(--muted)}
+.ref b{font-weight:600}
+
+/* 旅程頁分頁：玻璃膠囊（同貓咪網站） */
+.seg-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;justify-content:center;margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));background:rgba(245,245,247,.82);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);transition:box-shadow .3s}
+.seg-nav.stuck{box-shadow:0 1px 0 rgba(0,0,0,.06)}
+.seg-nav .cap{position:relative;display:inline-flex;padding:4px;border-radius:980px;background:rgba(120,120,128,.16);box-shadow:inset 0 1px 2px rgba(0,0,0,.06);touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:background .25s}
+.seg-nav .thumb{position:absolute;top:4px;bottom:4px;left:0;width:0;border-radius:980px;pointer-events:none;background:linear-gradient(180deg,#fff,rgba(255,255,255,.88));box-shadow:0 4px 14px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.10),inset 0 1px 0 #fff,inset 0 -1px 0 rgba(0,0,0,.04),inset 0 0 0 .5px rgba(0,0,0,.08)}
+.seg-nav .thumb.ready{transition:translate .45s var(--ease),width .45s var(--ease),scale .3s var(--ease),box-shadow .3s var(--ease)}
+/* 按住滑塊左右拖：滑塊微微放大、陰影加深，放開切到那一格（同貓咪網站） */
+.seg-nav .cap.drag{background:rgba(120,120,128,.2)}
+.seg-nav .cap.drag .thumb{transition:scale .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s var(--ease);scale:1.08;box-shadow:0 10px 26px rgba(0,0,0,.20),0 3px 8px rgba(0,0,0,.10),inset 0 1px 0 #fff,inset 0 0 0 .5px rgba(0,0,0,.08)}
+.seg-nav .cap.drag button[aria-selected="true"]:not(.over){color:var(--muted);font-weight:400}
+.seg-nav .cap button.over{color:var(--ink);font-weight:600}
+body.dragging,body.dragging *{cursor:grabbing !important}
+.seg-nav button{position:relative;z-index:1;height:36px;min-width:72px;padding:0 16px;border:0;border-radius:980px;background:transparent;color:var(--muted);font-size:.9375rem;letter-spacing:.04em;cursor:pointer;transition:color .3s}
+.seg-nav button[aria-selected="true"]{color:var(--ink);font-weight:600}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--band)}
+
+/* 總覽 */
+.sum{padding:22px 22px 20px}
+.sum .lab{color:var(--muted);font-size:.875rem}
+.sum .big{margin-top:2px;font-size:2.5rem;font-weight:600;letter-spacing:-.015em;line-height:1.15}
+.sum .big small{font-size:1.0625rem;font-weight:500;color:var(--muted);margin-right:6px;letter-spacing:0}
+.sum .big.neg{color:var(--bad)}
+.bar{height:6px;border-radius:6px;background:var(--soft);overflow:hidden;margin:16px 0 12px}
+.bar i{display:block;height:100%;width:0;border-radius:6px;background:var(--blue);transition:width .8s var(--ease)}
+.bar.warn i{background:#d08a1e}.bar.over i{background:var(--bad)}
+.kv{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.875rem}
+.kv b{color:var(--ink);font-weight:500;margin-left:6px}
+
+/* 每日記帳 */
+.day-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:18px 0 10px;border-bottom:1px solid var(--line)}
+.day-h b{font-size:1.0625rem;font-weight:600}
+.day-h em{font-style:normal;color:var(--muted);font-size:.875rem;margin-left:8px}
+.day-h span.t{color:var(--muted);font-size:.875rem}
+.row{display:flex;align-items:center;gap:14px;width:100%;min-height:66px;padding:10px 0;border:0;border-bottom:1px solid var(--hair);background:transparent;text-align:left;cursor:pointer;transition:background .2s,opacity .2s}
+.row.last{border-bottom:0}
+.row:active{opacity:.55}
+.row > .ico{color:var(--muted);width:24px}
+.row .mid{flex:1;min-width:0}
+.row .t{display:block;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .s{display:block;color:var(--muted);font-size:.8125rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .amt{flex:none;text-align:right}
+.row .amt b{display:block;font-weight:500;font-size:1rem}
+.row .amt span{display:block;color:var(--muted);font-size:.8125rem}
+.row.off .t,.row.off .amt b{color:var(--faint)}
+.row.fresh{animation:fresh 1.4s var(--ease)}
+@keyframes fresh{0%{background:var(--blue-soft)}100%{background:transparent}}
+.empty{padding:40px 8px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-size:1.0625rem;font-weight:600;margin-bottom:4px}
+
+/* 預算帳戶 */
+.acct{display:block;width:100%;padding:18px 0;border:0;border-bottom:1px solid var(--hair);background:transparent;text-align:left;cursor:pointer;transition:opacity .2s}
+.acct:active{opacity:.55}
+.acct-top{display:flex;align-items:center;gap:14px}
+.acct-top > .ico{color:var(--muted);width:24px}
+.acct-top .mid{flex:1;min-width:0}
+.acct-top .mid b{display:block;font-weight:600}
+.acct-top .mid span{display:block;color:var(--muted);font-size:.8125rem}
+.acct-top .left{text-align:right}
+.acct-top .left b{display:block;font-size:1.125rem;font-weight:600}
+.acct-top .left span{display:block;color:var(--muted);font-size:.8125rem}
+.acct .bar{margin:12px 0 8px 38px}
+.acct .kv{margin-left:38px;font-size:.8125rem}
+
+/* 記一筆：底部置中的藍色膠囊 */
+.fab{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:25;display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 26px 0 22px;border:0;border-radius:980px;background:var(--blue);color:#fff;font-size:1.0625rem;font-weight:500;letter-spacing:.04em;cursor:pointer;transform:translateX(-50%);box-shadow:0 10px 28px rgba(0,113,227,.32),0 2px 6px rgba(0,0,0,.08);transition:transform .4s var(--spring);animation:fabIn .6s .2s var(--spring) both}
+@keyframes fabIn{from{opacity:0;transform:translate(-50%,24px)}to{opacity:1;transform:translateX(-50%)}}
+.fab:active{transform:translateX(-50%) scale(.94)}
+
+/* ===== 底部面板（iOS 式：取消／標題／完成） ===== */
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.28);opacity:0;transition:opacity .35s var(--ease)}
+.scrim.on{opacity:1}
+.sheet{position:fixed;left:50%;bottom:0;z-index:41;width:min(100%,var(--col));max-height:calc(100vh - 28px - env(safe-area-inset-top,0px));overflow:auto;overscroll-behavior:contain;transform:translate(-50%,104%);background:var(--band);border-radius:16px 16px 0 0;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.sheet.on{transform:translate(-50%,0)}
+.sheet-h{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56px;margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:0 max(16px,env(safe-area-inset-left,0px));background:rgba(245,245,247,.86);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.sheet-h h2{margin:0;font-size:1.0625rem;font-weight:600}
+.sheet-h button{justify-self:start;height:44px;padding:0;border:0;background:transparent;color:var(--link);font-size:1.0625rem;cursor:pointer;transition:opacity .2s}
+.sheet-h button.done{justify-self:end;font-weight:600}
+.sheet-h button:disabled{color:var(--faint);cursor:default}
+.sheet-h button:active{opacity:.5}
+.grp{background:#fff;border-radius:14px;margin-top:22px;overflow:hidden}
+.grp-lab{margin:24px 16px -14px;color:var(--muted);font-size:.8125rem}
+.line{display:flex;align-items:center;gap:12px;min-height:52px;padding:0 16px;border-top:1px solid var(--hair)}
+.line:first-child{border-top:0}
+.line > label,.line > .k{flex:none;width:5em;color:var(--ink)}
+.line input,.line select{flex:1;min-width:0;height:50px;padding:0;border:0;border-radius:0;background:transparent;font-size:1rem;color:var(--ink);text-align:right;-webkit-appearance:none;appearance:none}
+.line input::placeholder{color:var(--faint)}
+.line input:focus,.line select:focus{outline:none}
+/* 日期時間：自己排版顯示的文字，原生選擇器透明蓋在上面（各家瀏覽器的日期欄位寬度不一，直接顯示會凸出去） */
+.pick{position:relative;flex:1;min-width:0;display:flex;align-items:center;justify-content:flex-end;height:50px}
+.pick span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s}
+.line .pick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
+.pick:focus-within span{color:var(--link)}
+/* 自己做的日曆與時間滾輪：點日期列就在下面展開 */
+.line.go .val.on{color:var(--ink);font-weight:600}
+.line.go:focus-visible{outline:none;background:var(--soft)}
+.expand{display:grid;grid-template-rows:0fr;transition:grid-template-rows .42s var(--ease)}
+.expand.open{grid-template-rows:1fr}
+.expand > div{min-height:0;overflow:hidden}
+/* 滾輪選擇器（像 iPhone 鬧鐘）：中間灰色玻璃選取帶，上下的項目沿著圓柱彎下去、漸淡 */
+.pk{border-top:1px solid var(--hair);padding-top:6px}
+.wheels{position:relative;display:flex;justify-content:center;align-items:center;height:216px;margin:0 12px}
+.wheels::before{content:"";position:absolute;left:0;right:0;top:50%;height:38px;transform:translateY(-50%);border-radius:11px;background:rgba(120,120,128,.13);pointer-events:none}
+.wheel{position:relative;flex:none;height:216px;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain;perspective:420px;-webkit-user-select:none;user-select:none;
+  -webkit-mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent)}
+.wheel::-webkit-scrollbar{display:none}
+.wheel:focus{outline:none}
+.wheel .pad{height:90px}
+.wheel .it{height:36px;line-height:36px;text-align:center;font-size:1.3125rem;white-space:nowrap;scroll-snap-align:center;transform-origin:50% 50%;will-change:transform,opacity;cursor:pointer;font-variant-numeric:tabular-nums lining-nums}
+.wheel .it.off{color:var(--faint)}
+.wheels .colon{position:relative;font-size:1.25rem;font-weight:600;padding:0 2px}
+.cal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px 14px}
+.cal-foot .hint{font-size:.8125rem}
+.cal-ok{height:36px;padding:0 22px;border:0;border-radius:980px;color:var(--ink);font-size:.9375rem;font-weight:600;letter-spacing:.06em;cursor:pointer;background:linear-gradient(180deg,#fff,rgba(255,255,255,.88));box-shadow:0 4px 14px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08),inset 0 1px 0 #fff,inset 0 0 0 .5px rgba(0,0,0,.1);transition:transform .25s var(--spring),box-shadow .25s}
+.cal-ok:active{transform:scale(.94);box-shadow:0 2px 6px rgba(0,0,0,.1),inset 0 0 0 .5px rgba(0,0,0,.1)}
+/* 預算帳戶列：可以自己新增 */
+.brow{gap:10px}
+.line .bname{flex:none;width:6.5em;text-align:left}
+.line .bamt{flex:1}
+.unit-btn{flex:none;min-width:48px;height:28px;padding:0 10px;border:0;border-radius:980px;background:var(--soft);color:var(--muted);font-size:.8125rem;letter-spacing:.04em;cursor:pointer;transition:background .2s,color .2s,transform .2s var(--ease)}
+.unit-btn:active{transform:scale(.92)}
+.rm{flex:none;display:grid;place-items:center;width:22px;height:22px;padding:0;border:0;border-radius:50%;background:var(--bad);color:#fff;cursor:pointer;transition:transform .2s var(--ease)}
+.rm:active{transform:scale(.85)}
+.rm::before{content:"";width:10px;height:2px;border-radius:2px;background:currentColor}
+.brow.out{animation:rowOut .3s var(--ease) forwards;overflow:hidden}
+@keyframes rowOut{to{opacity:0;min-height:0;height:0;padding-block:0;border-top-width:0}}
+.brow.in{animation:rowIn .35s var(--ease)}
+@keyframes rowIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.add-row .link-btn{height:52px}
+.line select{text-align-last:right}
+.line .unit{color:var(--muted);flex:none;font-size:.9375rem}
+.line.stack-line{display:grid;gap:12px;padding:14px 16px}
+.line .toggle-lab{flex:1;width:auto}
+
+/* 金額 */
+.amount-box{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:6px;padding:18px 0 4px}
+.cur-seg{display:inline-flex;padding:3px;border-radius:980px;background:rgba(120,120,128,.12)}
+.cur-seg button{min-width:64px;height:30px;padding:0 14px;border:0;border-radius:980px;background:transparent;color:var(--muted);font-size:.875rem;letter-spacing:.06em;cursor:pointer;transition:background .25s,color .25s,box-shadow .25s}
+.cur-seg button[aria-pressed="true"]{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,.08),0 0 0 .5px rgba(0,0,0,.04)}
+/* 金額：自己排版「符號＋數字＋游標」，真正的輸入框透明蓋在上面（各瀏覽器的輸入框游標位置不一致） */
+.amount{position:relative;min-width:0;max-width:100%;overflow:hidden;display:flex;align-items:baseline;justify-content:center;width:100%;margin-top:10px;--fs:3.25rem;cursor:text}
+.amount .sym{font-size:calc(var(--fs) * .5);font-weight:500;color:var(--muted);margin-right:.32em;white-space:nowrap;line-height:1}
+.amount .shown{font-size:var(--fs);font-weight:600;letter-spacing:-.015em;line-height:1.1;white-space:nowrap;font-variant-numeric:tabular-nums lining-nums}
+.amount .shown.ghost{color:var(--line)}
+.amount .caret{align-self:center;width:2.5px;height:calc(var(--fs) * .82);margin-left:3px;border-radius:2px;background:var(--ink);opacity:0}
+.amount.focus .caret{animation:blink 1.06s steps(1) infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.amount input{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;opacity:0;font-size:16px;color:transparent;background:transparent;caret-color:transparent;cursor:text}
+.conv{color:var(--muted);font-size:.875rem;min-height:1.4em}
+
+/* 類別：一排圓形圖示 */
+.cats{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:22px}
+.cat{display:grid;justify-items:center;gap:6px;padding:0;border:0;background:transparent;color:var(--muted);font-size:.75rem;cursor:pointer}
+.cat .ico{width:44px;height:44px;border-radius:50%;background:#fff;color:var(--ink);transition:background .25s,color .25s,transform .35s var(--spring)}
+.cat[aria-pressed="true"]{color:var(--ink);font-weight:600}
+.cat[aria-pressed="true"] .ico{background:var(--ink);color:#fff;transform:scale(1.06)}
+.cat:active .ico{transform:scale(.9)}
+.cats.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+/* 付款方式：膠囊 */
+.pays{display:flex;flex-wrap:wrap;gap:8px}
+.pay{height:34px;padding:0 14px;border:1px solid var(--line);border-radius:980px;background:#fff;color:var(--ink);font-size:.875rem;cursor:pointer;transition:background .25s,color .25s,border-color .25s,transform .2s var(--ease)}
+.pay:active{transform:scale(.95)}
+.pay[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+
+.line input.switch,.switch{position:relative;width:51px;height:31px;flex:none;margin:0;appearance:none;-webkit-appearance:none;border-radius:31px;background:#e9e9ea;cursor:pointer;transition:background .25s}
+.line input.switch::after,.switch::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.08);transition:transform .32s var(--spring)}
+.line input.switch:checked,.switch:checked{background:var(--blue)}
+.line input.switch:checked::after,.switch:checked::after{transform:translateX(20px)}
+.hint{display:block;color:var(--muted);font-size:.75rem;line-height:1.4}
+.del{display:block;width:100%;height:52px;border:0;background:transparent;color:var(--bad);font-size:1rem;cursor:pointer;transition:background .2s}
+.del.armed{background:var(--bad-soft);font-weight:600}
+.err{margin:10px 16px 0;color:var(--bad);font-size:.8125rem;min-height:1.3em}
+
+/* 帳號 */
+.me{display:flex;align-items:center;gap:14px;padding:16px}
+.me .me-btn{width:48px;height:48px;font-size:1.125rem;cursor:default}
+.me b{display:block;font-weight:600}
+.me span.e{color:var(--muted);font-size:.875rem}
+.menu-btn{display:block;width:100%;height:52px;padding:0 16px;border:0;border-top:1px solid var(--hair);background:transparent;text-align:left;font-size:1rem;color:var(--link);cursor:pointer}
+.menu-btn.red{color:var(--bad)}
+.menu-btn:active{background:var(--soft)}
+
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:60;padding:10px 20px;border-radius:980px;background:rgba(29,29,31,.92);color:#fff;font-size:.9375rem;transform:translate(-50%,8px);opacity:0;transition:opacity .25s,transform .35s var(--spring);pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:360px){.card,.trip{padding-left:18px;padding-right:18px}.sum{padding:20px 18px}.sum .big{font-size:2.125rem}.amount{--fs:2.75rem}.cat .ico{width:38px;height:38px}.seg-nav button{min-width:64px;padding:0 14px}.line > label,.line > .k{width:4em}.line input,.line select{font-size:.9375rem}.line .bname{width:5em}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}}
+</style>
+
+<div id="app"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ================= 小工具 ================= */
+const $ = id => document.getElementById(id);
+function el(tag, props, ...kids){
+  const e = document.createElement(tag);
+  if(props) for(const [k, v] of Object.entries(props)){
+    if(v == null || v === false) continue;
+    if(k === "class") e.className = v;
+    else if(k === "text") e.textContent = v;          // 使用者輸入一律用 textContent，不當 HTML（防 XSS）
+    else if(k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if(k in e && k !== "list") e[k] = v;
+    else e.setAttribute(k, v === true ? "" : v);
+  }
+  kids.flat().forEach(c => c != null && c !== false && e.append(c));
+  return e;
+}
+// 圖示：程式內寫死的線條 SVG（不含使用者資料）
+const P = {
+  back:'<path d="m15 18-6-6 6-6"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  swap:'<path d="m7 4-3 3 3 3"/><path d="M4 7h13a3 3 0 0 1 3 3v1"/><path d="m17 20 3-3-3-3"/><path d="M20 17H7a3 3 0 0 1-3-3v-1"/>',
+  pen:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  sliders:'<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/>',
+  trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  food:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+  shop:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+  fun:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>',
+  plane:'<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
+  train:'<path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"/><path d="m9 15-1-1"/><path d="m15 15 1-1"/><path d="M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z"/><path d="m8 19-2 3"/><path d="m16 19 2 3"/>',
+  bed:'<path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 18h20"/>',
+  more:'<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  cash:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>',
+  card:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+  phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
+  ic:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 15h4"/><path d="M15 9.5a3.5 3.5 0 0 1 0 5"/><path d="M17.5 8a6 6 0 0 1 0 8"/>'
+};
+function icon(name, size = 20, sw = 1.6){
+  const s = el("span", {class:"ico", "aria-hidden":"true"});
+  s.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${P[name]}</svg>`;
+  return s;
+}
+let toastTm;
+function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastTm); toastTm = setTimeout(() => t.classList.remove("on"), 1800); }
+const uid = p => p + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
+
+/* ================= 幣別與匯率 =================
+   金額一律存「最小單位的整數」（日圓 1 圓、美金 1 分），避免小數誤差累積。
+   匯率：內建一份當天的市場中間價；有網路時自動抓最新的（每天更新），抓不到就用上次存的。每筆記帳保存記帳當下的匯率。 */
+// [代碼, 符號, 小數位數, 匯率（1 單位 ≈ 幾台幣，內建 2026-10-24 市場中間價）, 貨幣名稱]
+const CUR = Object.fromEntries([
+  ["TWD","NT$",0,1.0,"新台幣"],["JPY","¥",0,0.207769,"日圓"],["KRW","₩",0,0.0246215,"韓元"],["CNY","CN¥",2,4.8836,"人民幣"],["HKD","HK$",2,4.15507,"港幣"],
+  ["MOP","MOP$",2,4.03405,"澳門幣"],["MNT","₮",0,0.00905123,"圖格里克"],["SGD","S$",2,25.4949,"新加坡幣"],["MYR","RM",2,7.97548,"令吉"],["THB","฿",2,0.965279,"泰銖"],
+  ["VND","₫",0,0.00127087,"越南盾"],["PHP","₱",2,0.512409,"菲律賓披索"],["IDR","Rp",0,0.00180148,"印尼盾"],["KHR","៛",0,0.0079873,"柬埔寨瑞爾"],["LAK","₭",0,0.00144797,"寮國基普"],
+  ["MMK","K",0,0.0155166,"緬甸元"],["BND","B$",2,25.4949,"汶萊幣"],["INR","₹",2,0.343203,"印度盧比"],["NPR","Rs",2,0.214401,"尼泊爾盧比"],["LKR","Rs",2,0.0982066,"斯里蘭卡盧比"],
+  ["MVR","Rf",2,2.10548,"拉菲亞"],["AED","AED",2,8.87291,"迪拉姆"],["QAR","QR",2,8.95213,"卡達里亞爾"],["SAR","SR",2,8.68953,"沙烏地里亞爾"],["TRY","₺",2,0.655497,"土耳其里拉"],
+  ["ILS","₪",2,10.4931,"新謝克爾"],["JOD","JD",3,45.9602,"約旦第納爾"],["EGP","E£",2,0.591617,"埃及鎊"],["MAD","MAD",2,3.31818,"摩洛哥迪拉姆"],["ZAR","R",2,1.96397,"南非蘭特"],
+  ["KES","KSh",2,0.251152,"肯亞先令"],["EUR","€",2,36.5093,"歐元"],["GBP","£",2,43.5957,"英鎊"],["CHF","CHF",2,39.499,"瑞士法郎"],["CZK","Kč",2,1.50056,"捷克克朗"],
+  ["HUF","Ft",0,0.0995512,"福林"],["PLN","zł",2,8.29167,"茲羅提"],["SEK","kr",2,3.28138,"瑞典克朗"],["NOK","kr",2,3.49186,"挪威克朗"],["DKK","kr",2,4.88467,"丹麥克朗"],
+  ["ISK","kr",0,0.267616,"冰島克朗"],["USD","US$",2,32.5857,"美元"],["CAD","CA$",2,23.2676,"加幣"],["MXN","MX$",2,1.74631,"墨西哥披索"],["BRL","R$",2,6.55492,"巴西雷亞爾"],
+  ["ARS","AR$",2,0.0213892,"阿根廷披索"],["CLP","CL$",0,0.0327446,"智利披索"],["PEN","S/",2,9.46847,"秘魯索爾"],["AUD","A$",2,22.9246,"澳幣"],["NZD","NZ$",2,18.5769,"紐幣"],["FJD","FJ$",2,14.5026,"斐濟幣"],
+  ["RUB","₽",2,0.405703,"盧布"],["UAH","₴",2,0.718374,"格里夫納"],["BYN","Br",2,11.1073,"白俄羅斯盧布"],["KZT","₸",0,0.0720306,"堅戈"],["UZS","UZS",0,0.00273355,"索姆"],["GEL","₾",2,12.5595,"拉里"],
+  ["AMD","֏",0,0.0902668,"德拉姆"],["AZN","₼",2,19.1543,"馬納特"],["PKR","Rs",2,0.117786,"巴基斯坦盧比"],["BDT","৳",2,0.263547,"塔卡"],["BTN","Nu.",2,0.343203,"努扎姆"],
+  ["BHD","BD",3,86.6642,"巴林第納爾"],["KWD","KD",3,104.97,"科威特第納爾"],["OMR","OMR",3,85.0031,"阿曼里亞爾"],["LBP","LL",0,0.000362529,"黎巴嫩鎊"],
+  ["TND","DT",3,10.9236,"突尼西亞第納爾"],["TZS","TSh",0,0.0123028,"坦尚尼亞先令"],["UGX","USh",0,0.00734639,"烏干達先令"],["ETB","Br",2,0.200549,"比爾"],["GHS","GH₵",2,2.80939,"塞地"],
+  ["NGN","₦",2,0.0244725,"奈拉"],["MUR","Rs",2,0.690985,"模里西斯盧比"],["SCR","SR",2,2.26503,"塞席爾盧比"],["MGA","Ar",0,0.00721218,"阿里亞里"],["NAD","N$",2,1.96397,"納米比亞元"],["BWP","P",2,2.37227,"普拉"],
+  ["RON","lei",2,6.82446,"列伊"],["RSD","din",0,0.309767,"塞爾維亞第納爾"],["ALL","L",0,0.401953,"列克"],["MKD","den",0,0.592603,"代納爾"],["BAM","KM",2,18.6669,"馬克"],["MDL","L",2,1.81234,"摩爾多瓦列伊"],
+  ["COP","COL$",0,0.0103592,"哥倫比亞披索"],["UYU","$U",2,0.813074,"烏拉圭披索"],["BOB","Bs",2,2.75338,"玻利維亞諾"],["PYG","₲",0,0.00564266,"瓜拉尼"],["DOP","RD$",2,0.532149,"多明尼加披索"],
+  ["JMD","J$",2,0.205221,"牙買加元"],["CRC","₡",0,0.0715412,"科朗"],["GTQ","Q",2,4.2641,"格查爾"],["BSD","BS$",2,32.5857,"巴哈馬元"],
+  ["XPF","F",0,0.305948,"太平洋法郎"],["WST","WS$",2,11.7732,"塔拉"],["TOP","T$",2,13.6045,"潘加"],["VUV","VT",0,0.274239,"瓦圖"],["PGK","PGK",2,7.38753,"基那"]
+].map(([k, sym, dec, rate, name]) => [k, {sym, dec, rate, name}]));
+// 依地區排列的國家／地區（同一種貨幣可以有好幾個國家，例如歐元）
+const REGIONS = [
+  ["東亞", ["台灣 TWD","日本 JPY","韓國 KRW","中國 CNY","香港 HKD","澳門 MOP","蒙古 MNT"]],
+  ["東南亞", ["新加坡 SGD","馬來西亞 MYR","泰國 THB","越南 VND","菲律賓 PHP","印尼 IDR","柬埔寨 KHR","寮國 LAK","緬甸 MMK","汶萊 BND","東帝汶 USD"]],
+  ["南亞", ["印度 INR","尼泊爾 NPR","不丹 BTN","斯里蘭卡 LKR","馬爾地夫 MVR","巴基斯坦 PKR","孟加拉 BDT"]],
+  ["中亞與高加索", ["哈薩克 KZT","烏茲別克 UZS","喬治亞 GEL","亞美尼亞 AMD","亞塞拜然 AZN"]],
+  ["歐洲", ["法國 EUR","德國 EUR","義大利 EUR","西班牙 EUR","荷蘭 EUR","比利時 EUR","盧森堡 EUR","奧地利 EUR","希臘 EUR","葡萄牙 EUR","芬蘭 EUR","愛爾蘭 EUR",
+    "克羅埃西亞 EUR","斯洛維尼亞 EUR","斯洛伐克 EUR","愛沙尼亞 EUR","拉脫維亞 EUR","立陶宛 EUR","馬爾他 EUR","賽普勒斯 EUR","保加利亞 EUR","摩納哥 EUR","梵蒂岡 EUR","聖馬利諾 EUR","安道爾 EUR","蒙特內哥羅 EUR",
+    "英國 GBP","瑞士 CHF","列支敦斯登 CHF","捷克 CZK","匈牙利 HUF","波蘭 PLN","羅馬尼亞 RON","塞爾維亞 RSD","阿爾巴尼亞 ALL","北馬其頓 MKD","波士尼亞 BAM","摩爾多瓦 MDL",
+    "瑞典 SEK","挪威 NOK","丹麥 DKK","冰島 ISK","俄羅斯 RUB","烏克蘭 UAH","白俄羅斯 BYN"]],
+  ["美洲", ["美國 USD","加拿大 CAD","墨西哥 MXN","巴西 BRL","阿根廷 ARS","智利 CLP","秘魯 PEN","哥倫比亞 COP","烏拉圭 UYU","玻利維亞 BOB","巴拉圭 PYG","厄瓜多 USD","巴拿馬 USD",
+    "哥斯大黎加 CRC","瓜地馬拉 GTQ","多明尼加 DOP","牙買加 JMD","巴哈馬 BSD","波多黎各 USD"]],
+  ["大洋洲", ["澳洲 AUD","紐西蘭 NZD","斐濟 FJD","關島 USD","塞班 USD","帛琉 USD","大溪地 XPF","新喀里多尼亞 XPF","薩摩亞 WST","東加 TOP","萬那杜 VUV","巴布亞紐幾內亞 PGK"]],
+  ["中東", ["阿聯 AED","卡達 QAR","沙烏地阿拉伯 SAR","巴林 BHD","科威特 KWD","阿曼 OMR","約旦 JOD","以色列 ILS","黎巴嫩 LBP","土耳其 TRY"]],
+  ["非洲", ["埃及 EGP","摩洛哥 MAD","突尼西亞 TND","南非 ZAR","納米比亞 NAD","波札那 BWP","肯亞 KES","坦尚尼亞 TZS","烏干達 UGX","衣索比亞 ETB","迦納 GHS","奈及利亞 NGN","模里西斯 MUR","塞席爾 SCR","馬達加斯加 MGA"]]
+].map(([region, list]) => [region, list.map(x => { const [name, cur] = x.split(" "); return {name, cur}; })]);
+const countryLabel = t => `${t.country || CUR[t.cur].name} ${t.cur}`;
+const unit = c => 10 ** CUR[c].dec;
+// ---- 即時匯率 ----
+const BAKED = Object.fromEntries(Object.entries(CUR).map(([k, v]) => [k, v.rate]));
+const RATES = {date:"2026-10-24", live:false};
+const RATE_KEY = "travelHelper.rates";
+function applyRates(map, date, live){
+  let n = 0;
+  for(const [k, v] of Object.entries(map)){
+    // 安全檢查：只接受合理的正數，而且跟內建值差不到 3 倍（防止來源被竄改或資料錯誤）
+    if(!CUR[k] || k === "TWD" || typeof v !== "number" || !isFinite(v) || v <= 0) continue;
+    if(v > BAKED[k] * 3 || v < BAKED[k] / 3) continue;
+    CUR[k].rate = v; n++;
+  }
+  if(n){ RATES.date = date; RATES.live = !!live; }
+  return n;
+}
+try{ const c = JSON.parse(localStorage.getItem(RATE_KEY)); if(c && c.date > RATES.date) applyRates(c.map, c.date, true); }catch(e){}
+async function refreshRates(){
+  if(RATES.live && RATES.date >= ymd(new Date(Date.now() - 864e5))) return;      // 已經是今天或昨天的就不再抓
+  const urls = ["https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/twd.min.json",
+                "https://latest.currency-api.pages.dev/v1/currencies/twd.min.json"];
+  for(const u of urls){
+    try{
+      const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 6000);
+      const res = await fetch(u, {signal:ctl.signal, cache:"no-cache"}); clearTimeout(tm);
+      if(!res.ok) continue;
+      const j = await res.json();
+      if(!j || typeof j.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(j.date) || !j.twd) continue;
+      const map = {};
+      for(const k of Object.keys(CUR)){ const v = j.twd[k.toLowerCase()]; if(typeof v === "number" && v > 0) map[k] = 1 / v; }   // 來源是「1 台幣 = 多少外幣」，換成「1 外幣 = 多少台幣」
+      if(applyRates(map, j.date, true)){
+        try{ localStorage.setItem(RATE_KEY, JSON.stringify({date:j.date, map})); }catch(e){}
+        if(!sheetOpen && !subPage) render();
+        return;
+      }
+    }catch(e){}
+  }
+}
+const rateDate = () => RATES.date.replaceAll("-", "/");
+const toMinor = (v, c) => Math.round(v * unit(c));
+function fmt(minor, c){
+  const d = CUR[c].dec, v = minor / unit(c);
+  const s = Math.abs(v).toLocaleString("zh-TW", {minimumFractionDigits:d, maximumFractionDigits:d});
+  return (v < 0 ? "−" : "") + CUR[c].sym + (CUR[c].sym.length > 1 ? " " : "") + s;
+}
+const twdOf = e => Math.round(e.amount / unit(e.cur) * e.rate);   // 換算台幣，用記帳當下的匯率
+
+/* ================= 日期 ================= */
+const pad = n => String(n).padStart(2, "0");
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseYmd = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const dayDiff = (a, b) => Math.round((parseYmd(b) - parseYmd(a)) / 864e5);
+const WEEK = "日一二三四五六";
+const md = s => { const d = parseYmd(s); return `${d.getMonth() + 1}/${d.getDate()}`; };
+const mdw = s => `${md(s)}（${WEEK[parseYmd(s).getDay()]}）`;
+const range = t => {
+  const a = parseYmd(t.start), b = parseYmd(t.end), now = new Date().getFullYear();
+  return `${a.getFullYear() !== now ? a.getFullYear() + "/" : ""}${md(t.start)} – ${a.getFullYear() !== b.getFullYear() ? b.getFullYear() + "/" : ""}${md(t.end)}`;
+};
+function phase(t){
+  const today = ymd(new Date());
+  if(today < t.start) return {key:"before", label:`還有 ${dayDiff(today, t.start)} 天`};
+  if(today > t.end) return {key:"after", label:"已結束"};
+  return {key:"during", label:`第 ${dayDiff(t.start, today) + 1} 天`};
+}
+
+/* ================= 類別與支付方式 ================= */
+const CATS = [
+  {id:"food", name:"食物", icon:"food"}, {id:"shop", name:"購物", icon:"shop"}, {id:"fun", name:"娛樂", icon:"fun"},
+  {id:"fly", name:"飛機", icon:"plane"}, {id:"move", name:"交通", icon:"train"}, {id:"stay", name:"住宿", icon:"bed"}, {id:"other", name:"其他", icon:"more"}
+];
+const catOf = id => CATS.find(c => c.id === id) || CATS[CATS.length - 1];
+const METHODS = {cash:{name:"現金", icon:"cash"}, card:{name:"信用卡", icon:"card"}, epay:{name:"電子支付", icon:"phone"}, ic:{name:"交通卡", icon:"ic"}};
+
+/* ================= 資料層 =================
+   框架階段：存在這台裝置的瀏覽器。
+   接上 Firebase 後：同一組函式改成讀寫 Firestore 的 users/{uid}/trips/{tripId}/expenses/{id}，畫面程式不用改。 */
+const KEY = "travelHelper.v2";
+const Store = {
+  data:null,
+  load(){
+    try{ this.data = JSON.parse(localStorage.getItem(KEY)); }catch(e){ this.data = null; }
+    if(!this.data || !Array.isArray(this.data.trips)) this.data = {user:null, trips:[]};
+  },
+  save(){ try{ localStorage.setItem(KEY, JSON.stringify(this.data)); }catch(e){} },
+  trip(id){ return this.data.trips.find(t => t.id === id); }
+};
+
+// 範例資料：日期跟著今天走，一趟旅途中、一趟還沒出發
+function sampleTrips(){
+  const today = new Date(), s = addDays(today, -2);
+  const at = (dOff, hh, mm) => { const d = addDays(s, dOff); d.setHours(hh, mm, 0, 0); return d.toISOString(); };
+  const cash = uid("a"), suica = uid("a"), card = uid("a"), r = CUR.JPY.rate;
+  const ex = (title, yen, acct, cat, iso, extra = {}) => ({id:uid("e"), title, amount:yen, cur:"JPY", rate:r, acct, cat, time:iso, excluded:false, ...extra});
+  const tokyo = {
+    id:uid("t"), sample:true, name:"東京自由行", dest:"東京", country:"日本", start:ymd(s), end:ymd(addDays(s, 5)), cur:"JPY",
+    accounts:[
+      {id:cash, name:"日幣現金", method:"cash", cur:"JPY", budget:40000},
+      {id:suica, name:"Suica", method:"ic", cur:"JPY", budget:5000},
+      {id:card, name:"信用卡", method:"card", cur:"TWD", budget:15000}
+    ],
+    expenses:[
+      ex("來回機票", 0, card, "fly", at(-30, 21, 10), {amount:12800, cur:"TWD", rate:1, excluded:true}),
+      ex("成田特快", 3070, suica, "move", at(0, 14, 20)),
+      ex("飯店三晚", 42600, card, "stay", at(0, 15, 40)),
+      ex("一蘭拉麵", 1180, cash, "food", at(0, 19, 5)),
+      ex("築地早餐", 2400, cash, "food", at(1, 8, 30)),
+      ex("teamLab Planets", 3800, card, "fun", at(1, 11, 0)),
+      ex("藥妝店", 6480, cash, "shop", at(1, 17, 45)),
+      ex("地鐵", 420, suica, "move", at(2, 9, 15)),
+      ex("咖啡", 650, cash, "food", at(2, 10, 5))
+    ]
+  };
+  const os = addDays(today, 340);
+  const osaka = {
+    id:uid("t"), sample:true, name:"大阪京都五日遊", dest:"大阪", country:"日本", start:ymd(os), end:ymd(addDays(os, 4)), cur:"JPY",
+    accounts:[{id:uid("a"), name:"日幣現金", method:"cash", cur:"JPY", budget:50000}, {id:uid("a"), name:"信用卡", method:"card", cur:"TWD", budget:20000}],
+    expenses:[]
+  };
+  return [tokyo, osaka];
+}
+
+/* ================= 計算 ================= */
+function acctSpent(t, a){        // 用帳戶自己的幣別計算已花（不含「不計入」）
+  return t.expenses.filter(e => e.acct === a.id && !e.excluded).reduce((sum, e) =>
+    sum + (e.cur === a.cur ? e.amount : Math.round(twdOf(e) / CUR[a.cur].rate * unit(a.cur))), 0);
+}
+function totals(t){
+  const budget = t.accounts.reduce((s, a) => s + Math.round(a.budget / unit(a.cur) * CUR[a.cur].rate), 0);
+  const spent = t.expenses.filter(e => !e.excluded).reduce((s, e) => s + twdOf(e), 0);
+  return {budget, spent, left:budget - spent};
+}
+function barEl(spent, budget){
+  const p = budget > 0 ? spent / budget : (spent > 0 ? 1 : 0);
+  const b = el("div", {class:"bar" + (p > 1 ? " over" : p >= .9 ? " warn" : ""), role:"progressbar", "aria-label":"已用預算", "aria-valuemin":"0", "aria-valuemax":"100", "aria-valuenow":String(Math.min(100, Math.round(p * 100)))}, el("i"));
+  requestAnimationFrame(() => requestAnimationFrame(() => { b.firstChild.style.width = Math.min(100, p * 100) + "%"; }));
+  return b;
+}
+
+/* ================= 畫面 ================= */
+const S = {view:"home", tripId:null, tab:"ledger", fresh:null, prevTab:null, renamingTrip:null, statView:"cat"};
+let fab = null;
+function go(view, opts = {}){ Object.assign(S, {view, prevTab:null}, opts); render(); window.scrollTo(0, 0); }
+function render(){
+  const app = $("app");
+  app.replaceChildren();
+  if(fab){ fab.remove(); fab = null; }
+  if(!Store.data.user){ app.append(renderLogin()); return; }
+  const t = S.view === "trip" ? Store.trip(S.tripId) : null;
+  app.append(t ? renderTrip(t) : renderHome());
+}
+
+/* ---------- 登入 ---------- */
+function renderLogin(){
+  return el("main", {class:"screen login gut"},
+    el("h1", {text:"旅遊小幫手"}),
+    el("p", {class:"lede"}, el("span", {text:"記下每一筆。"}), el("span", {text:"看清每一分。"}), el("span", {text:"玩得更安心。"})),
+    el("button", {type:"button", class:"g-btn", onclick:signIn, text:"使用 Google 帳號登入"}),
+    el("small", {text:"框架示範：按下會用範例帳號進入，資料只存在這台裝置"}));
+}
+function signIn(){
+  // 之後換成 Firebase Authentication 的 Google 登入
+  Store.data.user = {name:"示範使用者", email:"demo@example.com"};
+  if(!Store.data.trips.length) Store.data.trips = sampleTrips();
+  Store.save(); go("home");
+}
+
+/* ---------- 我的旅程 ---------- */
+function renderHome(){
+  const u = Store.data.user;
+  const order = {during:0, before:1, after:2};
+  const trips = [...Store.data.trips].sort((a, b) => order[phase(a).key] - order[phase(b).key] || (phase(a).key === "after" ? b.start.localeCompare(a.start) : a.start.localeCompare(b.start)));
+  const head = el("header", {class:"gut"}, el("div", {class:"col"},
+    el("div", {class:"top"}, el("span"), el("button", {type:"button", class:"me-btn", "aria-label":"帳號", onclick:openMe, text:u.name.slice(0, 1)})),
+    el("div", {class:"head"}, el("h1", {text:"我的旅程"}), el("p", {text:trips.length ? `${trips.length} 趟旅程${trips.some(t => t.sample) ? "・含範例資料" : ""}` : "從第一趟開始"}))));
+  const band = el("section", {class:"band gut"}, el("div", {class:"col"},
+    el("div", {class:"stack"}, trips.map((t, i) => tripCard(t, i))),
+    el("div", {style:"margin-top:8px;padding-left:4px"}, el("button", {type:"button", class:"link-btn", onclick:() => openTripForm()}, icon("plus", 18, 1.8), el("span", {text:"新增旅程"})))));
+  return el("main", {class:"screen"}, head, band);
+}
+function tripCard(t, i){
+  const ph = phase(t), tot = totals(t);
+  const sub = `${range(t)} · ${t.dest || t.country || CUR[t.cur].name}`;
+  if(S.renamingTrip === t.id){
+    const inp = el("input", {id:"trip-rename", maxLength:24, value:t.name, "aria-label":"旅程名稱", autocomplete:"off"});
+    let done = false;
+    const finish = save => { if(done) return; done = true; const v = inp.value.trim().slice(0, 24); if(save && v){ t.name = v; delete t.sample; Store.save(); } S.renamingTrip = null; render(); };
+    inp.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); finish(true); } if(e.key === "Escape"){ e.preventDefault(); finish(false); } });
+    inp.addEventListener("blur", () => finish(true));
+    requestAnimationFrame(() => { inp.focus(); inp.select(); });
+    return el("div", {class:"trip renaming"},
+      el("div", {class:"trip-top"}, el("span", {style:"flex:1;min-width:0"}, inp, el("span", {class:"d", style:"margin-top:6px", text:sub})), el("span", {class:"pill " + ph.key, text:ph.label})),
+      el("div", {class:"trip-foot"}, el("span", {text:"剩餘預算"}), el("b", {class:"num", text:fmt(tot.left, "TWD")})));
+  }
+  let fired = false;
+  const card = el("button", {type:"button", class:"trip rise", style:`--i:${i}`, "aria-label":`${t.name}，${ph.label}。長按可以重新命名、編輯或刪除`,
+      onclick:() => { if(fired){ fired = false; return; } go("trip", {tripId:t.id, tab:"ledger"}); }},
+    el("div", {class:"trip-top"},
+      el("span", null, el("b", {text:t.name}), el("span", {class:"d", text:sub})),
+      el("span", {class:"pill " + ph.key, text:ph.label})),
+    el("div", {class:"trip-foot"}, el("span", {text:"剩餘預算"}), el("b", {class:"num", text:fmt(tot.left, "TWD")})));
+  // 長按（或電腦按右鍵）：浮起卡片，跳出選單
+  card.addEventListener("pointerdown", e => {
+    if(e.button > 0 || !e.isPrimary) return;
+    fired = false;
+    const sx = e.clientX, sy = e.clientY; let tm;
+    const stop = () => { clearTimeout(tm); card.classList.remove("pressing"); card.removeEventListener("pointermove", mv); card.removeEventListener("pointerup", stop); card.removeEventListener("pointercancel", stop); };
+    const mv = ev => { if(Math.hypot(ev.clientX - sx, ev.clientY - sy) > 8) stop(); };
+    card.addEventListener("pointermove", mv); card.addEventListener("pointerup", stop); card.addEventListener("pointercancel", stop);
+    card.classList.add("pressing");
+    tm = setTimeout(() => { stop(); fired = true; try{ if(navigator.vibrate) navigator.vibrate(12); }catch(err){} tripMenu(t, card); }, 420);
+  });
+  card.addEventListener("contextmenu", e => { e.preventDefault(); if(!document.querySelector(".ctx")){ fired = e.pointerType === "touch" || fired; tripMenu(t, card); } });
+  return card;
+}
+function tripMenu(t, card){
+  if(document.querySelector(".ctx")) return;
+  card.classList.add("held");
+  const scrim = el("div", {class:"ctx-scrim"});
+  const item = (ic, label, run, cls) => el("button", {type:"button", role:"menuitem", class:cls || null, onclick:run}, icon(ic, 20), el("span", {text:label}));
+  const close = () => {
+    document.removeEventListener("keydown", onKey); removeEventListener("scroll", close);
+    menu.classList.add("out"); scrim.classList.remove("on"); card.classList.remove("held");
+    setTimeout(() => { menu.remove(); scrim.remove(); }, 180);
+  };
+  const delBtn = item("trash", "刪除旅程", null, "danger");
+  let armed = false;
+  delBtn.addEventListener("click", () => {
+    if(!armed){ armed = true; delBtn.classList.add("armed"); delBtn.lastChild.textContent = "再按一次確認刪除"; return; }
+    close(); Store.data.trips = Store.data.trips.filter(x => x.id !== t.id); Store.save(); render(); toast("已刪除旅程");
+  });
+  const menu = el("div", {class:"ctx", role:"menu", "aria-label":t.name},
+    item("pen", "重新命名", () => { close(); S.renamingTrip = t.id; render(); }),
+    item("sliders", "編輯旅程", () => { close(); openTripForm(t); }),
+    el("div", {class:"sep"}), delBtn);
+  document.body.append(scrim, menu);
+  const r = card.getBoundingClientRect(), mh = menu.offsetHeight, mw = menu.offsetWidth, vw = document.documentElement.clientWidth;
+  let top = r.bottom + 10;
+  if(top + mh > innerHeight - 16){ top = Math.max(16, r.top - mh - 10); menu.classList.add("up"); }
+  menu.style.top = top + "px";
+  menu.style.left = Math.min(Math.max(16, r.left), vw - mw - 16) + "px";
+  requestAnimationFrame(() => scrim.classList.add("on"));
+  const onKey = e => { if(e.key === "Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  scrim.addEventListener("click", close);
+  addEventListener("scroll", close, {once:true, passive:true});
+  menu.querySelector("button").focus({preventScroll:true});
+}
+
+/* ---------- 旅程頁 ---------- */
+function renderTrip(t){
+  const ph = phase(t);
+  const head = el("header", {class:"gut"}, el("div", {class:"col"},
+    el("div", {class:"top"}, el("button", {type:"button", class:"back", onclick:() => go("home")}, icon("back", 22, 2), el("span", {text:"我的旅程"})), el("button", {type:"button", class:"text-btn", onclick:() => openTripForm(t), text:"編輯"})),
+    el("div", {class:"head"}, el("h1", {text:t.name}), el("p", {text:`${range(t)} · ${ph.label}`}))));
+  const body = el("div", {class:"col"});
+  if(S.tab === "ledger") body.append(...ledger(t));
+  else if(S.tab === "stats") body.append(...stats(t));
+  else if(S.tab === "conv") body.append(...converter(t));
+  else body.append(el("div", {class:"card rise"}, el("div", {class:"empty"}, el("b", {text:"清單會在第二階段加入"}), el("span", {text:"行前待辦、行李檢查、購物清單"}))));
+  const band = el("section", {class:"band gut", style:"padding-top:0"}, segNav(), body);
+  if(S.tab === "ledger"){
+    fab = el("button", {type:"button", class:"fab", onclick:() => openExpense(t)}, icon("plus", 20, 2), el("span", {text:"記一筆"}));
+    document.body.append(fab);
+  }
+  return el("main", {class:"screen"}, head, band);
+}
+// 分頁：玻璃膠囊＋白色滑塊，從上一個分頁滑到新的分頁
+function segNav(){
+  const tabs = [["ledger", "記帳"], ["stats", "統計"], ["conv", "換算"], ["lists", "清單"]];
+  const thumb = el("span", {class:"thumb", "aria-hidden":"true"});
+  let noSlide = false;
+  const cap = el("div", {class:"cap", role:"tablist", "aria-label":"旅程分頁"}, thumb, tabs.map(([id, label]) =>
+    el("button", {type:"button", role:"tab", "aria-selected":String(S.tab === id), "data-id":id, text:label, onclick:ev => {
+      if(cap._suppress && ev.isTrusted) return;
+      if(S.tab === id){ window.scrollTo({top:0, behavior:"smooth"}); return; }
+      const y = Math.min(scrollY, document.querySelector(".band").offsetTop);
+      S.prevTab = noSlide ? null : S.tab; noSlide = false; S.tab = id; render(); window.scrollTo(0, y);
+    }})));
+  const put = b => { thumb.style.width = b.offsetWidth + "px"; thumb.style.translate = `${b.offsetLeft}px 0`; };
+  // 按住滑塊左右拖，放開時切到最近的那一格
+  const btns = () => [...cap.querySelectorAll("button")];
+  const tabAt = x => btns().reduce((best, b) => Math.abs(b.offsetLeft + b.offsetWidth / 2 - x) < Math.abs(best.offsetLeft + best.offsetWidth / 2 - x) ? b : best);
+  let drag = null;
+  cap.addEventListener("pointerdown", e => { if(e.button > 0 || !e.isPrimary) return; drag = {id:e.pointerId, sx:e.clientX, left:cap.getBoundingClientRect().left, moving:false, over:null}; });
+  cap.addEventListener("pointermove", e => {
+    if(!drag || e.pointerId !== drag.id) return;
+    if(!drag.moving){
+      if(Math.abs(e.clientX - drag.sx) < 6) return;
+      drag.moving = true; try{ cap.setPointerCapture(e.pointerId); }catch(err){}
+      cap.classList.add("drag"); document.body.classList.add("dragging");
+    }
+    const x = e.clientX - drag.left, b = tabAt(x), w = b.offsetWidth, all = btns();
+    const grow = w * .04;   // 拖動時滑塊放大 1.08 倍，左右各多出 4%，先扣掉才不會貼到邊
+    const min = all[0].offsetLeft + grow, max = all[all.length - 1].offsetLeft + all[all.length - 1].offsetWidth - w - grow;
+    thumb.style.width = w + "px"; thumb.style.translate = `${Math.max(min, Math.min(max, x - w / 2))}px 0`;
+    if(drag.over !== b){ all.forEach(t => t.classList.toggle("over", t === b)); drag.over = b; try{ if(navigator.vibrate) navigator.vibrate(6); }catch(err){} }
+  });
+  const endDrag = e => {
+    if(!drag || e.pointerId !== drag.id) return;
+    const d = drag; drag = null; if(!d.moving) return;
+    cap.classList.remove("drag"); document.body.classList.remove("dragging");
+    btns().forEach(t => t.classList.remove("over"));
+    cap._suppress = true; setTimeout(() => { cap._suppress = false; }, 300);
+    const b = d.over || tabAt(e.clientX - d.left);
+    if(b.dataset.id === S.tab) put(b); else { noSlide = true; b.click(); }
+  };
+  cap.addEventListener("pointerup", endDrag); cap.addEventListener("pointercancel", endDrag);
+  const place = () => {
+    const cur = cap.querySelector('[aria-selected="true"]'), prev = S.prevTab && cap.querySelector(`[data-id="${S.prevTab}"]`);
+    if(prev && !thumb.classList.contains("ready")){ put(prev); thumb.getBoundingClientRect(); }
+    thumb.classList.add("ready"); put(cur); S.prevTab = null;
+  };
+  requestAnimationFrame(place);
+  if(document.fonts) document.fonts.ready.then(() => { const c = cap.querySelector('[aria-selected="true"]'); if(c) put(c); });
+  const nav = el("div", {class:"seg-nav"}, cap);
+  const onScroll = () => { if(!nav.isConnected){ removeEventListener("scroll", onScroll); return; } nav.classList.toggle("stuck", nav.getBoundingClientRect().top <= 0.5); };
+  addEventListener("scroll", onScroll, {passive:true});
+  return nav;
+}
+function summary(t, withSplit){
+  const tot = totals(t);
+  const card = el("div", {class:"card sum rise"},
+    el("div", {class:"lab", text:"剩餘預算（換算台幣）"}),
+    el("div", {class:"big num" + (tot.left < 0 ? " neg" : "")}, el("small", {text:"NT$"}), document.createTextNode((tot.left < 0 ? "−" : "") + Math.abs(tot.left).toLocaleString("zh-TW"))),
+    barEl(tot.spent, tot.budget),
+    el("div", {class:"kv"}, el("span", null, "已花", el("b", {class:"num", text:fmt(tot.spent, "TWD")})), el("span", null, "預算", el("b", {class:"num", text:fmt(tot.budget, "TWD")}))));
+  // 每個支付方式各剩多少（用原本的幣別），點了到「預算」看細節
+  if(withSplit && t.accounts.length){
+    card.append(el("div", {class:"split"}, t.accounts.map(a => {
+      const left = a.budget - acctSpent(t, a);
+      const sp = acctSpent(t, a);
+      return el("button", {type:"button", "aria-label":`${a.name}：花掉 ${fmt(sp, a.cur)}，剩下 ${fmt(left, a.cur)}。點一下調整預算`, onclick:() => openTripForm(t)},
+        el("span", {class:"sp-top"},
+          icon(METHODS[a.method].icon, 20),
+          el("span", {class:"n"}, document.createTextNode(a.name), el("small", {text:`花掉 ${fmt(sp, a.cur)}`})),
+          el("span", {class:"v num" + (left < 0 ? " neg" : "")}, document.createTextNode(fmt(left, a.cur)), el("small", {text:"剩下"}))),
+        barEl(sp, a.budget));
+    })));
+  }
+  return card;
+}
+function ledger(t){
+  const out = [summary(t, true)];
+  if(!t.expenses.length){
+    out.push(el("div", {class:"card rise", style:"margin-top:16px;--i:1"}, el("div", {class:"empty"}, el("b", {text:"還沒有記帳"}), el("span", {text:"按下方「記一筆」開始"}))));
+    return out;
+  }
+  const groups = new Map();
+  [...t.expenses].sort((a, b) => b.time.localeCompare(a.time)).forEach(e => { const k = ymd(new Date(e.time)); if(!groups.has(k)) groups.set(k, []); groups.get(k).push(e); });
+  const card = el("div", {class:"card rise", style:"margin-top:16px;--i:1"});
+  groups.forEach((list, k) => {
+    const sub = list.filter(e => !e.excluded).reduce((s, e) => s + twdOf(e), 0);
+    const tag = k < t.start ? "出發前" : k > t.end ? "回國後" : `第 ${dayDiff(t.start, k) + 1} 天`;
+    card.append(el("div", {class:"day-h"}, el("span", null, el("b", {text:mdw(k)}), el("em", {text:tag})), el("span", {class:"t num", text:sub ? fmt(sub, "TWD") : ""})));
+    list.forEach((e, i) => card.append(expenseRow(t, e, i === list.length - 1)));
+  });
+  out.push(card, el("p", {class:"foot-note", text:`匯率：1 ${t.cur} ≈ ${+CUR[t.cur].rate.toPrecision(4)} TWD（${rateDate()} 市場中間價，有網路時每天自動更新）。每一筆都保存記帳當下的匯率；銀行換匯或刷卡的實際匯率會因手續費略有差異。`}));
+  return out;
+}
+function expenseRow(t, e, last){
+  const c = catOf(e.cat), a = t.accounts.find(x => x.id === e.acct), d = new Date(e.time);
+  return el("button", {type:"button", class:"row" + (last ? " last" : "") + (e.excluded ? " off" : "") + (S.fresh === e.id ? " fresh" : ""), onclick:() => openExpense(t, e)},
+    icon(c.icon, 22),
+    el("span", {class:"mid"}, el("span", {class:"t", text:e.title || c.name}),
+      el("span", {class:"s", text:`${pad(d.getHours())}:${pad(d.getMinutes())} · ${a ? a.name : "未指定"}${e.excluded ? " · 不計入統計" : ""}`})),
+    el("span", {class:"amt num"}, el("b", {text:fmt(e.amount, e.cur)}), e.cur !== "TWD" ? el("span", {text:fmt(twdOf(e), "TWD")}) : null));
+}
+// ---- 統計：玻璃球水位、分類／前十名／每日趨勢 ----
+function stats(t){
+  const tot = totals(t), counted = t.expenses.filter(e => !e.excluded), off = t.expenses.filter(e => e.excluded);
+  const pct = tot.budget > 0 ? tot.spent / tot.budget : 0;
+  const head = el("div", {class:"card st-top rise"},
+    el("div", {class:"st-row"}, el("div", null, el("span", {class:"lab", text:"預算"}), el("b", {class:"num", text:fmt(tot.budget, "TWD")})),
+      el("div", {class:"r"}, el("span", {class:"lab", text:"剩下"}), el("b", {class:"num" + (tot.left < 0 ? " neg" : ""), text:fmt(tot.left, "TWD")}))),
+    orb(pct, tot.budget > 0),
+    el("div", {class:"st-row"}, el("div", null, el("span", {class:"lab", text:"不計入"}), el("span", {class:"off", text:off.length ? `${off.length} 筆 · ${fmt(off.reduce((s, e) => s + twdOf(e), 0), "TWD")}` : "沒有"})),
+      el("div", {class:"r"}, el("span", {class:"lab", text:"花掉"}), el("b", {class:"num", text:fmt(tot.spent, "TWD")}))));
+  // 分類／前十名／趨勢：小一號的玻璃分段
+  const views = [["cat", "分類"], ["top", "前十名"], ["trend", "趨勢"]];
+  const pane = el("div", {class:"st-pane"});
+  const thumb = el("span", {class:"thumb", "aria-hidden":"true"});
+  const seg = el("div", {class:"mini-seg", role:"tablist", "aria-label":"統計方式"}, thumb, views.map(([id, label]) =>
+    el("button", {type:"button", role:"tab", "data-id":id, "aria-selected":String((S.statView || "cat") === id), text:label, onclick:() => show(id)})));
+  const place = anim => { const b = seg.querySelector('[aria-selected="true"]'); if(!b) return; if(anim) thumb.classList.add("ready"); thumb.style.width = b.offsetWidth + "px"; thumb.style.translate = `${b.offsetLeft}px 0`; };
+  const show = id => {
+    S.statView = id;
+    seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.id === id)));
+    place(true);
+    pane.replaceChildren(id === "cat" ? byCat(t, counted, tot.spent) : id === "top" ? topTen(t, counted) : trend(t, counted));
+    pane.classList.remove("fade-in"); void pane.offsetWidth; pane.classList.add("fade-in");
+  };
+  pane.append((S.statView || "cat") === "cat" ? byCat(t, counted, tot.spent) : S.statView === "top" ? topTen(t, counted) : trend(t, counted));
+  requestAnimationFrame(() => place(false));
+  if(document.fonts) document.fonts.ready.then(() => place(false));
+  return [head, el("div", {class:"card st-body rise", style:"--i:1"}, el("div", {class:"mini-wrap"}, seg), pane)];
+}
+// ---- 換算：上下兩種貨幣，改哪一邊另一邊就跟著算；中間的玻璃鈕對調 ----
+function converter(t){
+  if(!S.conv || S.conv.trip !== t.id){
+    const local = {cur:t.cur, country:t.country || CUR[t.cur].name};
+    S.conv = {trip:t.id, a:t.cur === "TWD" ? {cur:"USD", country:"美國"} : local, b:{cur:"TWD", country:"台灣"}, val:"", from:"a"};
+  }
+  const c = S.conv;
+  // 換算不先四捨五入成整數：結果最多顯示到小數兩位（三位小數的貨幣顯示三位），比較精準
+  const exact = (minor, f, to) => minor / unit(f) * CUR[f].rate / CUR[to].rate;
+  const digits = cur => Math.max(2, CUR[cur].dec);
+  const show = (v, cur) => v.toLocaleString("en-US", {maximumFractionDigits:digits(cur)});
+  const money = (v, cur) => CUR[cur].sym + (CUR[cur].sym.length > 1 ? " " : "") + v.toLocaleString("en-US", {minimumFractionDigits:v < 1000 ? 2 : 0, maximumFractionDigits:v < 1000 ? digits(cur) : 0});
+  const side = key => {
+    const s = c[key];
+    const inp = el("input", {id:`cv-${key}`, inputmode:"decimal", autocomplete:"off", placeholder:"0", "aria-label":`${s.country} ${s.cur} 金額`});
+    const sym = el("span", {class:"sym", text:CUR[s.cur].sym});
+    const btn = el("button", {type:"button", class:"cv-cur", "aria-label":`換成其他貨幣，目前是${s.country} ${s.cur}`, onclick:() => pickCountry("換算", s, x => { c[key] = {cur:x.cur, country:x.name}; render(); }, "選擇貨幣")},
+      el("span", null, s.country, " ", el("b", {text:s.cur})), icon("back", 14, 2.2));
+    inp.addEventListener("input", () => { cleanAmount(inp, s.cur); c.val = inp.value; c.from = key; calc(); });
+    return {card:el("div", {class:"cv-card"}, btn, el("div", {class:"cv-row"}, sym, inp)), inp};
+  };
+  const A = side("a"), B = side("b");
+  const calc = () => {
+    const src = c.from === "a" ? A : B, dst = c.from === "a" ? B : A, f = c[c.from].cur, to = c[c.from === "a" ? "b" : "a"].cur;
+    src.inp.value = c.val;
+    const m = parseAmount(c.val, f);
+    dst.inp.value = m ? show(exact(m, f, to), to) : "";
+  };
+  const swap = el("button", {type:"button", class:"swap", "aria-label":"對調兩種貨幣", onclick:() => {
+    const x = c.a; c.a = c.b; c.b = x; c.from = c.from === "a" ? "b" : "a"; render();
+    const sw = document.querySelector(".swap"); if(sw){ sw.classList.add("spin"); }
+  }}, icon("swap", 22, 1.8));
+  calc();
+  const fa = c.a.cur, fb = c.b.cur;
+  const rateAB = CUR[fa].rate / CUR[fb].rate, rateBA = 1 / rateAB;
+  const nice = v => v >= 1000 ? Math.round(v).toLocaleString("en-US") : (+v.toPrecision(4)).toLocaleString("en-US", {maximumFractionDigits:8});
+  // 常用金額對照：依匯率自動挑一組好讀的整數（日圓 100～5,000、美元 1～50…）
+  const base = 10 ** Math.max(0, Math.floor(Math.log10(100 / CUR[fa].rate)));
+  const refs = [1, 2, 5, 10, 20, 50].map(x => x * base);
+  const ref = el("div", {class:"card cv-ref rise", style:"--i:1"}, el("h3", {text:"常用金額對照"}), refs.map(v => {
+    const m = toMinor(v, fa);
+    return el("button", {type:"button", class:"ref num", onclick:() => { c.from = "a"; c.val = v.toLocaleString("en-US"); calc(); }},
+      el("span", {text:fmt(m, fa)}), el("b", {text:money(exact(m, fa, fb), fb)}));
+  }));
+  return [el("div", {class:"cv rise"}, A.card, B.card, swap),
+    el("p", {class:"cv-rate num", text:`1 ${fa} ≈ ${nice(rateAB)} ${fb}　·　1 ${fb} ≈ ${nice(rateBA)} ${fa}\n${rateDate()} 市場中間價${RATES.live ? "" : "（內建）"}，有網路時每天自動更新\n銀行換匯、刷卡的實際匯率會多一點手續費`}), ref];
+}
+// 玻璃球＋水位（水面會慢慢晃）
+function orb(p, has){
+  const NS = "http://www.w3.org/2000/svg";
+  const id = "o" + Math.random().toString(36).slice(2, 7);
+  const lvl = Math.max(0, Math.min(1, p)), over = p > 1;
+  const R = 92, top = 100 - R, y = top + (1 - lvl) * R * 2;   // 水面高度
+  const wave = (amp, len) => { let d = `M0 0`; for(let x = 0; x < 600; x += len) d += ` Q${x + len / 4} ${-amp} ${x + len / 2} 0 T${x + len} 0`; return d + " V220 H0 Z"; };
+  const w = document.createElement("div");
+  w.className = "orb" + (over ? " over" : "");
+  w.innerHTML = `<svg viewBox="0 0 200 200" role="img" aria-label="預算用掉 ${Math.round(p * 100)}%">
+    <defs>
+      <clipPath id="${id}c"><circle cx="100" cy="100" r="${R}"/></clipPath>
+      <clipPath id="${id}w"><rect x="0" y="200" width="200" height="200"><animate attributeName="y" from="200" to="${y}" dur="1.6s" begin="indefinite" fill="freeze" calcMode="spline" keySplines=".22 1 .36 1" keyTimes="0;1"/></rect></clipPath>
+      <radialGradient id="${id}g" cx="35%" cy="28%" r="80%"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#f6f6f8"/><stop offset="1" stop-color="#e9e9ee"/></radialGradient>
+      <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    </defs>
+    <circle cx="100" cy="100" r="${R}" fill="url(#${id}g)"/>
+    <g clip-path="url(#${id}c)">
+      <g class="lv" style="--y:${y}px"><path class="wv b" d="${wave(6, 150)}"/></g>
+      <g class="lv" style="--y:${y}px"><path class="wv f" d="${wave(5, 120)}"/></g>
+    </g>
+    <text x="100" y="104" class="pc">${has ? Math.round(p * 100) + "%" : "—"}</text>
+    <text x="100" y="128" class="pl">預算使用</text>
+    <g clip-path="url(#${id}w)"><g clip-path="url(#${id}c)"><text x="100" y="104" class="pc in">${has ? Math.round(p * 100) + "%" : "—"}</text><text x="100" y="128" class="pl in">預算使用</text></g></g>
+    <ellipse cx="74" cy="52" rx="38" ry="20" fill="url(#${id}h)" opacity=".75" transform="rotate(-24 74 52)"/>
+    <circle cx="100" cy="100" r="${R}" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="1"/>
+    <circle cx="100" cy="100" r="${R - 1.5}" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.5"/>
+  </svg>`;
+  // 水從底部升上來
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    w.classList.add("fill");
+    const a = w.querySelector("animate");   // 白字跟著水位一起升上來
+    try{ a.beginElement(); }catch(e){ a.parentNode.setAttribute("y", y); }
+  }));
+  return w;
+}
+function byCat(t, list, spent){
+  const sums = CATS.map(c => ({c, v:list.filter(e => e.cat === c.id).reduce((s, e) => s + twdOf(e), 0)})).filter(x => x.v > 0).sort((a, b) => b.v - a.v);
+  if(!sums.length) return el("div", {class:"empty", style:"padding:32px 0"}, el("b", {text:"還沒有花費"}), el("span", {text:"記帳後，這裡會依類別統計"}));
+  const pc = v => spent ? Math.round(v / spent * 100) : 0;
+  const box = el("div", {class:"cat-list"}, sums.map((x, i) => {
+    const bar = el("div", {class:"cbar"}, el("i"));
+    requestAnimationFrame(() => requestAnimationFrame(() => { bar.firstChild.style.width = (x.v / sums[0].v * 100) + "%"; }));
+    return el("div", {class:"crow", style:`--i:${i}`}, el("div", {class:"ctop"}, icon(x.c.icon, 20), el("span", {class:"cn", text:x.c.name}), el("b", {class:"num", text:pc(x.v) + "%"}), el("span", {class:"num cv", text:fmt(x.v, "TWD")})), bar);
+  }));
+  box.append(el("div", {class:"ctotal"}, el("span", {text:"合計"}), el("b", {class:"num", text:fmt(spent, "TWD")})));
+  return box;
+}
+function topTen(t, list){
+  const top = [...list].sort((a, b) => twdOf(b) - twdOf(a)).slice(0, 10);
+  if(!top.length) return el("div", {class:"empty", style:"padding:32px 0"}, el("b", {text:"還沒有花費"}), el("span", {text:"記帳後，這裡會列出最貴的十筆"}));
+  return el("div", null, top.map((e, i) => {
+    const c = catOf(e.cat), d = new Date(e.time);
+    return el("button", {type:"button", class:"row" + (i === top.length - 1 ? " last" : ""), onclick:() => openExpense(t, e)},
+      el("span", {class:"rank num", text:String(i + 1)}),
+      el("span", {class:"mid"}, el("span", {class:"t", text:e.title || c.name}), el("span", {class:"s", text:`${d.getMonth() + 1}/${d.getDate()} · ${c.name}`})),
+      el("span", {class:"amt num"}, el("b", {text:fmt(e.amount, e.cur)}), e.cur !== "TWD" ? el("span", {text:fmt(twdOf(e), "TWD")}) : null));
+  }));
+}
+function trend(t, list){
+  const days = [];
+  for(let d = parseYmd(t.start); ymd(d) <= t.end; d = addDays(d, 1)) days.push(ymd(d));
+  const val = k => list.filter(e => ymd(new Date(e.time)) === k).reduce((s, e) => s + twdOf(e), 0);
+  const vs = days.map(val), max = Math.max(...vs, 1), today = ymd(new Date());
+  if(!vs.some(v => v)) return el("div", {class:"empty", style:"padding:32px 0"}, el("b", {text:"還沒有花費"}), el("span", {text:"記帳後，這裡會畫出每天花多少"}));
+  const avg = Math.round(vs.reduce((a, b) => a + b, 0) / Math.max(1, vs.filter((v, i) => days[i] <= today).length || vs.length));
+  const chart = el("div", {class:"trend" + (days.length > 10 ? " dense" : "")}, days.map((k, i) => {
+    const col = el("div", {class:"tcol" + (k === today ? " now" : ""), title:`${md(k)} ${fmt(vs[i], "TWD")}`},
+      el("span", {class:"tv num", text:vs[i] ? (vs[i] >= 10000 ? (vs[i] / 1000).toFixed(1) + "k" : vs[i].toLocaleString("zh-TW")) : ""}),
+      el("div", {class:"tb"}, el("i", {style:`--h:${vs[i] / max * 100}%;--i:${i}`})),
+      el("span", {class:"td num", text:md(k)}));
+    return col;
+  }));
+  return el("div", null, chart, el("div", {class:"kv", style:"margin-top:14px"}, el("span", null, "每天平均", el("b", {class:"num", text:fmt(avg, "TWD")})), el("span", null, "最多的一天", el("b", {class:"num", text:fmt(max, "TWD")}))));
+}
+
+/* ================= 底部面板 ================= */
+let sheetOpen = null, subPage = null;
+function openSheet({title, done = "完成", body, onDone}){
+  if(sheetOpen) sheetOpen(true);
+  const scrim = el("div", {class:"scrim"});
+  const cancel = el("button", {type:"button", text:"取消"});
+  const ok = el("button", {type:"button", class:"done", text:done});
+  const sheet = el("div", {class:"sheet", role:"dialog", "aria-modal":"true", "aria-label":title}, el("div", {class:"sheet-h"}, cancel, el("h2", {text:title}), ok), body);
+  document.body.append(scrim, sheet);
+  const prev = document.activeElement;
+  document.documentElement.style.overflow = "hidden";
+  requestAnimationFrame(() => requestAnimationFrame(() => { scrim.classList.add("on"); sheet.classList.add("on"); }));
+  const close = instant => {
+    if(sheetOpen !== close) return; sheetOpen = null;
+    document.documentElement.style.overflow = ""; document.removeEventListener("keydown", onKey);
+    if(subPage){ const sp = subPage; subPage = null; sp.classList.remove("on"); setTimeout(() => sp.remove(), 450); }
+    if(instant){ scrim.remove(); sheet.remove(); return; }
+    scrim.classList.remove("on"); sheet.classList.remove("on");
+    setTimeout(() => { scrim.remove(); sheet.remove(); }, 450);
+    if(prev && prev.isConnected) prev.focus({preventScroll:true});
+  };
+  const onKey = e => { if(e.key === "Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  scrim.addEventListener("click", () => close());
+  cancel.addEventListener("click", () => close());
+  ok.addEventListener("click", () => onDone && onDone());
+  // 從標題列往下拖可以關閉
+  let sy = null;
+  sheet.addEventListener("touchstart", e => { if(e.target.closest(".sheet-h") && !e.target.closest("button")) sy = e.touches[0].clientY; }, {passive:true});
+  sheet.addEventListener("touchmove", e => { if(sy == null) return; const dy = Math.max(0, e.touches[0].clientY - sy); sheet.style.transition = "none"; sheet.style.transform = `translate(-50%,${dy}px)`; }, {passive:true});
+  sheet.addEventListener("touchend", e => { if(sy == null) return; const dy = e.changedTouches[0].clientY - sy; sy = null; sheet.style.transition = ""; sheet.style.transform = ""; if(dy > 90) close(); });
+  sheetOpen = close;
+  return {close, ok};
+}
+// 第二層頁面：選國家／貨幣（可搜尋，依地區分組）
+function pickCountry(backLabel, current, onPick, title = "當地貨幣"){
+  const page = el("div", {class:"subpage", role:"dialog", "aria-modal":"true", "aria-label":title});
+  const closeP = () => { if(subPage !== page) return; subPage = null; page.classList.remove("on"); setTimeout(() => page.remove(), 450); };
+  const back = el("button", {type:"button", class:"back", onclick:closeP}, icon("back", 22, 2), el("span", {text:backLabel}));
+  const q = el("input", {type:"search", id:"c-search", placeholder:"搜尋國家或貨幣代碼", autocomplete:"off", "aria-label":"搜尋國家或貨幣"});
+  const list = el("div", {class:"sub-list", role:"listbox", "aria-label":"國家與貨幣"});
+  const draw = () => {
+    const term = q.value.trim(), up = term.toUpperCase();
+    list.replaceChildren(); let hits = 0;
+    REGIONS.forEach(([region, cs]) => {
+      const f = cs.filter(c => !term || c.name.includes(term) || c.cur.includes(up) || CUR[c.cur].name.includes(term));
+      if(!f.length) return; hits += f.length;
+      list.append(el("p", {class:"grp-lab", text:region}), el("div", {class:"grp"}, f.map(c => {
+        const ck = icon("check", 18, 2.2); ck.classList.add("ck");
+        return el("button", {type:"button", class:"opt", role:"option", "aria-selected":String(current.country === c.name && current.cur === c.cur),
+          onclick:() => { onPick(c); closeP(); }}, el("span", {class:"nm", text:c.name}), el("span", {class:"cd", text:c.cur}), ck);
+      })));
+    });
+    if(!hits) list.append(el("p", {class:"no-hit", text:"找不到符合的國家"}));
+  };
+  q.addEventListener("input", draw);
+  draw();
+  page.append(el("div", {class:"sheet-h"}, back, el("h2", {text:title}), el("span")), el("div", {class:"search"}, icon("search", 16, 2), q), list);
+  document.body.append(page); subPage = page;
+  requestAnimationFrame(() => requestAnimationFrame(() => page.classList.add("on")));
+  const sel = list.querySelector('[aria-selected="true"]');
+  if(sel) list.scrollTop = Math.max(0, sel.offsetTop - list.clientHeight / 2);
+}
+const line = (label, input, extra) => el("div", {class:"line"}, el("label", {for:(input.input || input).id, text:label}), input, extra || null);
+// ---- 自己做的日曆（瀏覽器內建的日期選擇器在部分手機很慢或跳不出來） ----
+// opts.sel() 回傳 {start, end}（單選時兩個一樣）；opts.focus() 回傳要顯示的月份基準日；opts.onPick(日期)
+// 展開區：同一個面板裡同時只開一個
+function expander(content){
+  const x = el("div", {class:"expand"}, el("div", null, content));
+  return {el:x, open(){ document.querySelectorAll(".expand.open").forEach(o => { if(o !== x) o.classList.remove("open"); }); x.classList.add("open"); }, close(){ x.classList.remove("open"); }, isOpen:() => x.classList.contains("open")};
+}
+// ---- 滾輪（像 iPhone 鬧鐘）：原生捲動＋吸附，所以慣性滑動很順；每個影格只更新畫面上看得到的幾項 ----
+// items: [{v, label}]；onChange(值, 是否已停下)
+function wheel(items, value, onChange, width){
+  const H = 36;
+  const w = el("div", {class:"wheel", tabIndex:0, role:"listbox", style:`width:${width}px`});
+  w.append(el("div", {class:"pad"}));
+  const nodes = items.map((it, i) => el("div", {class:"it", role:"option", text:it.label, onclick:() => go(i, true)}));
+  w.append(...nodes, el("div", {class:"pad"}));
+  let idx = Math.max(0, items.findIndex(it => it.v === value)), raf = 0, settleT, lastTick = 0;
+  const paint = () => {
+    raf = 0;
+    const f = w.scrollTop / H, lo = Math.max(0, Math.floor(f) - 4), hi = Math.min(items.length - 1, Math.ceil(f) + 4);
+    for(let i = lo; i <= hi; i++){
+      const d = i - f, a = Math.abs(d);
+      nodes[i].style.transform = `rotateX(${(-d * 20).toFixed(2)}deg) scale(${(1 - Math.min(a, 4) * .035).toFixed(3)})`;
+      nodes[i].style.opacity = Math.max(.12, 1 - a * .28).toFixed(2);
+    }
+    const r = Math.min(items.length - 1, Math.max(0, Math.round(f)));
+    if(r !== idx){
+      idx = r; onChange(items[idx].v, false);
+      const now = performance.now(); if(now - lastTick > 40){ lastTick = now; try{ if(navigator.vibrate) navigator.vibrate(3); }catch(e){} }
+    }
+  };
+  const go = (i, smooth) => { i = Math.max(0, Math.min(items.length - 1, i)); w.scrollTo({top:i * H, behavior:smooth ? "smooth" : "auto"}); };
+  w.addEventListener("scroll", () => {
+    if(!raf) raf = requestAnimationFrame(paint);
+    clearTimeout(settleT); settleT = setTimeout(() => onChange(items[idx].v, true), 140);
+  }, {passive:true});
+  w.addEventListener("keydown", e => { if(e.key === "ArrowDown"){ e.preventDefault(); go(idx + 1, true); } if(e.key === "ArrowUp"){ e.preventDefault(); go(idx - 1, true); } });
+  w.setTo = (v, smooth) => { const i = items.findIndex(it => it.v === v); if(i < 0) return; idx = i; go(i, smooth); if(!smooth) paint(); };
+  w.mark = test => nodes.forEach((n, i) => n.classList.toggle("off", !!test(items[i].v)));
+  w.refresh = () => { w.scrollTop = idx * H; paint(); };
+  return w;
+}
+// 年／月／日 三個滾輪；不存在的日子（例如 11 月 31 日）變淡，停在那裡會自動退回月底
+function dateWheels(value, onChange){
+  const d0 = parseYmd(value), now = new Date().getFullYear();
+  const st = {y:d0.getFullYear(), m:d0.getMonth() + 1, d:d0.getDate()};
+  // 年份：往前 10 年（補記舊旅程）、往後 20 年
+  const years = []; for(let y = Math.min(now - 10, st.y); y <= Math.max(now + 20, st.y); y++) years.push({v:y, label:`${y} 年`});
+  const range = (n, f) => Array.from({length:n}, (_, i) => ({v:i + 1, label:f(i + 1)}));
+  const dim = () => new Date(st.y, st.m, 0).getDate();
+  const emit = settled => {
+    const max = dim(); dw.mark(v => v > max);
+    if(st.d > max){ if(settled){ st.d = max; dw.setTo(max, true); } }
+    onChange(ymd(new Date(st.y, st.m - 1, Math.min(st.d, max))), settled);
+  };
+  const yw = wheel(years, st.y, (v, s) => { st.y = v; emit(s); }, 104);
+  const mw = wheel(range(12, m => `${m} 月`), st.m, (v, s) => { st.m = v; emit(s); }, 76);
+  const dw = wheel(range(31, d => `${d} 日`), st.d, (v, s) => { st.d = v; emit(s); }, 76);
+  const box = el("div", {class:"wheels", role:"group", "aria-label":"選擇日期"}, yw, mw, dw);
+  return {el:box,
+    set(v, smooth){ const d = parseYmd(v); st.y = d.getFullYear(); st.m = d.getMonth() + 1; st.d = d.getDate(); yw.setTo(st.y, smooth); mw.setTo(st.m, smooth); dw.setTo(st.d, smooth); dw.mark(x => x > dim()); },
+    refresh(){ [yw, mw, dw].forEach(w => w.refresh()); dw.mark(x => x > dim()); }};
+}
+// 出發／回程：各自展開一組年月日滾輪，按「確認」收起；回程不會早於出發
+function dateRange(start0, end0){
+  const ds = {start:start0, end:end0};
+  const sv = el("span", {class:"val"}), ev = el("span", {class:"val"});
+  const len = el("span", {class:"hint"});
+  const sync = () => {
+    sv.textContent = fmtDate(ds.start); ev.textContent = fmtDate(ds.end);
+    sv.classList.toggle("on", sx.isOpen()); ev.classList.toggle("on", ex.isOpen());
+    len.textContent = `共 ${dayDiff(ds.start, ds.end) + 1} 天`;
+  };
+  const sW = dateWheels(ds.start, (v, settled) => {
+    const keep = dayDiff(ds.start, ds.end);
+    ds.start = v;
+    if(ds.end < ds.start){ ds.end = ymd(addDays(parseYmd(v), Math.max(0, keep))); eW.set(ds.end, false); }
+    sync();
+  });
+  const eW = dateWheels(ds.end, (v, settled) => {
+    ds.end = v < ds.start ? ds.start : v;
+    if(settled && v < ds.start) eW.set(ds.start, true);   // 回程比出發早：滾回出發那天
+    sync();
+  });
+  const panel = (w, which) => {
+    const ok = el("button", {type:"button", class:"cal-ok", text:"確認", onclick:() => { x.close(); sync(); }});
+    const x = expander(el("div", {class:"pk"}, w.el, el("div", {class:"cal-foot"}, which === "end" ? len : el("span"), ok)));
+    return x;
+  };
+  const sx = panel(sW, "start"), ex = panel(eW, "end");
+  const toggle = (x, w) => { if(x.isOpen()){ x.close(); sync(); return; } x.open(); w.set(x === sx ? ds.start : ds.end, false); requestAnimationFrame(() => w.refresh()); sync(); };
+  const row = (label, v, x, w) => el("button", {type:"button", class:"line go", onclick:() => toggle(x, w)}, el("span", {class:"k", text:label}), v);
+  const startRow = row("出發", sv, sx, sW), endRow = row("回程", ev, ex, eW);
+  sync();
+  return {rows:[startRow, sx.el, endRow, ex.el], start:{get value(){ return ds.start; }}, end:{get value(){ return ds.end; }}};
+}
+// 記帳時間：日期（含星期）＋時＋分，三個滾輪
+function dateTime(iso){
+  const st = {date:ymd(iso), h:iso.getHours(), m:iso.getMinutes()};
+  const v = el("span", {class:"val"});
+  const sync = () => { v.textContent = fmtDT(`${st.date}T${pad(st.h)}:${pad(st.m)}`); v.classList.toggle("on", ex.isOpen()); };
+  const base = parseYmd(st.date), today = ymd(new Date()), days = [];
+  for(let i = -90; i <= 90; i++){ const d = addDays(base, i), k = ymd(d); days.push({v:k, label:k === today ? "今天" : `${d.getMonth() + 1}月${d.getDate()}日 週${WEEK[d.getDay()]}`}); }
+  const dw = wheel(days, st.date, x => { st.date = x; sync(); }, 150);
+  const hw = wheel(Array.from({length:24}, (_, i) => ({v:i, label:pad(i)})), st.h, x => { st.h = x; sync(); }, 56);
+  const mw = wheel(Array.from({length:60}, (_, i) => ({v:i, label:pad(i)})), st.m, x => { st.m = x; sync(); }, 56);
+  const ok = el("button", {type:"button", class:"cal-ok", text:"確認", onclick:() => { ex.close(); sync(); }});
+  const ex = expander(el("div", {class:"pk"}, el("div", {class:"wheels", role:"group", "aria-label":"選擇日期與時間"}, dw, hw, el("span", {class:"colon", text:":"}), mw), el("div", {class:"cal-foot"}, el("span"), ok)));
+  const row = el("button", {type:"button", class:"line go", onclick:() => {
+    if(ex.isOpen()){ ex.close(); sync(); return; }
+    ex.open(); [dw, hw, mw].forEach(w => w.refresh()); sync();
+  }}, el("span", {class:"k", text:"時間"}), v);
+  sync();
+  return {row, panel:ex.el, input:{get value(){ return `${st.date}T${pad(st.h)}:${pad(st.m)}`; }}};
+}
+const fmtDate = v => { const d = parseYmd(v); return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} 週${WEEK[d.getDay()]}`; };
+const fmtDT = v => { const [dd, tt] = v.split("T"); const d = parseYmd(dd); return `${d.getMonth() + 1}/${d.getDate()} 週${WEEK[d.getDay()]} ${tt || ""}`; };
+function twoStep(btn, label, run){
+  let armed = false, tm;
+  btn.addEventListener("click", () => {
+    if(!armed){ armed = true; btn.classList.add("armed"); btn.textContent = "再按一次確認刪除"; tm = setTimeout(() => { armed = false; btn.classList.remove("armed"); btn.textContent = label; }, 3000); return; }
+    clearTimeout(tm); run();
+  });
+}
+// 金額：只留數字與小數點，依幣別限制小數位，打字時加千分位
+function parseAmount(str, cur){
+  const s = String(str).replace(/[^\d.]/g, "");
+  if(!s) return null;
+  const v = Number(s);
+  if(!isFinite(v) || v <= 0 || v >= 1e10) return null;
+  return toMinor(v, cur);
+}
+function cleanAmount(inp, cur){
+  let s = inp.value.replace(/[^\d.]/g, "");
+  const dec = CUR[cur].dec;
+  if(dec === 0) s = s.replace(/\./g, "");
+  else { const [a, ...b] = s.split("."); s = b.length ? a + "." + b.join("").slice(0, dec) : a; }
+  s = s.replace(/^0+(?=\d)/, "");
+  let [i, f] = s.split(".");
+  i = i.slice(0, 10);                                   // 整數最多 10 位，小數位數照幣別
+  s = i.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (f !== undefined ? "." + f : "");
+  if(inp.value !== s){ inp.value = s; try{ inp.setSelectionRange(s.length, s.length); }catch(e){} }
+}
+const plain = (minor, cur) => (minor / unit(cur)).toLocaleString("en-US", {maximumFractionDigits:CUR[cur].dec});
+
+/* ---------- 記一筆／編輯 ---------- */
+function openExpense(t, e){
+  const editing = !!e, last = Store.data.lastPick || {};
+  const st = {cur:e ? e.cur : t.cur, cat:e ? e.cat : (last.cat || "food"),
+    acct:e ? e.acct : (t.accounts.some(a => a.id === last.acct) ? last.acct : (t.accounts[0] && t.accounts[0].id))};
+  const amt = el("input", {id:"f-amount", inputmode:"decimal", autocomplete:"off", placeholder:"0", "aria-label":"金額"});
+  if(e) amt.value = plain(e.amount, e.cur);
+  const sym = el("span", {class:"sym", text:CUR[st.cur].sym});
+  const shown = el("span", {class:"shown", "aria-hidden":"true"}), caret = el("span", {class:"caret", "aria-hidden":"true"});
+  const conv = el("div", {class:"conv num", "aria-live":"polite"});
+  const curs = [...new Set([t.cur, "TWD"])];
+  const seg = el("div", {class:"cur-seg", role:"group", "aria-label":"幣別"}, curs.map(c =>
+    el("button", {type:"button", "aria-pressed":String(st.cur === c), text:c, onclick:ev => { st.cur = c; seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b === ev.currentTarget))); update(); amt.focus(); }})));
+  const title = el("input", {id:"f-title", maxLength:40, placeholder:catOf(st.cat).name, autocomplete:"off"});
+  if(e) title.value = e.title;
+  const cats = el("div", {class:"cats", role:"group", "aria-label":"類別"}, CATS.map(c => {
+    const b = el("button", {type:"button", class:"cat", "aria-pressed":String(st.cat === c.id), onclick:() => { st.cat = c.id; title.placeholder = c.name; cats.querySelectorAll(".cat").forEach(x => x.setAttribute("aria-pressed", String(x === b))); }}, icon(c.icon, 20), el("span", {text:c.name}));
+    return b;
+  }));
+  const pays = el("div", {class:"pays", role:"group", "aria-label":"付款方式"}, t.accounts.map(a => {
+    const b = el("button", {type:"button", class:"pay", "aria-pressed":String(st.acct === a.id), text:a.name, onclick:() => { st.acct = a.id; pays.querySelectorAll(".pay").forEach(x => x.setAttribute("aria-pressed", String(x === b))); }});
+    return b;
+  }));
+  const d0 = e ? new Date(e.time) : new Date();
+  const dt = dateTime(d0), when = dt.input;
+  const excl = el("input", {type:"checkbox", class:"switch", id:"f-excl", checked:e ? e.excluded : false});
+  const body = el("div", null,
+    el("div", {class:"amount-box"}, seg, el("div", {class:"amount"}, sym, shown, caret, amt), conv),
+    cats,
+    el("div", {class:"grp"},
+      el("div", {class:"line stack-line"}, el("span", {class:"k", text:"付款方式"}), t.accounts.length ? pays : el("span", {class:"hint", text:"還沒有預算帳戶，先到「預算」新增"})),
+      line("名稱", title), dt.row, dt.panel,
+      el("div", {class:"line"}, el("label", {for:"f-excl", class:"toggle-lab"}, "不計入統計", el("span", {class:"hint", text:"出發前付的機票等，不扣旅途預算"})), excl)));
+  let del = null;
+  if(editing){ del = el("button", {type:"button", class:"del", text:"刪除這筆"}); body.append(el("div", {class:"grp"}, del)); }
+  const {close, ok} = openSheet({title:editing ? "編輯" : "記一筆", done:editing ? "儲存" : "記下", body, onDone:save});
+  function update(){
+    cleanAmount(amt, st.cur);
+    const m = parseAmount(amt.value, st.cur);
+    sym.textContent = CUR[st.cur].sym;
+    conv.textContent = st.cur === "TWD" ? "新台幣" : m ? "約 " + fmt(Math.round(m / unit(st.cur) * CUR[st.cur].rate), "TWD") : CUR[st.cur].name;
+    ok.disabled = !m;
+    shown.textContent = amt.value || "0"; shown.classList.toggle("ghost", !amt.value);
+    fitAmount();
+  }
+  amt.addEventListener("input", update);
+  const box = () => amt.parentNode;
+  amt.addEventListener("focus", () => box().classList.add("focus")); amt.addEventListener("blur", () => box().classList.remove("focus"));
+  // 數字太長時整組縮小，永遠放得進一行
+  function fitAmount(){
+    const b = box(); if(!b) return;
+    b.style.removeProperty("--fs");
+    const avail = b.parentNode.clientWidth - 8;   // 用外框寬度量，不受數字本身撐開影響
+    const need = () => sym.offsetWidth + shown.offsetWidth + caret.offsetWidth + 16;
+    let fs = parseFloat(getComputedStyle(b).getPropertyValue("--fs")) || 3.25;
+    for(let i = 0; i < 14 && need() > avail && fs > 1.5; i++){ fs = Math.max(1.5, fs * .9); b.style.setProperty("--fs", fs + "rem"); }
+  }
+  amt.addEventListener("keydown", ev => { if(ev.key === "Enter" && !ok.disabled){ ev.preventDefault(); save(); } });
+  update();
+  if(document.fonts) document.fonts.ready.then(update);
+  if(!editing) setTimeout(() => amt.focus({preventScroll:true}), 420);
+  function save(){
+    const m = parseAmount(amt.value, st.cur); if(!m) return;
+    const tm = when.value ? new Date(when.value) : new Date();
+    const rec = {title:title.value.trim().slice(0, 40), amount:m, cur:st.cur, acct:st.acct || null, cat:st.cat, time:isNaN(tm) ? new Date().toISOString() : tm.toISOString(), excluded:excl.checked};
+    if(editing){
+      if(rec.cur !== e.cur || rec.amount !== e.amount) rec.rate = CUR[rec.cur].rate;   // 金額或幣別有改才用現在的匯率
+      Object.assign(e, rec); S.fresh = e.id;
+    } else { const n = {id:uid("e"), rate:CUR[rec.cur].rate, ...rec}; t.expenses.push(n); S.fresh = n.id; }
+    Store.data.lastPick = {cat:st.cat, acct:st.acct};
+    Store.save(); close(); render(); S.fresh = null; toast(editing ? "已儲存" : "已記下");
+  }
+  if(del) twoStep(del, "刪除這筆", () => { t.expenses = t.expenses.filter(x => x.id !== e.id); Store.save(); close(); render(); toast("已刪除"); });
+}
+
+/* ---------- 新增／編輯旅程 ---------- */
+function openTripForm(trip){
+  const editing = !!trip, today = new Date();
+  const st = {country:editing ? (trip.country || CUR[trip.cur].name) : "日本", cur:editing ? trip.cur : "JPY"};
+  const name = el("input", {id:"t-name", maxLength:24, placeholder:"東京自由行", autocomplete:"off", value:editing ? trip.name : ""});
+  const dest = el("input", {id:"t-dest", maxLength:12, placeholder:"東京", autocomplete:"off", value:editing ? (trip.dest || "") : ""});
+  const dr = dateRange(editing ? trip.start : ymd(addDays(today, 30)), editing ? trip.end : ymd(addDays(today, 34)));
+  const start = dr.start, end = dr.end;
+  // 已經有記帳的旅程不能換貨幣（換了金額就對不上）
+  const locked = editing && trip.expenses.length > 0;
+  const curVal = el("span", {class:"val", text:`${st.country} ${st.cur}`});
+  const curBtn = el("button", {type:"button", class:"line go", disabled:locked, onclick:() => pickCountry(editing ? "編輯旅程" : "新增旅程", st, c => {
+    st.country = c.name; st.cur = c.cur; curVal.textContent = `${c.name} ${c.cur}`;
+    if(!dest.value) dest.placeholder = c.name;
+    rows.forEach(r => { r.ub.textContent = r.cur(); cleanAmount(r.amt, r.cur()); });
+  })}, el("span", {class:"k", text:"當地貨幣"}), curVal, locked ? null : icon("back", 16, 2));
+  if(!locked){ const ch = curBtn.querySelector(".ico"); if(ch) ch.classList.add("chev"); }
+  // 預算帳戶：新增和編輯旅程都在這裡設定（不用另外的預算分頁）
+  const rowsBox = el("div"), rows = [];
+  let n = 0;
+  const addRow = (nm, method, local, focus, acct) => {
+    const r = {method, local, id:"b" + (++n), acctId:acct ? acct.id : null};
+    r.name = el("input", {id:`t-bn-${r.id}`, class:"bname", maxLength:16, value:nm, placeholder:"名稱", autocomplete:"off", "aria-label":"帳戶名稱"});
+    r.amt = el("input", {id:`t-ba-${r.id}`, class:"bamt", inputmode:"decimal", placeholder:"0", autocomplete:"off", "aria-label":"預算金額"});
+    r.cur = () => r.local ? st.cur : "TWD";
+    r.ub = el("button", {type:"button", class:"unit-btn", "aria-label":"切換幣別", text:r.cur(), onclick:() => { r.local = !r.local; r.ub.textContent = r.cur(); cleanAmount(r.amt, r.cur()); }});
+    if(acct && acct.budget) r.amt.value = plain(acct.budget, acct.cur);
+    r.amt.addEventListener("input", () => cleanAmount(r.amt, r.cur()));
+    const rm = el("button", {type:"button", class:"rm", "aria-label":"移除這個帳戶", onclick:() => {
+      rows.splice(rows.indexOf(r), 1); r.el.style.height = r.el.offsetHeight + "px"; r.el.classList.add("out"); setTimeout(() => r.el.remove(), 300);
+    }});
+    r.el = el("div", {class:"line brow" + (focus ? " in" : "")}, rm, r.name, r.amt, r.ub);
+    rows.push(r); rowsBox.append(r.el);
+    if(focus) setTimeout(() => r.name.focus(), 50);
+  };
+  const err = el("p", {class:"err", role:"alert"});
+  const body = el("div", null,
+    el("div", {class:"grp"}, line("名稱", name), line("目的地", dest)),
+    el("div", {class:"grp"}, ...dr.rows, curBtn));
+  if(locked) body.append(el("p", {class:"hint", style:"margin:8px 16px 0", text:"已經有記帳，當地貨幣不能更改"}));
+  if(editing) trip.accounts.forEach(a => addRow(a.name, a.method, a.cur !== "TWD", false, a));
+  else { addRow("現金", "cash", true); addRow("信用卡", "card", false); }
+  body.append(el("p", {class:"grp-lab", text:"預算（每種付款方式各帶多少）"}),
+    el("div", {class:"grp"}, rowsBox, el("div", {class:"line add-row"}, el("button", {type:"button", class:"link-btn", onclick:() => addRow("", "epay", true, true)}, icon("plus", 18, 1.8), el("span", {text:"新增付款方式"})))));
+  body.append(err);
+  let del = null;
+  if(editing){ del = el("button", {type:"button", class:"del", text:"刪除旅程"}); body.append(el("div", {class:"grp"}, del), el("p", {class:"hint", style:"margin:8px 16px 0", text:"刪除後，這趟旅程的記帳和預算帳戶會一起刪除"})); }
+  const {close} = openSheet({title:editing ? "編輯旅程" : "新增旅程", done:editing ? "儲存" : "建立", body, onDone:() => {
+    if(!name.value.trim()){ err.textContent = "請填旅程名稱"; name.focus(); return; }
+    if(!start.value || !end.value){ err.textContent = "請選出發和回程日期"; return; }
+    if(end.value < start.value){ err.textContent = "回程日要在出發日之後"; return; }
+    const info = {name:name.value.trim().slice(0, 24), dest:dest.value.trim().slice(0, 12), start:start.value, end:end.value, country:st.country, cur:st.cur};
+    if(editing){
+      const keep = new Set();
+      trip.accounts = rows.filter(r => r.acctId || r.name.value.trim() || r.amt.value).map(r => {
+        const old = r.acctId && trip.accounts.find(a => a.id === r.acctId);
+        if(old) keep.add(old.id);
+        return {id:old ? old.id : uid("a"), name:(r.name.value.trim() || METHODS[r.method].name).slice(0, 16), method:r.method, cur:r.cur(), budget:parseAmount(r.amt.value, r.cur()) || 0};
+      });
+      trip.expenses.forEach(x => { if(x.acct && !keep.has(x.acct) && !trip.accounts.some(a => a.id === x.acct)) x.acct = null; });   // 刪掉的付款方式：記帳保留，變成「未指定」
+      Object.assign(trip, info); delete trip.sample;
+      Store.save(); close(); render(); toast("已儲存");
+      return;
+    }
+    const accounts = rows.filter(r => r.name.value.trim() || r.amt.value).map(r => ({
+      id:uid("a"), name:(r.name.value.trim() || METHODS[r.method].name).slice(0, 16), method:r.method, cur:r.cur(), budget:parseAmount(r.amt.value, r.cur()) || 0}));
+    const t = {id:uid("t"), ...info, accounts, expenses:[]};
+    Store.data.trips.push(t); Store.save(); close(); go("trip", {tripId:t.id, tab:"ledger"}); toast("旅程已建立");
+  }});
+  if(del) twoStep(del, "刪除旅程", () => {
+    Store.data.trips = Store.data.trips.filter(x => x.id !== trip.id);
+    Store.save(); close(); go("home"); toast("已刪除旅程");
+  });
+  if(!editing) setTimeout(() => name.focus({preventScroll:true}), 420);
+}
+
+/* ---------- 預算帳戶 ---------- */
+function openAccountForm(t, a){
+  const editing = !!a;
+  const st = {method:a ? a.method : "cash", cur:a ? a.cur : t.cur};
+  const name = el("input", {id:"a-name", maxLength:16, placeholder:METHODS[st.method].name, autocomplete:"off"});
+  if(a) name.value = a.name;
+  const methods = el("div", {class:"cats four", role:"group", "aria-label":"付款方式", style:"margin-top:18px"}, Object.entries(METHODS).map(([k, m]) => {
+    const b = el("button", {type:"button", class:"cat", "aria-pressed":String(st.method === k), onclick:() => { st.method = k; name.placeholder = m.name; methods.querySelectorAll(".cat").forEach(x => x.setAttribute("aria-pressed", String(x === b))); }}, icon(m.icon, 20), el("span", {text:m.name}));
+    return b;
+  }));
+  const amt = el("input", {id:"a-amt", inputmode:"decimal", placeholder:"0", autocomplete:"off"});
+  if(a) amt.value = plain(a.budget, a.cur);
+  const u = el("span", {class:"unit", text:st.cur});
+  const curSel = el("select", {id:"a-cur"}, [...new Set([t.cur, "TWD"])].map(c => el("option", {value:c, text:`${CUR[c].name} ${c}`, selected:st.cur === c})));
+  curSel.addEventListener("change", () => { st.cur = curSel.value; u.textContent = st.cur; cleanAmount(amt, st.cur); });
+  amt.addEventListener("input", () => cleanAmount(amt, st.cur));
+  const err = el("p", {class:"err", role:"alert"});
+  const body = el("div", null, methods, el("div", {class:"grp"}, line("名稱", name), line("幣別", curSel), line("預算", amt, u)), err);
+  let del = null;
+  if(editing){ del = el("button", {type:"button", class:"del", text:"刪除這個帳戶"}); body.append(el("div", {class:"grp", style:"margin-top:8px"}, del)); }
+  const {close} = openSheet({title:editing ? "預算帳戶" : "新增預算帳戶", done:editing ? "儲存" : "新增", body, onDone:() => {
+    const nm = (name.value.trim() || METHODS[st.method].name).slice(0, 16);
+    const b = amt.value ? parseAmount(amt.value, st.cur) : 0;
+    if(b === null){ err.textContent = "預算金額格式不對"; return; }
+    if(editing) Object.assign(a, {name:nm, method:st.method, cur:st.cur, budget:b});
+    else t.accounts.push({id:uid("a"), name:nm, method:st.method, cur:st.cur, budget:b});
+    Store.save(); close(); render(); toast(editing ? "已儲存" : "已新增");
+  }});
+  if(del) twoStep(del, "刪除這個帳戶", () => {
+    t.accounts = t.accounts.filter(x => x.id !== a.id);
+    t.expenses.forEach(x => { if(x.acct === a.id) x.acct = null; });   // 記帳保留，付款方式變成「未指定」
+    Store.save(); close(); render(); toast("已刪除");
+  });
+}
+
+/* ---------- 帳號 ---------- */
+function openMe(){
+  const u = Store.data.user;
+  const reset = el("button", {type:"button", class:"menu-btn", text:"重設範例資料"});
+  const out = el("button", {type:"button", class:"menu-btn red", text:"登出"});
+  const body = el("div", null, el("div", {class:"grp"},
+    el("div", {class:"me"}, el("span", {class:"me-btn", text:u.name.slice(0, 1)}), el("div", null, el("b", {text:u.name}), el("span", {class:"e", text:u.email}))),
+    reset, out));
+  const {close} = openSheet({title:"帳號", done:"完成", body, onDone:() => close()});
+  reset.addEventListener("click", () => { Store.data.trips = sampleTrips(); Store.save(); close(); go("home"); toast("範例資料已重設"); });
+  out.addEventListener("click", () => { Store.data.user = null; Store.save(); close(); go("home"); });
+}
+
+Store.load();
+render();
+refreshRates();
+</script>
+
+</body>
+</html>
