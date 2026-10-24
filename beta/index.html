@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tV4+VwuMRFiFpH4bOfM0kQYH64PStTNpTFi/3EUhS4A=' 'sha256-x6dLyySMvERxUfvbNOQmKkrK+rOxKg/aP13qAnzzUzM=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.googleusercontent.com; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sqzamIoCxygYyDxkYeZSgQY1KaXavpXBJ/2mlhbl77Y=' 'sha256-x6dLyySMvERxUfvbNOQmKkrK+rOxKg/aP13qAnzzUzM=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.googleusercontent.com; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>旅遊小幫手（測試版）</title>
 <meta name="description" content="出國記帳、預算、統計與匯率換算的旅遊小幫手。">
@@ -65,7 +65,9 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
 .g-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;margin-top:44px;height:50px;padding:0 28px;border:0;border-radius:980px;background:var(--ink);color:#fff;font-size:1rem;font-weight:500;letter-spacing:.02em;cursor:pointer;transition:transform .2s var(--ease),background .2s;animation:rise .7s .16s var(--ease) both}
 @media (hover:hover){.g-btn:hover{background:#000}}
 .g-btn:active{transform:scale(.96)}
-.login small{display:block;margin-top:16px;color:var(--muted);font-size:.8125rem;animation:rise .7s .22s var(--ease) both}
+.login .alt{margin-top:10px;height:44px;padding:0 12px;border:0;background:transparent;color:var(--link);font-size:.9375rem;cursor:pointer;transition:opacity .2s;animation:rise .7s .19s var(--ease) both}
+.login .alt:active{opacity:.5}
+.login small{display:block;margin-top:6px;color:var(--muted);font-size:.8125rem;animation:rise .7s .22s var(--ease) both}
 
 /* ===== 頂部 ===== */
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px}
@@ -107,6 +109,8 @@ button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:trans
 .me-btn img{position:absolute;inset:0;width:100%;height:100%;max-width:none;border-radius:50%;object-fit:cover;object-position:center;display:block}
 .offline{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:980px;background:var(--soft);color:var(--muted);font-size:.75rem}
 .offline::before{content:"";width:6px;height:6px;border-radius:50%;background:#c4870f}
+button.offline{border:0;cursor:pointer;transition:transform .2s var(--ease)}
+button.offline:active{transform:scale(.96)}
 .head{padding-block:8px 32px}
 .head h1{font-size:clamp(2.2rem,7vw,2.75rem);font-weight:600;letter-spacing:-.012em;line-height:1.15;margin:0;text-wrap:balance;animation:rise .6s var(--ease) both}
 .head p{margin:8px 0 0;color:var(--muted);font-size:1.0625rem;animation:rise .6s .06s var(--ease) both}
@@ -427,6 +431,22 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .me span.e{color:var(--muted);font-size:.875rem}
 .menu-btn{display:block;width:100%;height:52px;padding:0 16px;border:0;border-top:1px solid var(--hair);background:transparent;text-align:left;font-size:1rem;color:var(--link);cursor:pointer}
 .menu-btn.red{color:var(--bad)}
+.menu-btn.armed{background:var(--bad-soft);font-weight:600}
+.menu-btn:disabled{opacity:.5;cursor:default}
+.alert{text-align:center;padding:26px 8px 2px}
+.alert .ic{display:grid;place-items:center;width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:#fff;color:var(--ink)}
+.alert.bad .ic{background:var(--bad-soft);color:var(--bad)}
+.alert h3{margin:0;font-size:1.25rem;font-weight:600;letter-spacing:.01em}
+.alert p{margin:8px 0 0;color:var(--muted);font-size:.9375rem;line-height:1.6}
+.fact{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-top:1px solid var(--hair);font-size:.9375rem;line-height:1.55}
+.fact:first-child{border-top:0}
+.fact svg{flex:none;margin-top:2px;color:var(--muted)}
+.alert.bad + .grp .fact svg{color:var(--bad)}
+.confirm-in{display:block;width:100%;height:50px;padding:0 16px;border:0;background:transparent;font-size:1rem;outline:none}
+.wide-btn{display:block;width:100%;height:50px;margin-top:22px;border:0;border-radius:14px;background:var(--ink);color:#fff;font-size:1rem;font-weight:500;cursor:pointer;transition:transform .2s var(--ease),opacity .2s,background .2s}
+.wide-btn:active{transform:scale(.98)}
+.wide-btn.bad{background:var(--bad)}
+.wide-btn:disabled{opacity:.3;cursor:default;transform:none}
 .menu-btn:active{background:var(--soft)}
 
 .toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:60;padding:10px 20px;border-radius:980px;background:rgba(29,29,31,.92);color:#fff;font-size:.9375rem;transform:translate(-50%,8px);opacity:0;transition:opacity .25s,transform .35s var(--spring);pointer-events:none}
@@ -466,6 +486,10 @@ const P = {
   sliders:'<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/>',
   trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
   plus:'<path d="M12 5v14M5 12h14"/>',
+  alert:'<path d="m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  cloud:'<path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9Z"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  user:'<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',
   food:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
   shop:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
   fun:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>',
@@ -610,16 +634,21 @@ const METHODS = {cash:{name:"現金", icon:"cash"}, card:{name:"信用卡", icon
    ・雲端模式（window.TH_CLOUD = true，測試版）：Google 登入後存在 Firestore 的 users/{uid}/trips/{tripId}/expenses/{id}，
      手機上留一份離線副本；Store.save() 只把「跟雲端不一樣的文件」寫上去。 */
 const KEY = "travelHelper.v2";
+const GUEST_KEY = "travelHelper.guest";          // 訪客模式：資料只存在這台裝置（localStorage），沒有雲端備份
 const CLOUD = !!window.TH_CLOUD;
+const guestFlag = () => { try{ return localStorage.getItem(GUEST_KEY) === "1"; }catch(e){ return false; } };
 const Store = {
   data:null,
   load(){
-    if(CLOUD){ this.data = {user:null, trips:[]}; return; }
+    const guest = CLOUD && guestFlag();
+    if(CLOUD && !guest){ this.data = {user:null, trips:[]}; return; }
     try{ this.data = JSON.parse(localStorage.getItem(KEY)); }catch(e){ this.data = null; }
     if(!this.data || !Array.isArray(this.data.trips)) this.data = {user:null, trips:[]};
+    if(guest){ this.data.user = {name:"訪客", email:"", guest:true}; this.data.trips = this.data.trips.filter(t => !t.sample); }
   },
+  get guest(){ return !!(this.data && this.data.user && this.data.user.guest); },
   save(){
-    if(CLOUD){ Cloud.sync(); return; }
+    if(CLOUD && !this.guest){ Cloud.sync(); return; }
     try{ localStorage.setItem(KEY, JSON.stringify(this.data)); }catch(e){}
   },
   trip(id){ return this.data.trips.find(t => t.id === id); }
@@ -679,9 +708,53 @@ const Cloud = {
     try{ await this.F.terminate(this.db); await this.F.clearIndexedDbPersistence(this.db); }catch(e){}
     location.reload();
   },
+  // 刪除帳號：先請本人再登入一次確認身分 → 刪掉雲端所有資料 → 刪掉帳號 → 清掉這台裝置的副本
+  async deleteAccount(onStep){
+    const A = this.A, F = this.F, db = this.db, user = this.auth && this.auth.currentUser;
+    if(!user) return false;
+    try{
+      const p = new A.GoogleAuthProvider();
+      p.setCustomParameters({prompt:"select_account"});
+      await A.reauthenticateWithPopup(user, p);
+    }catch(e){
+      const c = e && e.code || "";
+      if(c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") return false;
+      toast(c === "auth/popup-blocked" ? "彈出視窗被擋住了，請允許後再試一次" : c === "auth/user-mismatch" ? "請選擇目前登入的這個 Google 帳號" : c === "auth/network-request-failed" ? "網路不穩，請再試一次" : "身分確認沒有成功，請再試一次");
+      return false;
+    }
+    onStep("正在刪除資料…");
+    this.stop();
+    try{
+      const uid = this.uid, refs = [];
+      const trips = await F.getDocsFromServer(F.collection(db, "users", uid, "trips"));
+      for(const t of trips.docs){
+        const ex = await F.getDocsFromServer(F.collection(db, "users", uid, "trips", t.id, "expenses"));
+        ex.docs.forEach(d => refs.push(d.ref));
+        refs.push(t.ref);
+      }
+      refs.push(F.doc(db, "users", uid));
+      for(let i = 0; i < refs.length; i += 450){
+        const b = F.writeBatch(db);
+        refs.slice(i, i + 450).forEach(r => b.delete(r));
+        await b.commit();
+      }
+      onStep("正在刪除帳號…");
+      await A.deleteUser(user);
+    }catch(e){
+      toast("刪除沒有完成，請確認網路後再試一次");
+      this.onUser(this.auth.currentUser);
+      return false;
+    }
+    try{ await F.terminate(db); await F.clearIndexedDbPersistence(db); }catch(e){}
+    try{ localStorage.removeItem(KEY); localStorage.removeItem(GUEST_KEY); sessionStorage.setItem("travelHelper.bye", "1"); }catch(e){}
+    location.reload();
+    return true;
+  },
   stop(){ this.unsub.forEach(f => f()); this.unsub = []; this.expUnsub.forEach(f => f()); this.expUnsub.clear(); },
   path:(...p) => p.join("/"),
   onUser(u){
+    if(!u && Store.guest){ this.state = "out"; this.uid = null; return; }          // 訪客：資料留在本機，不動
+    if(u && Store.guest){ try{ localStorage.removeItem(GUEST_KEY); }catch(e){} }  // 訪客綁定 Google：本機資料由 migrate() 搬上雲端
     this.stop(); this.base.clear(); this.gotTrips = false;
     if(!u){ this.state = "out"; this.uid = null; Store.data = {user:null, trips:[]}; render(); return; }
     this.state = "in"; this.uid = u.uid;
@@ -859,6 +932,7 @@ function renderLogin(){
     el("h1", {text:"旅遊小幫手"}),
     el("p", {class:"lede"}, el("span", {text:"記下每一筆。"}), el("span", {text:"看清每一分。"}), el("span", {text:"玩得更安心。"})),
     el("button", {type:"button", class:"g-btn", disabled:loading || (CLOUD && Cloud.state === "error"), onclick:signIn, text:loading ? "載入中…" : "使用 Google 帳號登入"}),
+    CLOUD ? el("button", {type:"button", class:"alt", onclick:startGuest, text:"先以訪客身分使用"}) : null,
     el("small", {text:CLOUD ? (Cloud.state === "error" ? Cloud.error : "登入後資料存在雲端，換手機也不會不見") : "框架示範：按下會用範例帳號進入，資料只存在這台裝置"}));
 }
 function signIn(){
@@ -866,6 +940,25 @@ function signIn(){
   Store.data.user = {name:"示範使用者", email:"demo@example.com"};
   if(!Store.data.trips.length) Store.data.trips = sampleTrips();
   Store.save(); go("home");
+}
+
+// 訪客模式：先講清楚資料可能不見，使用者確認後才開始
+function startGuest(){
+  const go1 = el("button", {type:"button", class:"wide-btn", text:"我了解，以訪客身分開始"});
+  const body = el("div", null,
+    el("div", {class:"alert"}, el("div", {class:"ic"}, icon("user", 26, 1.6)), el("h3", {text:"以訪客身分使用"}), el("p", {text:"不用登入就能記帳，但請先了解："})),
+    el("div", {class:"grp"},
+      el("div", {class:"fact"}, icon("phone", 20, 1.7), el("span", {text:"資料只存在這台裝置的瀏覽器裡，沒有任何備份。"})),
+      el("div", {class:"fact"}, icon("trash", 20, 1.7), el("span", {text:"清除瀏覽資料、換手機或刪掉這個網頁，資料就會消失，無法救回。"})),
+      el("div", {class:"fact"}, icon("clock", 20, 1.7), el("span", {text:"iPhone 的 Safari 若 7 天沒打開這個網頁，系統可能自動清掉資料。"})),
+      el("div", {class:"fact"}, icon("cloud", 20, 1.7), el("span", {text:"之後隨時可以在「帳號」綁定 Google，把資料搬上雲端保存。"}))),
+    go1);
+  const {close, ok} = openSheet({title:"訪客模式", body});
+  ok.style.visibility = "hidden";
+  go1.addEventListener("click", () => {
+    try{ localStorage.setItem(GUEST_KEY, "1"); }catch(e){ toast("這個瀏覽器無法儲存資料，請改用 Google 登入"); return; }
+    Store.load(); Store.save(); close(); go("home");
+  });
 }
 
 /* ---------- 我的旅程 ---------- */
@@ -884,7 +977,8 @@ function renderHome(){
   const order = {during:0, before:1, after:2};
   const trips = [...Store.data.trips].sort((a, b) => order[phase(a).key] - order[phase(b).key] || (phase(a).key === "after" ? b.start.localeCompare(a.start) : a.start.localeCompare(b.start)));
   const head = el("header", {class:"gut"}, el("div", {class:"col"},
-    el("div", {class:"top"}, CLOUD && !navigator.onLine ? el("span", {class:"offline", text:"離線中，連上網路後自動同步"}) : el("span"), avatarBtn(u)),
+    el("div", {class:"top"}, Store.guest ? el("button", {type:"button", class:"offline", onclick:openMe, text:"訪客模式・資料只在這台裝置"})
+      : CLOUD && !navigator.onLine ? el("span", {class:"offline", text:"離線中，連上網路後自動同步"}) : el("span"), avatarBtn(u)),
     el("div", {class:"head"}, el("h1", {text:"我的旅程"}), el("p", {text:trips.length ? `${trips.length} 趟旅程${trips.some(t => t.sample) ? "・含範例資料" : ""}` : `你好，${u.name}`}))));
   const band = el("section", {class:"band gut"}, el("div", {class:"col"},
     el("div", {class:"stack"}, trips.length ? trips.map((t, i) => tripCard(t, i)) : el("div", {class:"card rise"}, el("div", {class:"empty"}, el("b", {text:"還沒有旅程"}), el("span", {text:"按下方「新增旅程」，開始記第一趟"})))),
@@ -1627,6 +1721,7 @@ function openAccountForm(t, a){
 
 /* ---------- 帳號 ---------- */
 function openMe(){
+  if(Store.guest){ openGuestMe(); return; }
   const u = Store.data.user;
   const reset = CLOUD ? null : el("button", {type:"button", class:"menu-btn", text:"重設範例資料"});
   const out = el("button", {type:"button", class:"menu-btn red", text:"登出"});
@@ -1634,7 +1729,9 @@ function openMe(){
   const body = el("div", null, el("div", {class:"grp"},
     el("div", {class:"me"}, pic, el("div", null, el("b", {text:u.name}), el("span", {class:"e", text:u.email}))),
     reset, out),
-    CLOUD ? el("p", {class:"hint", style:"margin:10px 16px 0", text:"登出時會一併清除這台裝置上的資料副本，雲端的資料不受影響。"}) : null);
+    CLOUD ? el("p", {class:"hint", style:"margin:10px 16px 0", text:"登出時會一併清除這台裝置上的資料副本，雲端的資料不受影響。"}) : null,
+    CLOUD ? el("div", {class:"grp"}, el("button", {type:"button", class:"menu-btn red", style:"border-top:0", onclick:openDeleteAccount, text:"刪除帳號"})) : null,
+    CLOUD ? el("p", {class:"hint", style:"margin:10px 16px 0", text:"刪除帳號會永久刪除所有旅程與記帳，無法復原。"}) : null);
   const {close} = openSheet({title:"帳號", done:"完成", body, onDone:() => close()});
   if(reset) reset.addEventListener("click", () => { Store.data.trips = sampleTrips(); Store.save(); close(); go("home"); toast("範例資料已重設"); });
   out.addEventListener("click", () => {
@@ -1643,8 +1740,64 @@ function openMe(){
   });
 }
 
+// 訪客的帳號頁：綁定 Google（資料搬上雲端），或清除資料離開
+function openGuestMe(){
+  const bind = el("button", {type:"button", class:"menu-btn", text:"綁定 Google 帳號"});
+  const leave = el("button", {type:"button", class:"menu-btn red", text:"清除資料並離開"});
+  const pic = avatarBtn(Store.data.user); pic.disabled = true; pic.removeAttribute("aria-label");
+  const n = Store.data.trips.length;
+  const body = el("div", null,
+    el("div", {class:"grp"}, el("div", {class:"me"}, pic, el("div", null, el("b", {text:"訪客"}), el("span", {class:"e", text:"資料只存在這台裝置"}))), bind),
+    el("p", {class:"hint", style:"margin:10px 16px 0", text:"綁定後，這台裝置上的旅程會一起搬上雲端，換手機也不會不見。"}),
+    el("div", {class:"grp"}, Object.assign(leave, {style:"border-top:0"})),
+    el("p", {class:"hint", style:"margin:10px 16px 0", text:n ? `訪客資料沒有備份，清除後這 ${n} 趟旅程會永久消失。` : "訪客資料沒有備份，清除後無法復原。"}));
+  const {close} = openSheet({title:"帳號", done:"完成", body, onDone:() => close()});
+  bind.addEventListener("click", () => {
+    if(Cloud.state === "loading"){ toast("登入服務還在載入，請稍等一下"); return; }
+    if(Cloud.state === "error"){ toast(Cloud.error); return; }
+    close(); Cloud.signIn();
+  });
+  let armed = false, tm;
+  leave.addEventListener("click", () => {
+    if(!armed){
+      armed = true; leave.classList.add("armed"); leave.textContent = "再按一次，資料會永久消失";
+      tm = setTimeout(() => { armed = false; leave.classList.remove("armed"); leave.textContent = "清除資料並離開"; }, 4000); return;
+    }
+    clearTimeout(tm);
+    try{ localStorage.removeItem(KEY); localStorage.removeItem(GUEST_KEY); }catch(e){}
+    Store.data = {user:null, trips:[]}; close(); go("home"); toast("訪客資料已清除");
+  });
+}
+
+// 刪除帳號：講清楚會消失什麼 → 輸入「刪除」→ 再登入一次確認本人 → 刪除
+function openDeleteAccount(){
+  const trips = Store.data.trips.filter(t => !t.sample), n = trips.length, m = trips.reduce((s, t) => s + t.expenses.length, 0);
+  const input = el("input", {type:"text", class:"confirm-in", placeholder:"在這裡輸入", autocomplete:"off", autocapitalize:"off", spellcheck:"false", "aria-label":"輸入「刪除」確認"});
+  const btn = el("button", {type:"button", class:"wide-btn bad", disabled:true, text:"永久刪除帳號"});
+  const body = el("div", null,
+    el("div", {class:"alert bad"}, el("div", {class:"ic"}, icon("alert", 26, 1.7)), el("h3", {text:"永久刪除帳號"}), el("p", {text:"刪除後無法復原，以下資料會立即從雲端消失："})),
+    el("div", {class:"grp"},
+      el("div", {class:"fact"}, icon("plane", 20, 1.7), el("span", {text:n ? `${n} 趟旅程、${m} 筆記帳` : "所有旅程與記帳"})),
+      el("div", {class:"fact"}, icon("phone", 20, 1.7), el("span", {text:"所有裝置上的資料，其他手機和電腦也會一起消失"})),
+      el("div", {class:"fact"}, icon("user", 20, 1.7), el("span", {text:"你在旅遊小幫手的帳號與設定"}))),
+    el("p", {class:"grp-lab", text:"請輸入「刪除」兩個字確認"}),
+    el("div", {class:"grp"}, input),
+    el("p", {class:"hint", style:"margin:10px 16px 0", text:"為了確認是你本人，按下後會請你再登入一次 Google。"}),
+    btn);
+  const {close, ok} = openSheet({title:"刪除帳號", body});
+  ok.style.visibility = "hidden";
+  input.addEventListener("input", () => { btn.disabled = input.value.trim() !== "刪除"; });
+  btn.addEventListener("click", async () => {
+    if(!navigator.onLine){ toast("需要連上網路才能刪除帳號"); return; }
+    btn.disabled = true; input.disabled = true; btn.textContent = "確認身分中…";
+    const done = await Cloud.deleteAccount(step => { btn.textContent = step; });
+    if(!done){ btn.textContent = "永久刪除帳號"; input.disabled = false; btn.disabled = input.value.trim() !== "刪除"; }
+  });
+}
+
 Store.load();
 render();
+try{ if(sessionStorage.getItem("travelHelper.bye")){ sessionStorage.removeItem("travelHelper.bye"); setTimeout(() => toast("帳號已刪除，所有資料都清除了"), 400); } }catch(e){}
 refreshRates();
 if(CLOUD){
   Cloud.init();
