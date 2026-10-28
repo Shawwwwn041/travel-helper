@@ -2,7 +2,7 @@ rules_version = '2';
 
 // 旅遊小幫手的資料庫規則
 // 原則：1) 沒寫到的一律拒絕  2) 只有本人能讀寫自己的資料  3) 寫進來的資料要通過格式檢查
-// 資料結構：users/{uid}/trips/{tripId}/expenses/{expenseId}
+// 資料結構：users/{uid}/trips/{tripId}/ 底下有 items（清單）、photos（照片）、expenses（記帳）
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -76,20 +76,48 @@ service cloud.firestore {
 
           function validItem(d) {
             return d.keys().hasAll(['list', 'cat', 'name', 'done', 'pos'])
-              && d.keys().hasOnly(['list', 'cat', 'name', 'note', 'photo', 'who', 'price', 'paid', 'done', 'pos', 'createdAt', 'updatedAt'])
+              && d.keys().hasOnly(['list', 'cat', 'name', 'note', 'photo', 'who', 'price', 'paid', 'parent', 'spec', 'qty', 'discount', 'mode', 'thumb', 'pcount', 'done', 'pos', 'createdAt', 'updatedAt'])
               && d.list in ['todo', 'pack', 'shop']
               && d.cat is string && d.cat.size() >= 1 && d.cat.size() <= 40
               && d.name is string && d.name.size() >= 1 && d.name.size() <= 60
-              && text(d.get('note', ''), 120)
+              && text(d.get('note', ''), 1000)
               && d.done is bool
               && d.pos is number
               // 代買／伴手禮：給誰（最多 12 字）、金額（最小單位的整數）、收錢了沒
               && text(d.get('who', ''), 12)
               && (!('price' in d) || (d.price is int && d.price > 0 && d.price < 100000000000000))
               && d.get('paid', false) is bool
-              // 照片：只能是手機上重新壓過的 JPEG（data URL），不能是外部網址
+              // 兩層購物清單：店家裡的商品記住屬於哪一家店（parent），有規格、數量；店家可以填折扣
+              && (!('parent' in d) || (d.parent is string && d.parent.size() >= 1 && d.parent.size() <= 40))
+              && text(d.get('spec', ''), 40)
+              && (!('qty' in d) || (d.qty is int && d.qty >= 1 && d.qty <= 999))
+              && (!('discount' in d) || (d.discount is int && d.discount > 0 && d.discount < 100000000000000))
+              && (!('mode' in d) || d.mode in ['single', 'store'])
+              // 清單上的小縮圖（144px）和照片張數（最多 10 張）
+              && (!('thumb' in d) || (d.thumb is string && d.thumb.size() <= 30000
+                    && d.thumb.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')))
+              && (!('pcount' in d) || (d.pcount is int && d.pcount >= 0 && d.pcount <= 10))
+              // 舊版的單張照片（新版改存在 photos，留著讓舊資料能讀寫）
               && (!('photo' in d) || (d.photo is string && d.photo.size() <= 380000
                     && d.photo.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')))
+              && (d.get('createdAt', null) == null || d.createdAt is timestamp)
+              && (d.get('updatedAt', null) == null || d.updatedAt is timestamp);
+          }
+        }
+
+        // ---- 清單的照片：每張一份文件，記住屬於哪一項 ----
+        match /photos/{photoId} {
+          allow read, delete: if isOwner(uid);
+          allow create, update: if isOwner(uid) && idOk(photoId) && validPhoto(request.resource.data);
+
+          function validPhoto(d) {
+            return d.keys().hasAll(['item', 'data', 'pos'])
+              && d.keys().hasOnly(['item', 'data', 'pos', 'createdAt', 'updatedAt'])
+              && d.item is string && d.item.size() >= 1 && d.item.size() <= 40
+              // 只能是手機上重新壓過的 JPEG（data URL），不能是外部網址；一張最多約 280KB
+              && d.data is string && d.data.size() <= 380000
+              && d.data.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')
+              && d.pos is number
               && (d.get('createdAt', null) == null || d.createdAt is timestamp)
               && (d.get('updatedAt', null) == null || d.updatedAt is timestamp);
           }
