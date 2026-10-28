@@ -5,7 +5,7 @@
 ## 2026-10-28 改名「拾旅」
 
 - 網站名稱從「旅遊小幫手」改成「拾旅」（標題、主畫面名稱、分享預覽）。
-- 準備搬到 Firebase Hosting：shilu.web.app（新增 firebase.json、.firebaserc、deploy.bat）。
+- 準備搬到 Firebase Hosting：shilu-trip.web.app（新增 firebase.json、.firebaserc、deploy.bat）。
 
 ## 2026-10-28 修正：第二層頁面的返回鍵
 
