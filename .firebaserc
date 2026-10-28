@@ -1,0 +1,4 @@
+{
+  "projects": {"default": "travel-helper-992ae"},
+  "targets": {"travel-helper-992ae": {"hosting": {"shilu": ["shilu"]}}}
+}

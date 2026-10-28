@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-hqesknUJXO7ahycEF8LTPQE2zWfnkMzFtrEcx46nVO0=' 'sha256-x6dLyySMvERxUfvbNOQmKkrK+rOxKg/aP13qAnzzUzM=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sRrhjQOwO7+wD89GEQ88qBxb8bf5c3LOtNn2NnCtCxk=' 'sha256-x6dLyySMvERxUfvbNOQmKkrK+rOxKg/aP13qAnzzUzM=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>旅遊小幫手</title>
-<meta name="description" content="出國記帳、預算、統計與匯率換算的旅遊小幫手。">
-<meta name="apple-mobile-web-app-title" content="旅遊小幫手">
+<title>拾旅</title>
+<meta name="description" content="拾旅｜出國記帳、預算、清單與匯率換算。">
+<meta name="apple-mobile-web-app-title" content="拾旅">
 
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta property="og:title" content="旅遊小幫手">
+<meta property="og:title" content="拾旅">
 <meta property="og:description" content="出國記帳、預算、清單一次搞定">
-<meta property="og:image" content="https://shawwwwn041.github.io/travel-helper/icons/og.png">
+<meta property="og:image" content="https://shilu.web.app/icons/og.png">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#ffffff">
 <script>window.TH_CLOUD=true;</script>
@@ -1591,21 +1591,21 @@ function render(){
 /* ---------- 品牌圖示：線條雲＋線條飛機（跟歡迎動畫、主畫面圖示同一套） ---------- */
 function logo(){
   const w = el("span", {style:"display:contents"});
-  w.innerHTML = '<svg class="logo" viewBox="40 220 944 520" role="img" aria-label="旅遊小幫手">'
+  w.innerHTML = '<svg class="logo" viewBox="40 220 944 520" role="img" aria-label="拾旅">'
     + '<path d="M 140 640 C 300 640 420 560 560 450" fill="none" stroke="#d2d2d7" stroke-width="10" stroke-linecap="round" stroke-dasharray="2 26"/>'
     + '<path d="M 60 720 H 170 A 40 40 0 0 1 236 690 A 82 82 0 0 1 380 630 A 56 56 0 0 1 470 676 A 38 38 0 0 1 516 720 H 964" fill="none" stroke="#86868b" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>'
     + '<g class="lp"><g transform="translate(640 380) rotate(-32) scale(9.5) translate(-16 -16)"><path d="M30 16c0-1.1-.9-2-2-2h-8.5L12 3H9l4 11H6.5L4 11H2l1.5 5L2 21h2l2.5-3H13L9 29h3l7.5-11H28c1.1 0 2-.9 2-2Z" fill="#fff" stroke="#1d1d1f" stroke-width="1.15" stroke-linejoin="round"/></g></g></svg>';
   return w.firstChild;
 }
 const APP_VER = "0.3";
-const about = () => el("div", {class:"about"}, logo(), el("b", {text:"旅遊小幫手"}), el("span", {text:CLOUD ? (window.TH_BETA ? `測試版 ${APP_VER}` : `版本 ${APP_VER}`) : `示範版 ${APP_VER}`}));
+const about = () => el("div", {class:"about"}, logo(), el("b", {text:"拾旅"}), el("span", {text:CLOUD ? (window.TH_BETA ? `測試版 ${APP_VER}` : `版本 ${APP_VER}`) : `示範版 ${APP_VER}`}));
 
 /* ---------- 登入 ---------- */
 function renderLogin(){
   const loading = CLOUD && Cloud.state === "loading";
   return el("main", {class:"screen login gut"},
     logo(),
-    el("h1", {text:"旅遊小幫手"}),
+    el("h1", {text:"拾旅"}),
     el("p", {class:"lede"}, el("span", {text:"記下每一筆。"}), el("span", {text:"看清每一分。"}), el("span", {text:"玩得更安心。"})),
     el("button", {type:"button", class:"g-btn", disabled:loading || (CLOUD && Cloud.state === "error"), onclick:signIn, text:loading ? "載入中…" : "使用 Google 帳號登入"}),
     CLOUD ? el("button", {type:"button", class:"alt", onclick:startGuest, text:"先以訪客身分使用"}) : null,
@@ -1923,7 +1923,7 @@ function renderSetup(){
   check();
   return el("main", {class:"screen login setup gut"},
     el("h1", {text:"怎麼稱呼你？"}),
-    el("p", {class:"lede"}, el("span", {text:"選一張照片、取個暱稱，"}), el("span", {text:"旅遊小幫手會這樣稱呼你。"})),
+    el("p", {class:"lede"}, el("span", {text:"選一張照片、取個暱稱，"}), el("span", {text:"拾旅會這樣稱呼你。"})),
     ed.pf, ed.nick, next,
     el("small", {text:"照片會裁成正方形並縮小，拍攝地點等資訊不會留下。"}),
     ed.file);
@@ -3626,7 +3626,7 @@ function openDeleteAccount(){
     el("div", {class:"grp"},
       el("div", {class:"fact"}, icon("plane", 20, 1.7), el("span", {text:n ? `${n} 趟旅程、${m} 筆記帳` : "所有旅程與記帳"})),
       el("div", {class:"fact"}, icon("phone", 20, 1.7), el("span", {text:"所有裝置上的資料，其他手機和電腦也會一起消失"})),
-      el("div", {class:"fact"}, icon("user", 20, 1.7), el("span", {text:"你在旅遊小幫手的帳號與設定"}))),
+      el("div", {class:"fact"}, icon("user", 20, 1.7), el("span", {text:"你在拾旅的帳號與設定"}))),
     el("p", {class:"grp-lab", text:"請輸入「刪除」兩個字確認"}),
     el("div", {class:"grp"}, input),
     el("p", {class:"hint", style:"margin:8px 16px 0", text:"為了確認是你本人，按下後會請你再登入一次 Google。"}),
