@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-DdBycDM2xPAdEOI/SY9peWnCk2Bi5ABwghI+Iqy959s=' 'sha256-wOKpKfU4kNjWdjyiJq7pQto/68daXZCAgSIJLYrtDPs=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src 'self' https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rMyU3rAI8PKriq3SqIFuarEUbJ1B75Jd51HYETlWBJ8=' 'sha256-wOKpKfU4kNjWdjyiJq7pQto/68daXZCAgSIJLYrtDPs=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src 'self' https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>拾旅</title>
 <meta name="description" content="拾旅｜出國記帳、預算、清單與匯率換算。">
@@ -1215,6 +1215,7 @@ const Cloud = {
     try{ await this.A.signOut(this.auth); }catch(e){}
     // 登出時把手機上的離線副本一起清掉，借別人用也不會留下資料
     try{ await this.F.terminate(this.db); await this.F.clearIndexedDbPersistence(this.db); }catch(e){}
+    try{ localStorage.removeItem(KEY + ".backup"); }catch(e){}             // 搬家時留的備份也清掉
     location.reload();
   },
   // 刪除帳號：先請本人再登入一次確認身分 → 刪掉雲端所有資料 → 刪掉帳號 → 清掉這台裝置的副本
@@ -1259,7 +1260,7 @@ const Cloud = {
       return false;
     }
     try{ await F.terminate(db); await F.clearIndexedDbPersistence(db); }catch(e){}
-    try{ localStorage.removeItem(KEY); localStorage.removeItem(GUEST_KEY); sessionStorage.setItem("travelHelper.bye", "1"); }catch(e){}
+    try{ localStorage.removeItem(KEY); localStorage.removeItem(KEY + ".backup"); localStorage.removeItem(GUEST_KEY); sessionStorage.setItem("travelHelper.bye", "1"); }catch(e){}
     location.reload();
     return true;
   },

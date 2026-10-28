@@ -2,6 +2,12 @@
 
 旅遊小幫手的修改紀錄，新的在上面。
 
+## 2026-10-28（晚上）資安檢查與加強
+
+- 防止網頁被別的網站用框架嵌入（X-Frame-Options SAMEORIGIN、frame-ancestors 'self'）；同網域的登入元件仍可正常運作。
+- 關閉網頁用不到的瀏覽器權限（定位、麥克風、付款、USB）。
+- 登出、刪除帳號時，連同搬家時留下的手機備份一起清掉，借別人的手機登入也不會留下資料。
+
 ## 2026-10-28（晚上）登入畫面顯示新網址
 
 - 在 shilu-trip.web.app 登入時，Google 登入畫面改成顯示「shilu-trip.web.app」（原本顯示專案預設網域 travel-helper-992ae.firebaseapp.com）。舊網址維持原樣。
