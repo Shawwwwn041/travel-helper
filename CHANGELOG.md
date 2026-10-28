@@ -2,6 +2,11 @@
 
 旅遊小幫手的修改紀錄，新的在上面。
 
+## 2026-10-28（晚上）登入畫面顯示新網址
+
+- 在 shilu-trip.web.app 登入時，Google 登入畫面改成顯示「shilu-trip.web.app」（原本顯示專案預設網域 travel-helper-992ae.firebaseapp.com）。舊網址維持原樣。
+- 需要先在 Google Cloud 的 OAuth 用戶端加上 https://shilu-trip.web.app/__/auth/handler，再部署。
+
 ## 2026-10-28（晚上）修正：首頁寬螢幕三欄間距
 
 - 電腦寬螢幕上，三欄之間的分隔線左右距離不一樣（左 8、右 24），看起來「新增旅程」偏一邊；改回左右都是 24。

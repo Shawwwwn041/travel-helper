@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sRrhjQOwO7+wD89GEQ88qBxb8bf5c3LOtNn2NnCtCxk=' 'sha256-wOKpKfU4kNjWdjyiJq7pQto/68daXZCAgSIJLYrtDPs=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-DdBycDM2xPAdEOI/SY9peWnCk2Bi5ABwghI+Iqy959s=' 'sha256-wOKpKfU4kNjWdjyiJq7pQto/68daXZCAgSIJLYrtDPs=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src 'self' https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>拾旅</title>
 <meta name="description" content="拾旅｜出國記帳、預算、清單與匯率換算。">
@@ -1161,7 +1161,8 @@ const Store = {
 /* ---------- 雲端（Firebase） ---------- */
 const FIREBASE_CONFIG = {
   apiKey:"AIzaSyAaGKe1GGnr7eFkl58RxsKQ1XSBTg5JDsY",
-  authDomain:"travel-helper-992ae.firebaseapp.com",
+  // 登入畫面顯示的網域：在 Firebase Hosting 的新網址上就用自己（顯示 shilu-trip.web.app），其他地方用專案預設網域
+  authDomain:/^shilu-trip\.web\.app$/.test(location.hostname) ? location.hostname : "travel-helper-992ae.firebaseapp.com",
   projectId:"travel-helper-992ae",
   storageBucket:"travel-helper-992ae.firebasestorage.app",
   messagingSenderId:"841081071113",
