@@ -1,15 +1,38 @@
 {
   "hosting": {
     "target": "shilu",
-    "public": ".",
-    "ignore": ["firebase.json", ".firebaserc", "**/.*", "**/node_modules/**", "CHANGELOG.md", "README.md", "firestore.rules", "deploy.bat"],
+    "public": "site",
+    "ignore": [
+      "**/.*",
+      "**/node_modules/**"
+    ],
     "headers": [
-      {"source": "**/*.html", "headers": [{"key": "Cache-Control", "value": "no-cache"}]},
-      {"source": "**", "headers": [
-        {"key": "X-Content-Type-Options", "value": "nosniff"},
-        {"key": "Referrer-Policy", "value": "strict-origin-when-cross-origin"},
-        {"key": "X-Frame-Options", "value": "DENY"}
-      ]}
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          }
+        ]
+      }
     ]
   }
 }
