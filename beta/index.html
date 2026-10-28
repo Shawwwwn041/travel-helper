@@ -925,9 +925,10 @@ body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;back
 .op-p{background:var(--pri);color:#fff}.op-s{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--pri3)}
 .op-p:active,.op-s:active{transform:scale(.97)}
 .shop .sh-sum{padding:24px}.shop .ss-prog .pbar{height:4px;margin:0}
-/* 第二層頁面的返回鍵：跟頁面上「‹ 我的旅程」同一顆玻璃膠囊 */
-.subpage .sheet-h .back{height:40px;margin-left:0;padding:0 20px 0 12px;font-size:1rem;gap:4px;border-radius:980px;color:var(--ink);background:rgba(120,120,128,.10);box-shadow:0 4px 12px rgba(0,0,0,.06),inset 0 0 0 .5px rgba(0,0,0,.06)}
-.subpage .sheet-h .back:active{transform:scale(.95);opacity:1}
+/* 第二層頁面的返回鍵：跟「取消」一樣的純文字（不要膠囊） */
+.subpage .sheet-h .back{height:44px;margin-left:-7px;padding:0;gap:2px;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:var(--muted);font-size:1rem}
+.subpage .sheet-h .back::after,.subpage .sheet-h .back::before{display:none}
+.subpage .sheet-h .back:active{transform:none;opacity:.5}
 </style>
 
 <div id="app"></div>
