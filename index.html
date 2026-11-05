@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rMyU3rAI8PKriq3SqIFuarEUbJ1B75Jd51HYETlWBJ8=' 'sha256-wOKpKfU4kNjWdjyiJq7pQto/68daXZCAgSIJLYrtDPs=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src 'self' https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-W+NzPPpJUzTTjIhXeHdJxbHzS2g0xPr4ToeYHuj9bdg=' 'sha256-wOKpKfU4kNjWdjyiJq7pQto/68daXZCAgSIJLYrtDPs=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src 'self' https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>拾旅</title>
 <meta name="description" content="拾旅｜出國記帳、預算、清單與匯率換算。">
@@ -320,6 +320,9 @@ button.offline:active{transform:scale(.96)}
 .seg-nav .cap button.over{color:var(--ink);font-weight:600}
 body.dragging,body.dragging *{cursor:grabbing !important}
 .seg-nav button{position:relative;z-index:1;height:36px;min-width:72px;padding:0 16px;border:0;border-radius:980px;background:transparent;color:var(--muted);font-size:1rem;letter-spacing:.04em;cursor:pointer;transition:color .3s}
+/* 五個分頁全開時會塞不下 390px 的手機，縮一點讓它整排放得進去 */
+.seg-nav .cap.tight button{min-width:60px;padding:0 9px;letter-spacing:.02em}
+@media (max-width:360px){.seg-nav .cap.tight button{min-width:54px;padding:0 6px;font-size:.9375rem}}
 .seg-nav button[aria-selected="true"]{color:var(--ink);font-weight:600}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--band)}
 
@@ -413,6 +416,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   -webkit-mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent)}
 .wheel::-webkit-scrollbar{display:none}
 .wheel:focus{outline:none}
+.wheel{cursor:grab}
+.wheel.grab{cursor:grabbing;scroll-behavior:auto}
 .wheel .pad{height:90px}
 .wheel .it{height:36px;line-height:36px;text-align:center;font-size:1.25rem;white-space:nowrap;scroll-snap-align:center;transform-origin:50% 50%;will-change:transform,opacity;cursor:pointer;font-variant-numeric:tabular-nums lining-nums}
 .wheel .it.off{color:var(--faint)}
@@ -430,6 +435,16 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .rm{flex:none;display:grid;place-items:center;width:22px;height:22px;padding:0;border:0;border-radius:50%;background:var(--bad);color:#fff;cursor:pointer;transition:transform .2s var(--ease)}
 .rm:active{transform:scale(.85)}
 .rm::before{content:"";width:10px;height:2px;border-radius:2px;background:currentColor}
+.brow .kgrip{width:28px;height:32px;margin:0 -6px 0 0}
+/* 分頁設定的每一列：≡ 把手、名稱、開關 */
+.ced.tbed{gap:10px}
+.ced.tbed .grow{flex:1;color:var(--ink);font-size:1rem;cursor:pointer}
+.ced input.switch{flex:none;width:51px;height:31px;padding:0}
+.ced.tbed.dragging{position:relative;z-index:3;background:var(--card,#fff);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.14)}
+.ced.tbed.shifting,.ced.tbed.settling{transition:transform .2s var(--ease)}
+.brow.dragging{position:relative;z-index:3;background:var(--card,#fff);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.14)}
+.brow.shifting{transition:transform .2s var(--ease)}
+.brow.settling{transition:transform .22s var(--ease)}
 .brow.out{animation:rowOut .3s var(--ease) forwards;overflow:hidden}
 @keyframes rowOut{to{opacity:0;min-height:0;height:0;padding-block:0;border-top-width:0}}
 .brow.in{animation:rowIn .35s var(--ease)}
@@ -513,6 +528,11 @@ button.me:active{background:var(--soft)}
 .me span.e{color:var(--muted);font-size:.875rem}
 .menu-btn{display:block;width:100%;height:52px;padding:0 16px;border:0;border-top:1px solid var(--hair);background:transparent;text-align:left;font-size:1rem;color:var(--link);cursor:pointer}
 .menu-btn.red{color:var(--bad)}
+/* 右邊帶說明文字和箭頭的那種（例如「分頁設定　記帳・清單・行程…」） */
+.menu-btn:has(.grow){display:flex;align-items:center;gap:10px}
+.menu-btn .grow{flex:none}
+.menu-btn > .e{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;color:var(--muted);font-size:.9375rem}
+.menu-btn > .chev{flex:none;display:grid;place-items:center;color:var(--faint);margin-right:-4px}
 .menu-btn.armed{background:var(--bad-soft);font-weight:600}
 .menu-btn:disabled{opacity:.5;cursor:default}
 .alert{text-align:center;padding:24px 8px 2px}
@@ -568,7 +588,66 @@ button.me:active{background:var(--soft)}
 .li.add input{flex:1;min-width:0;height:38px;padding:0;border:0;background:transparent;font-size:1rem;color:var(--ink);outline:none}
 .li.add input::placeholder{color:var(--muted)}
 .li.add input:focus::placeholder{color:var(--faint)}
-.ls-tools{display:flex;justify-content:center;margin-top:16px}
+.ls-tools{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 16px;margin-top:16px}
+
+/* ===== 行程：一天一頁的時間軸 ===== */
+/* 日期列：玻璃滑塊，跟上面的分頁列同一種手感（可點、也可按住滑塊左右拖） */
+.pdays-sc{overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:2px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
+.pdays-sc::-webkit-scrollbar{display:none}
+/* 天數多到要橫捲時不畫底色：膠囊比螢幕寬，圓角會跑到畫面外，看起來只是一條灰帶。
+   放得下（.fit）才補上跟分頁列一樣的凹槽底。 */
+.pdays{position:relative;display:inline-flex;gap:0;padding:4px;border-radius:18px;background:transparent;touch-action:pan-x;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:background .25s}
+/* 天數放得下時不需要捲動，整條都能拖；放不下時左右滑是捲動，拖滑塊才換日期 */
+.pdays.fit{background:rgba(120,120,128,.14);box-shadow:inset 0 1px 2px rgba(0,0,0,.05);touch-action:pan-y}
+.pdays.fit.drag{background:rgba(120,120,128,.18)}
+/* 滑塊自己吃掉觸控（touch-action:none），所以按在滑塊上是拖滑塊、按在別處才是捲動整列 */
+.pdays .thumb{position:absolute;top:4px;bottom:4px;left:0;width:0;border-radius:14px;touch-action:none;cursor:grab;background:linear-gradient(180deg,#fff,rgba(255,255,255,.88));box-shadow:0 3px 10px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.08),inset 0 1px 0 #fff,inset 0 0 0 .5px rgba(0,0,0,.08)}
+.pdays.drag .thumb{cursor:grabbing}
+.pdays .thumb.ready{transition:translate .42s var(--ease),width .42s var(--ease),scale .3s var(--ease),box-shadow .3s var(--ease)}
+.pdays.drag .thumb{transition:scale .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s var(--ease);scale:1.06;box-shadow:0 8px 20px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.10),inset 0 1px 0 #fff,inset 0 0 0 .5px rgba(0,0,0,.08)}
+.pdays.drag .pday[aria-selected="true"]:not(.over) b{color:var(--muted);font-weight:600}
+.pdays .pday.over b{color:var(--ink)}
+.pday{flex:none;position:relative;z-index:1;display:grid;gap:1px;min-width:84px;padding:8px 14px 9px;border:0;border-radius:14px;background:transparent;color:var(--muted);cursor:pointer;text-align:left;transition:color .3s}
+.pday .p1{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.pday b{font-size:.8125rem;font-weight:600;letter-spacing:.02em;transition:color .3s}
+.pday .p2{font-size:.75rem;opacity:.9}
+.pday .pn{font-size:.6875rem;font-style:normal;opacity:.55;font-variant-numeric:tabular-nums}
+.pday[aria-selected="true"]{color:var(--ink)}
+.pday[aria-selected="true"] b{color:var(--ink)}
+
+.ptl{background:#fff;border-radius:16px;padding:0 8px 0 4px}
+.pstop{position:relative;display:flex;align-items:stretch;gap:8px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.pstop .pt{flex:none;width:48px;padding-top:12px;text-align:right;color:var(--muted);font-size:.875rem;font-variant-numeric:tabular-nums}
+.pstop .prail{flex:none;position:relative;width:16px}
+.pstop .prail::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1.5px;margin-left:-.75px;background:var(--hair)}
+.ptl > .pstop:first-child .prail::before{top:22px}
+.pstop.last .prail::before{bottom:auto;height:22px}
+.pstop .prail i{position:absolute;left:50%;top:18px;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:var(--pri);box-shadow:0 0 0 3.5px #fff}
+.pstop .ptx{flex:1;min-width:0;display:grid;gap:4px;justify-items:start;padding:12px 0 16px;border:0;background:transparent;text-align:left;cursor:pointer}
+.pstop .ptx b{font-size:1rem;color:var(--ink);line-height:1.35}
+.pstop .ptx .pnote{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:.875rem}
+.pstop .pmv{display:inline-block;margin-top:2px;padding:3px 10px;border-radius:99px;background:rgba(120,120,128,.1);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.05);color:var(--muted);font-size:.8125rem}
+.pstop .pic{align-self:center}
+.pstop .kgrip{align-self:center}
+.p-empty{padding:28px 24px;text-align:center}
+.pe-t{margin:0;color:var(--ink);font-size:1rem}
+.pe-s{margin:6px 0 0;color:var(--muted);font-size:.875rem;line-height:1.6}
+.p-add{font-weight:600}
+/* 交通方式：純文字玻璃膠囊，選到的那顆跟分頁滑塊同一種白玻璃 */
+.line.mvline{padding:12px 14px}
+.mvs{display:flex;flex-wrap:wrap;gap:8px;width:100%}
+.mv{height:34px;padding:0 15px;border:0;border-radius:980px;background:rgba(120,120,128,.1);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.07);color:var(--muted);font-size:.9375rem;cursor:pointer;transition:transform .2s var(--ease),background .2s,color .2s,box-shadow .25s}
+.mv:active{transform:scale(.95)}
+.mv.on{background:linear-gradient(180deg,#fff,rgba(255,255,255,.9));color:var(--ink);font-weight:600;box-shadow:0 3px 10px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.08),inset 0 1px 0 #fff,inset 0 0 0 .5px rgba(0,0,0,.08)}
+.mv.edit{display:inline-flex;align-items:center;gap:5px;background:transparent;box-shadow:none;color:var(--pri);padding:0 10px}
+.mv.edit .ico{opacity:.8}
+.mv-v{flex:1;text-align:right;color:var(--ink);font-size:1rem;font-weight:400}
+.line.mv-bs{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px}
+.mv-b{height:32px;padding:0 13px;border:0;border-radius:99px;background:rgba(120,120,128,.12);color:var(--ink);font-size:.875rem;cursor:pointer;transition:transform .2s var(--ease),background .2s}
+.mv-b:active{transform:scale(.94)}
+.mv-b:last-child{color:var(--muted)}
+.map-lk{display:inline-flex;align-items:center;gap:6px;margin:10px 16px 0;padding:7px 13px;border-radius:99px;background:rgba(0,0,0,.045);color:var(--pri);font-size:.875rem;text-decoration:none;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.07)}
+.map-lk .ico{flex:none;opacity:.8}
 /* 長按拖動（沿用貓咪小幫手的做法） */
 body.is-dragging,body.is-dragging *{cursor:grabbing !important;-webkit-user-select:none;user-select:none}
 .li.pressing{scale:.985;transition:scale .38s var(--ease)}
@@ -599,7 +678,7 @@ body.is-dragging,body.is-dragging *{cursor:grabbing !important;-webkit-user-sele
 .viewer .gv::-webkit-scrollbar{display:none}
 .viewer .gv > div{flex:none;width:100vw;height:100%;display:grid;place-items:center;scroll-snap-align:center}
 .viewer .gv img{max-width:100vw;max-height:70vh}
-.viewer .gv-n{position:absolute;top:calc(22px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;color:rgba(255,255,255,.8);font-size:.875rem;pointer-events:none}
+.viewer .gv-n{position:absolute;top:calc(22px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;font-size:.875rem;pointer-events:none}
 .viewer .gv-p{bottom:calc(132px + env(safe-area-inset-bottom,0px)) !important}
 .viewer .gv-tn{position:absolute;left:0;right:0;bottom:calc(26px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;gap:8px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
 .viewer .gv-tn button{flex:none;width:34px;height:34px;padding:0;border:0;border-radius:7px;overflow:hidden;opacity:.45;cursor:pointer;background:#222}
@@ -608,8 +687,12 @@ body.is-dragging,body.is-dragging *{cursor:grabbing !important;-webkit-user-sele
 .viewer.on{opacity:1}
 .viewer img{max-width:100vw;max-height:82vh;object-fit:contain;transform:scale(.96);transition:transform .35s var(--ease)}
 .viewer.on img{transform:none}
-.viewer p{position:absolute;left:0;right:0;bottom:calc(26px + env(safe-area-inset-bottom,0px));margin:0;padding:0 24px;text-align:center;color:#fff;font-size:1rem}
-.viewer .x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:16px;display:grid;place-items:center;width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;cursor:pointer}
+.viewer p{position:absolute;left:0;right:0;bottom:calc(26px + env(safe-area-inset-bottom,0px));margin:0;padding:0 16px;text-align:center;color:#fff;font-size:1rem}
+/* 說明文字和張數做成深色小膠囊：照片是白底時才不會整行看不見 */
+.viewer p span,.viewer .gv-n span{display:inline-block;max-width:100%;padding:5px 14px;border-radius:99px;background:rgba(28,28,30,.62);color:#fff;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.26)}
+.viewer p span:empty,.viewer .gv-n span:empty{display:none}
+.viewer .gv-n span{padding:3px 11px}
+.viewer .x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:16px;display:grid;place-items:center;width:38px;height:38px;border:0;border-radius:50%;background:rgba(28,28,30,.66);color:#fff;cursor:pointer;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.32),0 2px 12px rgba(0,0,0,.38)}
 .trip-lists{margin:-8px 0 16px;color:var(--muted);font-size:0.875rem}
 /* 代買／伴手禮：給誰、金額、收錢了沒 */
 .li .tx .who{display:inline;margin:0;color:var(--ink)}
@@ -626,6 +709,12 @@ body.is-dragging,body.is-dragging *{cursor:grabbing !important;-webkit-user-sele
 .chip.add{display:inline-flex;align-items:center;gap:4px;background:transparent;color:var(--muted);box-shadow:inset 0 0 0 1px #d2d2d7}
 .note-in{display:block;width:100%;min-height:96px;padding:12px 16px;border:0;background:transparent;font:inherit;font-size:1rem;line-height:1.6;color:var(--ink);resize:none;outline:none;field-sizing:content}
 .note-in::placeholder{color:var(--faint)}
+/* 備註裡的網址：做成一顆一顆可以按的小膠囊 */
+.note-lk{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 14px}
+.note-lk .lk{display:inline-flex;align-items:center;gap:6px;max-width:100%;height:32px;padding:0 12px;border-radius:99px;background:rgba(0,0,0,.045);color:var(--pri);font-size:.875rem;text-decoration:none;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.07)}
+.note-lk .lk span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note-lk .lk:active{background:rgba(0,0,0,.08)}
+.note-lk .ico{flex:none;opacity:.75}
 /* ---- 兩層購物清單：一家店（外層）裡有多件商品（內層） ---- */
 .li .go{flex:none;display:grid;place-items:center;color:var(--faint);margin-left:-4px}
 .sh-sum{padding:16px 24px}
@@ -668,8 +757,9 @@ body.is-dragging,body.is-dragging *{cursor:grabbing !important;-webkit-user-sele
 .kgrip{flex:none;align-self:center;display:grid;place-items:center;width:30px;height:44px;margin:0 -8px 0 2px;color:#c7c7cc;cursor:grab;touch-action:none}
 .li.done .kgrip{opacity:.6}
 .gv-bar{position:absolute;left:0;right:0;bottom:calc(84px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;gap:8px}
-.gv-bar button{height:36px;padding:0 16px;border:0;border-radius:99px;background:rgba(255,255,255,.14);color:#fff;font-size:.875rem;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.gv-bar button.armed{background:rgba(168,90,74,.85)}
+/* 深色底＋淺色描邊：照片是白底截圖時，按鈕一樣看得見（之前是半透明白底＋白字，疊在白照片上會整顆消失） */
+.gv-bar button{height:36px;padding:0 16px;border:0;border-radius:99px;background:rgba(28,28,30,.66);color:#fff;font-size:.875rem;cursor:pointer;-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.32),0 2px 12px rgba(0,0,0,.38)}
+.gv-bar button.armed{background:rgba(168,90,74,.92)}
 .sh-photo{display:block;width:100%;margin-top:12px;padding:0;border:0;overflow:hidden;cursor:zoom-in}
 .sh-photo img{display:block;width:100%;max-height:260px;object-fit:cover}
 .col > .sh-photo:first-child,.col > .sh-note:first-child{margin-top:0}
@@ -980,7 +1070,12 @@ const P = {
   cash:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>',
   card:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
   phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
-  ic:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 15h4"/><path d="M15 9.5a3.5 3.5 0 0 1 0 5"/><path d="M17.5 8a6 6 0 0 1 0 8"/>'
+  ic:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 15h4"/><path d="M15 9.5a3.5 3.5 0 0 1 0 5"/><path d="M17.5 8a6 6 0 0 1 0 8"/>',
+  link:'<path d="M10.5 13.5a4.5 4.5 0 0 0 6.6.4l2.6-2.6a4.5 4.5 0 0 0-6.4-6.4l-1.5 1.5"/><path d="M13.5 10.5a4.5 4.5 0 0 0-6.6-.4l-2.6 2.6a4.5 4.5 0 0 0 6.4 6.4l1.5-1.5"/>',
+  copy:'<rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M5 16a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2"/>',
+  pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+  route:'<circle cx="6" cy="19" r="2.6"/><circle cx="18" cy="5" r="2.6"/><path d="M8.6 19H14a4 4 0 0 0 0-8h-4a4 4 0 0 1 0-8h5.4"/>'
 };
 function icon(name, size = 20, sw = 1.6){
   const s = el("span", {class:"ico", "aria-hidden":"true"});
@@ -1285,6 +1380,9 @@ const Cloud = {
       const d = snap.exists() ? snap.data() : null, me = Store.data.user;
       if(d){
         Store.data.lastPick = d.lastPick || {};
+        if(Array.isArray(d.whoNames)) Store.data.whoNames = cleanWhos(d.whoNames);   // 用過的名字：存在帳號上，項目刪掉也不會跟著不見
+        if(Array.isArray(d.tabs)) Store.data.tabs = [...new Set(d.tabs)].filter(id => ALL_TABS.some(x => x[0] === id));
+        if(Array.isArray(d.moves) && d.moves.length) Store.data.moves = cleanMoves(d.moves);   // 自訂的交通方式
         me.nick = typeof d.nick === "string" ? d.nick.slice(0, 12) : "";
         me.avatar = typeof d.avatar === "string" && AVATAR_RE.test(d.avatar) ? d.avatar : "";
         this.base.set(this.path("users", uid), JSON.stringify(this.userDoc()));
@@ -1353,7 +1451,8 @@ const Cloud = {
       t.items = snap.docs.map(d => {
         const x = d.data();
         const raw = {list:x.list, cat:x.cat, name:x.name || "", note:x.note || "", photo:typeof x.photo === "string" && AVATAR_RE.test(x.photo) ? x.photo : "", done:!!x.done, pos:+x.pos || 0,
-          who:typeof x.who === "string" ? x.who : "", price:Number.isInteger(x.price) && x.price > 0 ? x.price : 0, paid:!!x.paid,
+          whos:cleanWhos(Array.isArray(x.whos) ? x.whos : (typeof x.who === "string" && x.who ? [x.who] : [])),
+          price:Number.isInteger(x.price) && x.price > 0 ? x.price : 0, paid:!!x.paid,
           parent:typeof x.parent === "string" ? x.parent : "", spec:typeof x.spec === "string" ? x.spec : "", qty:Number.isInteger(x.qty) && x.qty > 0 ? x.qty : 1,
           discount:Number.isInteger(x.discount) && x.discount > 0 ? x.discount : 0, mode:x.mode === "single" || x.mode === "store" ? x.mode : "",
           thumb:typeof x.thumb === "string" && AVATAR_RE.test(x.thumb) ? x.thumb : "", pcount:Number.isInteger(x.pcount) ? x.pcount : 0};
@@ -1366,12 +1465,37 @@ const Cloud = {
       });
       this.renderSoon();
     }, () => {});
-    this.expUnsub.set(tid, () => { off(); offI(); });
+    // 行程
+    const offP = F.onSnapshot(F.collection(this.db, "users", uid, "trips", tid, "plans"), snap => {
+      const t = Store.trip(tid); if(!t) return;
+      const pre = this.path("users", uid, "trips", tid, "plans") + "/";
+      for(const k of [...this.base.keys()]) if(k.startsWith(pre)) this.base.delete(k);
+      const oldP = new Map((t.plans || []).map(p => [p.id, p]));
+      t.plans = snap.docs.map(d => {
+        const x = d.data();
+        const raw = {day:typeof x.day === "string" ? x.day : "", name:x.name || "", note:x.note || "", pos:+x.pos || 0,
+          time:/^([01]\d|2[0-3]):[0-5]\d$/.test(x.time || "") ? x.time : "",
+          move:typeof x.move === "string" && MOVE_RE.test(x.move) ? x.move : "", mins:Number.isInteger(x.mins) && x.mins > 0 ? Math.min(1440, x.mins) : 0,
+          thumb:typeof x.thumb === "string" && AVATAR_RE.test(x.thumb) ? x.thumb : "", pcount:Number.isInteger(x.pcount) ? x.pcount : 0};
+        const p = oldP.get(d.id) || {id:d.id};
+        Object.assign(p, raw);
+        this.base.set(pre + d.id, JSON.stringify(this.planJson(p)));
+        return p;
+      });
+      this.renderSoon();
+    }, () => {});
+    this.expUnsub.set(tid, () => { off(); offI(); offP(); });
   },
   // ---- 雲端文件的樣子（欄位要跟資料庫規則一致） ----
   userDoc(){
     const lp = Store.data.lastPick || {}, me = Store.data.user || {};
     const d = {name:(me.name || "").slice(0, 60), lastPick:{cat:lp.cat || "food", acct:lp.acct || ""}};
+    const wn = cleanWhos(Store.data.whoNames);
+    if(wn.length) d.whoNames = wn;
+    const tb = Array.isArray(Store.data.tabs) ? [...new Set(Store.data.tabs)].filter(id => ALL_TABS.some(x => x[0] === id)) : [];
+    if(tb.length) d.tabs = tb;
+    const mv = cleanMoves(Store.data.moves);
+    if(mv.length) d.moves = mv;
     if(me.nick) d.nick = me.nick.slice(0, 12);
     if(me.avatar && AVATAR_RE.test(me.avatar)) d.avatar = me.avatar;
     return d;
@@ -1392,12 +1516,22 @@ const Cloud = {
     if(Number.isInteger(it.discount) && it.discount > 0) d.discount = it.discount;
     if(it.thumb && AVATAR_RE.test(it.thumb) && it.thumb.length <= 30000) d.thumb = it.thumb;
     if(it.pcount > 0) d.pcount = Math.min(MAX_PHOTOS, it.pcount);
-    if(it.who) d.who = cleanText(it.who, 12);
+    const ws = cleanWhos(whoList(it));
+    if(ws.length) d.whos = ws;
     if(Number.isInteger(it.price) && it.price > 0) d.price = it.price;
     if(it.paid) d.paid = true;
     return d;
   },
   expJson(e){ return {title:(e.title || "").slice(0, 40), amount:Math.round(e.amount), cur:e.cur, rate:e.rate, acct:e.acct || null, cat:e.cat, time:new Date(e.time).toISOString(), excluded:!!e.excluded}; },
+  planJson(p){
+    const d = {day:p.day, name:cleanText(p.name, 40) || "未命名", note:cleanMulti(p.note, 1000), pos:+p.pos || 0};
+    if(/^([01]\d|2[0-3]):[0-5]\d$/.test(p.time || "")) d.time = p.time;
+    if(p.move && MOVE_RE.test(p.move)) d.move = p.move;
+    if(Number.isInteger(p.mins) && p.mins > 0) d.mins = Math.min(1440, p.mins);
+    if(p.thumb && AVATAR_RE.test(p.thumb) && p.thumb.length <= 30000) d.thumb = p.thumb;
+    if(p.pcount > 0) d.pcount = Math.min(MAX_PHOTOS, p.pcount);
+    return d;
+  },
   // ---- 把畫面上的資料跟雲端比對，只寫有變動的文件 ----
   sync(){
     if(this.state !== "in" || !this.db) return;
@@ -1407,6 +1541,7 @@ const Cloud = {
       want.set(this.path("users", uid, "trips", t.id), {kind:"trip", data:this.tripDoc(t)});
       for(const e of t.expenses) want.set(this.path("users", uid, "trips", t.id, "expenses", e.id), {kind:"exp", data:this.expJson(e)});
       for(const it of t.items || []) want.set(this.path("users", uid, "trips", t.id, "items", it.id), {kind:"item", data:this.itemJson(it)});
+      for(const p of t.plans || []) want.set(this.path("users", uid, "trips", t.id, "plans", p.id), {kind:"plan", data:this.planJson(p)});
       // 照片：只處理這台裝置已經載入或新加的（沒載入的不會被誤刪）
       for(const ph of t.photos || []) want.set(this.path("users", uid, "trips", t.id, "photos", ph.id), {kind:"photo", data:{item:ph.item, data:ph.data, pos:ph.pos}});
     }
@@ -1423,7 +1558,7 @@ const Cloud = {
     for(const path of [...this.base.keys()]) if(!want.has(path)){
       this.base.delete(path); ops.push(["del", path]);
       const seg = path.split("/");                            // 刪掉旅程或項目時，雲端上還沒載入的照片也要一起刪
-      if(seg.length === 4) purge.push([seg[3], null]); else if(seg.length === 6 && seg[4] === "items") purge.push([seg[3], seg[5]]);
+      if(seg.length === 4) purge.push([seg[3], null]); else if(seg.length === 6 && (seg[4] === "items" || seg[4] === "plans")) purge.push([seg[3], seg[5]]);
     }
     if(purge.length) this.purgePhotos(purge);
     // 一批最多 450 筆，分批送出；沒網路時會先存在手機，連上後自動補傳
@@ -1525,7 +1660,7 @@ function sampleTrips(){
   const it = (k, n, name, done, note = "", extra = {}) => ({id:uid("i"), list:k, cat:C(k, n), name, note, photo:"", done, pos:++pos, ...extra});
   // 範例：一家店裡有好幾件商品（兩層購物清單）
   const uq = it("shop", 0, "UQ 難波 City 本館 B2", false, "折價券：滿 ¥30,000 折 ¥3,000\n長褲要試穿再買", {discount:3000});
-  const k = (name, spec, qty, price, done) => ({id:uid("i"), list:"shop", cat:uq.cat, parent:uq.id, name, spec, qty, price, note:"", photo:"", done, pos:++pos, who:"", paid:false});
+  const k = (name, spec, qty, price, done) => ({id:uid("i"), list:"shop", cat:uq.cat, parent:uq.id, name, spec, qty, price, note:"", photo:"", done, pos:++pos, paid:false});
   const uqKids = [k("無鋼圈內衣", "75/80 AB", 6, 1990, true), k("坦克背心", "粗肩帶 / M", 2, 1290, true), k("極暖發熱衣", "高領 / 白", 1, 2490, false),
     k("打褶繭型褲", "咖啡、黑 / 腰圍 58", 2, 4990, false), k("可攜式連帽外套", "灰 / S", 1, 3990, false)];
   tokyo.items = [...uqKids,
@@ -1539,10 +1674,10 @@ function sampleTrips(){
     it("pack", 3, "手機充電線", true), it("pack", 3, "轉接頭", false, "日本是 A 型插座，不用轉也可以"),
     it("pack", 4, "腸胃藥", false), it("pack", 4, "暈車藥", false),
     it("shop", 0, "合利他命 EX Plus", false, "270 錠"), it("shop", 0, "曼秀雷敦護唇膏", true),
-    it("shop", 1, "合利他命 EX Plus", true, "", {who:"媽媽", price:5980, paid:true}), it("shop", 1, "東京香蕉", true, "2 盒", {who:"同事", price:2592}),
-    it("shop", 1, "Kit Kat 抹茶", false, "", {who:"小美"}),
+    it("shop", 1, "合利他命 EX Plus", true, "", {whos:["媽媽"], price:5980, paid:true}), it("shop", 1, "東京香蕉", true, "2 盒", {whos:["同事", "小美"], price:2592}),
+    it("shop", 1, "Kit Kat 抹茶", false, "", {whos:["小美"]}),
     uq,
-    it("shop", 2, "薯條三兄弟", false, "", {who:"媽媽"}), it("shop", 2, "Suica 企鵝周邊", false, "", {who:"小美"})
+    it("shop", 2, "薯條三兄弟", false, "", {whos:["媽媽", "阿姨"]}), it("shop", 2, "Suica 企鵝周邊", false, "", {whos:["小美"]})
   ];
   const os = addDays(today, 340);
   const osaka = {
@@ -1550,6 +1685,18 @@ function sampleTrips(){
     accounts:[{id:uid("a"), name:"日幣現金", method:"cash", cur:"JPY", budget:50000}, {id:uid("a"), name:"信用卡", method:"card", cur:"TWD", budget:20000}],
     expenses:[]
   };
+  // 範例行程：今天（第 3 天）排滿，前一天留幾站，讓時間軸和交通工具一打開就看得到
+  let pp = 0;
+  const pl = (dOff, time, name, note, move, mins) => ({id:uid("l"), day:ymd(addDays(s, dOff)), time, name, note, move:move || "", mins:mins || 0, pos:++pp});
+  tokyo.plans = [
+    pl(1, "10:00", "明治神宮", "從原宿站表參道口出來走 5 分鐘", "walk", 12),
+    pl(1, "11:30", "竹下通", "可麗餅、扭蛋店", "bus", 20),
+    pl(1, "14:00", "澀谷 Scramble Square", "頂樓 SHIBUYA SKY 要先線上訂\nhttps://www.shibuya-scramble-square.com/sky/", "", 0),
+    pl(2, "09:00", "淺草寺", "雷門前拍照，人多要早點去", "walk", 15),
+    pl(2, "11:00", "晴空塔", "天望甲板；午餐在 B3 美食街", "bus", 25),
+    pl(2, "14:30", "上野阿美橫丁", "藥妝、水果店", "bus", 18),
+    pl(2, "18:30", "一蘭拉麵 上野店", "離車站 3 分鐘，常要排隊", "", 0)
+  ];
   return [tokyo, osaka];
 }
 
@@ -1581,6 +1728,7 @@ function render(){
   if(!Store.data.user){ app.append(renderLogin()); return; }   // 雲端模式：登入狀態確認前也顯示登入頁（按鈕先停用）
   if(CLOUD && !Store.guest && !Cloud.ready){ app.append(el("main", {class:"screen login gut"})); return; }   // 讀到個人資料前先留白，不讓首頁閃一下
   if(S.setup){ app.append(renderSetup()); return; }
+  seedWhos();                                                 // 舊資料第一次載入：把項目裡用過的名字收進帳號的名字簿
   const t = S.view === "trip" || S.view === "shop" ? Store.trip(S.tripId) : null;
   if(t && S.view === "shop"){
     const p = (t.items || []).find(i => i.id === S.shopId && !i.parent);
@@ -2104,9 +2252,11 @@ function renderTrip(t){
     el("div", {class:"top"}, el("button", {type:"button", class:"back", onclick:() => go("home")}, icon("back", 22, 2), el("span", {text:"我的旅程"})), el("button", {type:"button", class:"text-btn", onclick:() => openTripForm(t), text:"編輯"})),
     el("div", {class:"head"}, el("h1", {text:t.name}), el("p", {text:`${range(t)} · ${ph.label}`}))));
   const body = el("div", {class:"col"});
+  fixTab();
   if(S.tab === "ledger") body.append(...ledger(t));
   else if(S.tab === "stats") body.append(...stats(t));
   else if(S.tab === "conv") body.append(...converter(t));
+  else if(S.tab === "plan") body.append(...planTab(t));
   else body.append(...lists(t));
   const band = el("section", {class:"band gut", style:"padding-top:0"}, segNav(), body);
   if(S.tab === "ledger"){
@@ -2148,11 +2298,23 @@ function segDrag(cap, thumb, pick){
   };
   cap.addEventListener("pointerup", endDrag); cap.addEventListener("pointercancel", endDrag);
 }
+/* ---------- 旅程分頁：可以自己排順序、也可以關掉用不到的（FR-T01）----------
+   設定存在帳號上（不是每趟旅程各一份），存的是「開著的分頁，照順序排」 */
+const ALL_TABS = [["ledger", "記帳"], ["lists", "清單"], ["plan", "行程"], ["stats", "統計"], ["conv", "換算"]];
+const tabName = id => (ALL_TABS.find(x => x[0] === id) || [, id])[1];
+function tripTabs(){
+  const saved = Array.isArray(Store.data.tabs)
+    ? [...new Set(Store.data.tabs)].filter(id => ALL_TABS.some(x => x[0] === id)) : [];
+  const ids = saved.length ? saved : ALL_TABS.map(x => x[0]);
+  return ids.map(id => ALL_TABS.find(x => x[0] === id));
+}
+// 目前這一頁被關掉時，自動退到第一個開著的分頁
+function fixTab(){ const ids = tripTabs().map(x => x[0]); if(!ids.includes(S.tab)) S.tab = ids[0]; }
 // 玻璃滑塊分頁列（旅程頁、首頁共用）：點一下切換，或按住滑塊左右拖
-function segNav(tabs = [["ledger", "記帳"], ["lists", "清單"], ["stats", "統計"], ["conv", "換算"]], key = "tab", label = "旅程分頁"){
+function segNav(tabs = tripTabs(), key = "tab", label = "旅程分頁"){
   const thumb = el("span", {class:"thumb", "aria-hidden":"true"});
   let noSlide = false;
-  const cap = el("div", {class:"cap", role:"tablist", "aria-label":label}, thumb, tabs.map(([id, text]) =>
+  const cap = el("div", {class:"cap" + (tabs.length >= 5 ? " tight" : ""), role:"tablist", "aria-label":label}, thumb, tabs.map(([id, text]) =>
     el("button", {type:"button", role:"tab", "aria-selected":String(S[key] === id), "data-id":id, text, onclick:ev => {
       if(cap._suppress && ev.isTrusted) return;
       if(S[key] === id){ window.scrollTo({top:0, behavior:"smooth"}); return; }
@@ -2507,6 +2669,35 @@ function wheel(items, value, onChange, width){
     clearTimeout(settleT); settleT = setTimeout(() => onChange(items[idx].v, true), 140);
   }, {passive:true});
   w.addEventListener("keydown", e => { if(e.key === "ArrowDown"){ e.preventDefault(); go(idx + 1, true); } if(e.key === "ArrowUp"){ e.preventDefault(); go(idx - 1, true); } });
+  // 滑鼠按住上下拖（觸控交給瀏覽器原生捲動，插手反而會變兩倍速）
+  let dr = null;
+  w.addEventListener("pointerdown", e => {
+    if(e.button > 0 || !e.isPrimary || e.pointerType === "touch") return;
+    dr = {id:e.pointerId, y:e.clientY, top:w.scrollTop, moved:false};
+  });
+  w.addEventListener("pointermove", e => {
+    if(!dr || e.pointerId !== dr.id) return;
+    const dy = e.clientY - dr.y;
+    if(!dr.moved){
+      if(Math.abs(dy) < 3) return;
+      dr.moved = true;
+      try{ w.setPointerCapture(e.pointerId); }catch(err){}
+      w.classList.add("grab"); w.style.scrollSnapType = "none";   // 拖的過程先關吸附，不然會一格一格卡
+    }
+    w.scrollTop = dr.top - dy;
+  });
+  const endDrag = e => {
+    if(!dr || e.pointerId !== dr.id) return;
+    const moved = dr.moved; dr = null;
+    if(!moved) return;
+    w.classList.remove("grab"); w.style.scrollSnapType = "";
+    w._justDragged = true;                                        // 放開時會順便觸發 click，擋掉免得跳到別格
+    setTimeout(() => { w._justDragged = false; }, 0);
+    go(Math.round(w.scrollTop / H), true);
+  };
+  w.addEventListener("pointerup", endDrag);
+  w.addEventListener("pointercancel", endDrag);
+  w.addEventListener("click", e => { if(w._justDragged){ e.preventDefault(); e.stopPropagation(); } }, true);
   w.setTo = (v, smooth) => { const i = items.findIndex(it => it.v === v); if(i < 0) return; idx = i; go(i, smooth); if(!smooth) paint(); };
   w.mark = test => nodes.forEach((n, i) => n.classList.toggle("off", !!test(items[i].v)));
   w.refresh = () => { w.scrollTop = idx * H; paint(); };
@@ -2783,10 +2974,19 @@ function openTripForm(trip){
     const rm = el("button", {type:"button", class:"rm", "aria-label":"移除這個帳戶", onclick:() => {
       rows.splice(rows.indexOf(r), 1); r.el.style.height = r.el.offsetHeight + "px"; r.el.classList.add("out"); setTimeout(() => r.el.remove(), 300);
     }});
-    r.el = el("div", {class:"line brow" + (focus ? " in" : "")}, rm, r.name, r.amt, r.ub);
+    const grip = el("span", {class:"kgrip", "aria-hidden":"true"}, icon("grip", 18, 1.8));
+    r.el = el("div", {class:"line brow" + (focus ? " in" : "")}, rm, r.name, r.amt, r.ub, grip);
     rows.push(r); rowsBox.append(r.el);
+    armSort();
     if(focus) setTimeout(() => r.name.focus(), 50);
   };
+  // 預算項目可以上下拖（按住右邊的 ≡）：只換順序，名稱和金額不受影響
+  const BROW = ".line.brow:not(.out)";
+  const reorderRows = (i, j) => {
+    rows.splice(j, 0, rows.splice(i, 1)[0]);
+    rows.forEach(x => { x.el.classList.remove("dragging", "settling", "shifting"); x.el.style.transform = ""; rowsBox.append(x.el); });
+  };
+  const armSort = () => enableSort(rowsBox, reorderRows, BROW, "input, button:not(.kgrip), select");
   const err = el("p", {class:"err", role:"alert"});
   const body = el("div", null,
     el("div", {class:"grp"}, line("名稱", name), line("目的地", dest)),
@@ -2889,6 +3089,61 @@ function fixKids(t){
   for(const i of t.items) if(i.parent){ const p = byId.get(i.parent); i.list = p.list; i.cat = p.cat; }
   for(const p of t.items){ const k = kidsOf(t, p); if(k.length) p.done = k.every(x => x.done); }
 }
+// 送給誰／幫誰買：資料存成陣列 whos（可以多個人）；舊資料的單一 who 自動當成一個人
+const whoList = it => Array.isArray(it && it.whos) ? it.whos.filter(Boolean) : (it && it.who ? [it.who] : []);
+const cleanWhos = a => [...new Set((Array.isArray(a) ? a : []).map(x => cleanText(x, 12)).filter(Boolean))].slice(0, 10);
+// 寫入時一律用 whos 陣列，順手把舊的單一 who 清掉，免得兩個欄位對不上
+const setWhos = (it, a) => { const v = cleanWhos(a); if(v.length){ it.whos = v; rememberWho(v); } else delete it.whos; delete it.who; };
+// 用過的名字存在帳號上（以前是從現有項目倒推，所以把伴手禮刪掉，名字就跟著不見了）
+function whoNames(){ if(!Array.isArray(Store.data.whoNames)) Store.data.whoNames = []; return Store.data.whoNames; }
+const itemWhos = () => cleanWhos((Store.data.trips || []).flatMap(t => (t.items || []).flatMap(i => whoList(i))));
+// 舊版名字只存在項目上，刪掉項目名字就不見了。第一次載到資料時先抄進名字簿（不立刻寫雲端，下次存檔時一起帶上去）
+let whoSeeded = false;
+function seedWhos(){
+  if(whoSeeded) return;
+  const a = itemWhos(); if(!a.length) return;
+  whoSeeded = true;
+  const list = whoNames();
+  for(const n of a) if(!list.includes(n)) list.push(n);
+}
+function rememberWho(names){
+  const a = whoNames(); let add = false;
+  for(const n of cleanWhos(names)) if(!a.includes(n)){ a.push(n); add = true; }
+  if(a.length > 40) a.splice(0, a.length - 40);
+  if(add) Store.save();
+}
+// 伴手禮是「送給誰」、代買是「幫誰買」，欄位名稱和列上的字都要分開
+const WHO_LAB = {gift:{field:"送給誰", row:"送", hint:"可以選好幾個人"}, proxy:{field:"幫誰買", row:"幫", hint:"選好幾個人就平分金額"}};
+const whoSub = (kind, it) => { const a = whoList(it); return a.length ? (WHO_LAB[kind] ? WHO_LAB[kind].row : "給") + a.join("、") : ""; };
+// 代買分給好幾個人時，每人該付的錢＝平分
+const whoShare = (it, n) => { const a = whoList(it); return a.length > 1 ? n / a.length : n; };
+// 備註裡的網址：只收 http / https，用瀏覽器自己的 URL 解析，不接受 javascript: 這類
+const URL_RE = /https?:\/\/[^\s<>"'，。、）)]+/g;
+function urlsIn(s){
+  const out = [];
+  for(const m of String(s || "").match(URL_RE) || []){
+    const u = m.replace(/[.,;:!?]+$/, "");
+    try{ const p = new URL(u); if((p.protocol === "http:" || p.protocol === "https:") && !out.includes(u)) out.push(u); }catch(e){}
+  }
+  return out.slice(0, 8);
+}
+// 備註底下列出裡面的網址，按一下就開（備註本身是輸入框，裡面的字沒辦法直接做成連結）
+function noteLinks(note){
+  const us = urlsIn(note);
+  if(!us.length) return null;
+  return el("div", {class:"note-lk"}, us.map(u => {
+    let host = u;
+    try{ const p = new URL(u); host = p.hostname.replace(/^www\./, "") + (p.pathname.length > 1 ? "…" : ""); }catch(e){}
+    return el("a", {class:"lk", href:u, target:"_blank", rel:"noopener noreferrer", title:u}, icon("link", 15, 1.8), el("span", {text:host}));
+  }));
+}
+// 備註輸入框底下那排連結：打字時跟著更新
+function liveNoteLinks(ta){
+  const box = el("div");
+  const paint = () => box.replaceChildren(noteLinks(ta.value) || "");
+  ta.addEventListener("input", paint); ta.addEventListener("blur", paint); paint();
+  return box;
+}
 // 多行備註：保留換行，去掉其他看不見的控制字元
 const cleanMulti = (v, n) => [...String(v || "").replace(/\r\n?/g, "\n").replace(/[\u0000-\u0009\u000b-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/g, "")
   .split("\n").map(l => l.replace(/\s+$/, "")).join("\n").replace(/\n{3,}/g, "\n\n").trim()].slice(0, n).join("");
@@ -2956,7 +3211,11 @@ function listPane(t, k, paintTop, rebuild){
     if(c.kind === "proxy"){
       const flat = its.flatMap(i => { const k2 = kidsOf(t, i); return k2.length ? k2 : [i]; });
       const priced = flat.filter(i => i.price > 0), due = new Map();
-      for(const i of priced) if(!i.paid) due.set(i.who || "未填", (due.get(i.who || "未填") || 0) + lineTotal(i));
+      // 一項代買給好幾個人時，金額平分到每個人頭上
+      for(const i of priced) if(!i.paid){
+        const names = whoList(i), share = Math.round(whoShare(i, lineTotal(i)));
+        for(const w of (names.length ? names : ["未填"])) due.set(w, (due.get(w) || 0) + share);
+      }
       if(due.size){ sub = el("p", {class:"lcat-sub"}, document.createTextNode("還沒收："));
         [...due].forEach(([w, v], n) => { if(n) sub.append(document.createTextNode("・")); sub.append(document.createTextNode(`${w} `), el("b", {text:fmt(v, t.cur)})); }); }
       else if(priced.length) sub = el("p", {class:"lcat-sub", text:"代買的錢都收齊了"});
@@ -2965,7 +3224,9 @@ function listPane(t, k, paintTop, rebuild){
       el("h3", {class:"lcat-h"}, document.createTextNode(c.name), el("span")), sub,
       el("div", {class:"lgrp"}, its.map(it => itemRow(t, it, paintTop, rebuild)),
         el("div", {class:"li add", "data-cat":c.id}, el("span", {class:"plus", "aria-hidden":"true"}, icon("plus", 18, 2)), inp)));
-  }), el("div", {class:"ls-tools"}, el("button", {type:"button", class:"link-btn", onclick:() => openCats(t, k)}, icon("sliders", 18, 1.8), el("span", {text:"編輯類別"}))));
+  }), el("div", {class:"ls-tools"},
+    el("button", {type:"button", class:"link-btn", onclick:() => openCats(t, k)}, icon("sliders", 18, 1.8), el("span", {text:"編輯類別"})),
+    el("button", {type:"button", class:"link-btn", onclick:() => openCopyLists(t)}, icon("copy", 17, 1.8), el("span", {text:"複製到其他旅程"}))));
   // 長按拖動排序，可以拖到別的類別（FR-L03）
   // 放開時：只有被拖的那一項換位置／換類別，其他項目不動
   enableItemDrag(wrap, (row, target) => {
@@ -3014,8 +3275,14 @@ function itemRow(t, it, paintTop, rebuild){
   });
   const kind = catKind(t, it);
   const subParts = [];
-  if((kind === "proxy" || kind === "gift") && it.who) subParts.push(el("span", {class:"who", text:`給${it.who}`}));
-  if(it.note) subParts.push(document.createTextNode((subParts.length ? " · " : "") + it.note.split("\n")[0]));
+  const addSub = node => { if(subParts.length) subParts.push(document.createTextNode(" · ")); subParts.push(node); };
+  if(it.spec) addSub(document.createTextNode(it.spec));
+  // 數量：跟店家裡面的商品同一種寫法（1 × ¥219 ／ 2 件）。以前這裡只顯示總額，填了數量看不出來
+  if(it.price > 0) addSub(document.createTextNode(`${it.qty || 1} × ${fmt(it.price, t.cur)}`));
+  else if((it.qty || 1) > 1) addSub(document.createTextNode(`${it.qty} 件`));
+  const ws = whoSub(kind, it);
+  if(ws) addSub(el("span", {class:"who", text:ws}));
+  if(it.note) addSub(document.createTextNode(it.note.split("\n")[0]));
   const isShop = it.list === "shop" && !it.parent;                  // 購物清單：點了直接進這一項的頁面（可以加商品）
   const tx = el("button", {type:"button", class:"tx", onclick:() => isShop ? go("shop", {tripId:t.id, shopId:it.id}) : openItem(t, it)}, el("b", {text:it.name}), subParts.length ? el("span", null, ...subParts) : null);
   const pic = picBtn(t, it, () => isShop ? go("shop", {tripId:t.id, shopId:it.id}) : openItem(t, it));
@@ -3176,19 +3443,23 @@ function openItem(t, it){
   const disc = el("input", {id:"li-disc", inputmode:"decimal", autocomplete:"off", placeholder:"0", value:it.discount ? plain(it.discount, t.cur) : ""});
   disc.addEventListener("input", () => cleanAmount(disc, t.cur));
   const cat = el("select", {id:"li-cat"}, cats.map(c => el("option", {value:c.id, text:c.name, selected:c.id === it.cat})));
-  // 給誰：用過的名字都會出現在這裡（從所有旅程的購物清單收集，不另外存）
-  let who = it.who || "";
-  const chips = whoChips(who, v => { who = v; });
+  // 送給誰／幫誰買：可以選好幾個人；用過的名字都會留著
+  let whos = whoList(it);
+  const chips = whoChips(whos, v => { whos = v; });
   const price = el("input", {id:"li-price", inputmode:"decimal", autocomplete:"off", placeholder:"0", value:it.price ? plain(it.price, t.cur) : ""});
   price.addEventListener("input", () => cleanAmount(price, t.cur));
   const paid = el("input", {type:"checkbox", class:"switch", id:"li-paid", checked:!!it.paid});
-  const whoBox = el("div", null, el("p", {class:"grp-lab", text:"給誰"}), el("div", {class:"grp"}, chips));
+  const whoLab = el("p", {class:"grp-lab", text:"送給誰"});
+  const whoHint = el("p", {class:"hint", style:"margin:6px 16px 0"});
+  const whoBox = el("div", null, whoLab, el("div", {class:"grp"}, chips), whoHint);
   const paidLine = el("div", {class:"line"}, el("label", {for:"li-paid", text:"已收錢"}), el("span", {style:"flex:1"}), paid);
   const moneyBox = el("div", {class:"grp"}, line(isChild ? "單價" : "金額", price, el("span", {style:"color:var(--muted)", text:t.cur})), paidLine);
   const kindOf = id => (cats.find(c => c.id === id) || {}).kind || "";
   const kindNow = () => kindOf(isChild ? parent.cat : cat.value);
   const showKind = () => {
     const k = kindNow();
+    const L = WHO_LAB[k];                                                  // 伴手禮＝送給誰、代買＝幫誰買
+    if(L){ whoLab.textContent = L.field; whoHint.textContent = L.hint; chips.setAttribute("aria-label", L.field); }
     whoBox.hidden = isParent || !(k === "proxy" || k === "gift");          // 店家本身不填給誰，由裡面每件商品各自填
     moneyBox.hidden = isParent || (!isChild && k !== "proxy");            // 商品一定有單價；一般項目只有代買才有金額
     paidLine.hidden = k !== "proxy";
@@ -3202,7 +3473,7 @@ function openItem(t, it){
       isChild ? line("規格", spec) : null, isChild ? line("數量", qty) : null,
       isChild ? null : line("類別", cat), isParent ? line("折扣", disc, el("span", {style:"color:var(--muted)", text:t.cur})) : null),
     whoBox, moneyBox,
-    el("p", {class:"grp-lab", text:"備註"}), el("div", {class:"grp"}, note),
+    el("p", {class:"grp-lab", text:"備註"}), el("div", {class:"grp"}, note, liveNoteLinks(note)),
     (isParent && !photosOf(t, it).length && !(it.pcount > 0)) ? null : el("p", {class:"grp-lab", text:`照片（最多 ${MAX_PHOTOS} 張）`}),
     (isParent && !photosOf(t, it).length && !(it.pcount > 0)) ? null : el("div", {style:"padding:8px 2px 0"}, phBox()),
     null);
@@ -3216,17 +3487,380 @@ function openItem(t, it){
     if(isChild){
       it.spec = cleanText(spec.value, 40); it.qty = Math.min(999, Math.max(1, parseInt(qty.value, 10) || 1));
       it.price = parseAmount(price.value, t.cur) || 0;
-      it.who = k === "proxy" || k === "gift" ? who : ""; it.paid = k === "proxy" ? paid.checked : false;
+      setWhos(it, k === "proxy" || k === "gift" ? whos : []); it.paid = k === "proxy" ? paid.checked : false;
     } else if(isParent){
-      it.discount = parseAmount(disc.value, t.cur) || 0; it.who = ""; it.price = 0; it.paid = false;
+      it.discount = parseAmount(disc.value, t.cur) || 0; setWhos(it, []); it.price = 0; it.paid = false;
     } else {
-      it.who = k === "proxy" || k === "gift" ? who : "";                 // 改到「自己」就不留給誰／金額
+      setWhos(it, k === "proxy" || k === "gift" ? whos : []);            // 改到「自己」就不留送給誰／金額
       it.price = k === "proxy" ? (parseAmount(price.value, t.cur) || 0) : 0;
       it.paid = k === "proxy" ? paid.checked : false;
     }
     fixKids(t); Store.save(); return true;
   };
   const {close} = openSheet({title:isChild ? "商品" : isParent ? "店家" : "項目", done:"完成", body, onDone:() => { if(save()){ close(); render(); } }});
+}
+/* ================= 行程（FR-P01）=================
+   一天一頁的時間軸：每一站有時間、地點、備註、照片，還有「到下一站怎麼去、要多久」。
+   排序用拖的（不是照時間自動排），所以還沒定時間的行程也放得進去。 */
+// 交通方式是一份可以自己改的清單（存在帳號上），不是寫死的六種
+const MOVE_DEF = [["walk", "步行"], ["bus", "大眾運輸"], ["car", "汽車"], ["scooter", "機車"], ["taxi", "計程車"], ["plane", "飛機"]];
+// 行程存的是交通方式的代號。雲端那邊只檢查格式、不比對清單：清單和行程是分開同步的，
+// 先到的行程如果拿還沒到的清單去比對，自訂的交通方式會被誤刪
+const MOVE_RE = /^[A-Za-z0-9_-]{1,24}$/;
+function moveList(){
+  if(!Array.isArray(Store.data.moves) || !Store.data.moves.length) Store.data.moves = MOVE_DEF.map(([id, name]) => ({id, name}));
+  return Store.data.moves;
+}
+const moveName = id => (moveList().find(m => m.id === id) || {}).name || "";
+const moveIds = () => moveList().map(m => m.id);
+const cleanMoves = a => (Array.isArray(a) ? a : []).map(m => ({id:String(m && m.id || "").slice(0, 24), name:cleanText(m && m.name, 10)}))
+  .filter((m, i, all) => m.id && m.name && /^[A-Za-z0-9_-]+$/.test(m.id) && all.findIndex(x => x.id === m.id) === i).slice(0, 12);
+const planMins = n => { n = Math.max(0, Math.min(1440, Math.round(n) || 0)); return n >= 60 ? (n % 60 ? `${Math.floor(n / 60)} 小時 ${n % 60} 分` : `${Math.floor(n / 60)} 小時`) : `${n} 分`; };
+// 旅程的每一天（最多 60 天，避免日期打錯時跑出幾千格）
+function tripDays(t){
+  const out = [], e = parseYmd(t.end);
+  for(let d = parseYmd(t.start); d <= e && out.length < 60; d = addDays(d, 1)) out.push(ymd(d));
+  return out.length ? out : [t.start];
+}
+const plansOf = (t, day) => (t.plans || []).filter(p => p.day === day).sort((a, b) => a.pos - b.pos);
+const mapUrl = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+
+function planTab(t){
+  if(!Array.isArray(t.plans)) t.plans = [];
+  const days = tripDays(t), today = ymd(new Date());
+  if(!S.planDay || !days.includes(S.planDay)) S.planDay = days.includes(today) ? today : days[0];
+  // ---- 上面的日期列：玻璃滑塊（同分頁列），可以點、也可以按住滑塊左右拖 ----
+  const thumb = el("span", {class:"thumb", "aria-hidden":"true"});
+  const strip = el("div", {class:"pdays", role:"tablist", "aria-label":"旅程日期"}, thumb, days.map((d, i) => {
+    const dt = parseYmd(d);
+    return el("button", {type:"button", role:"tab", class:"pday" + (d === today ? " now" : ""),
+      "aria-selected":String(d === S.planDay), "data-day":d, onclick:() => pickDay(d)},
+      el("span", {class:"p1"}, el("b", {text:d === today ? "今天" : `第 ${i + 1} 天`}), el("i", {class:"pn"})),
+      el("span", {class:"p2", text:`${dt.getMonth() + 1}/${dt.getDate()} 週${WEEK[dt.getDay()]}`}));
+  }));
+  const sc = el("div", {class:"pdays-sc"}, strip);
+  const put = b => { thumb.style.width = b.offsetWidth + "px"; thumb.style.translate = `${b.offsetLeft}px 0`; };
+  const body = el("div", {class:"pbody"});
+  const tools = el("div", {class:"ls-tools"});
+
+  // 換天只重畫下半部，不整頁重新渲染——整頁重畫會閃一下，滑塊也沒辦法滑過去
+  function paintDay(){
+    const day = S.planDay, ps = plansOf(t, day);
+    strip.querySelectorAll(".pday").forEach(b => {
+      const d = b.dataset.day, n = plansOf(t, d).length;
+      b.setAttribute("aria-selected", String(d === day));
+      b.querySelector(".pn").textContent = n ? String(n) : "";
+    });
+    const cur = strip.querySelector('[aria-selected="true"]');
+    if(cur && thumb.classList.contains("ready")) put(cur);   // 換天時滑塊順順滑過去
+    const tl = el("div", {class:"ptl"}, ps.map((p, i) => planRow(t, p, i === ps.length - 1, paintDay)));
+    if(ps.length > 1) enableSort(tl, (i, j) => {
+      const a = ps.slice(); a.splice(j, 0, a.splice(i, 1)[0]);
+      a.forEach((x, n) => { x.pos = n + 1; });
+      Store.save(); paintDay();
+    }, ".pstop", ".pic, button:not(.kgrip)");
+    body.replaceChildren(ps.length ? tl : el("div", {class:"card p-empty"},
+      el("p", {class:"pe-t", text:"這一天還沒有安排"}),
+      el("p", {class:"pe-s", text:"把想去的地方一個一個加進來，順序之後都可以用拖的調整。"})));
+    const add = el("button", {type:"button", class:"link-btn p-add", onclick:() => openPlan(t, null, paintDay)}, icon("plus", 18, 1.8), el("span", {text:"新增行程"}));
+    // 有兩筆以上有填時間時，才給「照時間排一次」
+    const sortBtn = ps.filter(p => p.time).length > 1 ? el("button", {type:"button", class:"link-btn", onclick:() => {
+      const a = ps.slice().sort((x, y) => (x.time ? 0 : 1) - (y.time ? 0 : 1) || (x.time || "").localeCompare(y.time || "") || x.pos - y.pos);
+      a.forEach((x, n) => { x.pos = n + 1; });
+      Store.save(); paintDay(); toast("已照時間重新排序");
+    }}, icon("clock", 17, 1.8), el("span", {text:"照時間排一次"})) : null;
+    tools.replaceChildren(add, sortBtn || "");
+  }
+  function pickDay(d){
+    if(S.planDay === d) return;
+    S.planDay = d;
+    paintDay();
+    const b = strip.querySelector(`[data-day="${d}"]`);
+    if(b) b.scrollIntoView({block:"nearest", inline:"center", behavior:"smooth"});
+  }
+  paintDay();
+  segDrag(strip, thumb, b => b.click());
+  const fitCheck = () => strip.classList.toggle("fit", strip.scrollWidth <= sc.clientWidth + 1);
+  requestAnimationFrame(() => {
+    fitCheck();
+    const cur = strip.querySelector('[aria-selected="true"]');
+    if(cur){ put(cur); thumb.classList.add("ready"); cur.scrollIntoView({block:"nearest", inline:"center"}); }
+  });
+  const onRz = () => { if(!sc.isConnected){ removeEventListener("resize", onRz); return; } fitCheck(); };
+  addEventListener("resize", onRz);
+  if(document.fonts) document.fonts.ready.then(() => { const c = strip.querySelector('[aria-selected="true"]'); if(c) put(c); });
+  return [sc, body, tools];
+}
+// 時間軸上的一站
+function planRow(t, p, last, after){
+  const row = el("div", {class:"pstop" + (last ? " last" : ""), "data-id":p.id});
+  const mv = moveName(p.move);
+  const bits = [];
+  if(p.note) bits.push(el("span", {class:"pnote", text:p.note.split("\n")[0]}));
+  const mvTx = [mv, p.mins > 0 ? planMins(p.mins) : ""].filter(Boolean).join(" ");
+  if(mvTx) bits.push(el("span", {class:"pmv", text:mvTx}));
+  const tx = el("button", {type:"button", class:"ptx", onclick:() => openPlan(t, p, after)}, el("b", {text:p.name || "未命名"}), ...bits);
+  const pic = picBtn(t, p, () => openPlan(t, p, after));
+  row.append(el("span", {class:"pt", text:p.time || ""}), el("span", {class:"prail", "aria-hidden":"true"}, el("i")), tx);
+  if(pic) row.append(pic);
+  row.append(el("span", {class:"kgrip", "aria-hidden":"true"}, icon("grip", 18, 1.8)));
+  swipeDel(row, () => removePlan(t, p, after));
+  return row;
+}
+function removePlan(t, p, after){
+  t.plans = (t.plans || []).filter(x => x.id !== p.id);
+  t.photos = (t.photos || []).filter(ph => ph.item !== p.id);
+  Store.save(); (after || render)(); toast("已刪除");
+}
+// 交通方式清單：可以改名、新增、刪除、拖曳排序（跟「編輯類別」同一套操作）
+// 做成第二層頁面而不是另一個視窗——這個 app 一次只開一個視窗，再開一個會把正在編輯的行程關掉
+function openMoves(backLabel, after){
+  const page = el("div", {class:"subpage", role:"dialog", "aria-modal":"true", "aria-label":"交通方式"});
+  const closeP = () => { if(subPage !== page) return; subPage = null; page.classList.remove("on"); setTimeout(() => page.remove(), 450); };
+  const work = moveList().map(m => ({...m}));
+  const used = id => Store.data.trips.reduce((n, t) => n + (t.plans || []).filter(p => p.move === id).length, 0);
+  const box = el("div", {class:"grp"});
+  const paint = focusLast => {
+    box.replaceChildren(...work.map(m => {
+      const inp = el("input", {value:m.name, maxLength:10, placeholder:"例如：渡輪", autocomplete:"off", "aria-label":"交通方式名稱"});
+      inp.addEventListener("input", () => { m.name = inp.value; });
+      const handle = el("button", {type:"button", class:"handle", "aria-label":`調整「${m.name}」的順序`}, icon("grip", 18, 1.8));
+      const row = el("div", {class:"ced"}, handle, inp);
+      const n = used(m.id);
+      swipeDel(row, () => {
+        if(work.length <= 1){ toast("至少要留一種交通方式"); return false; }
+        work.splice(work.indexOf(m), 1); paint();
+      }, {label:n ? `${n} 筆行程會清空` : "刪除", w:n ? 140 : 84});
+      handle.addEventListener("pointerdown", e => { if(e.button > 0) return; e.preventDefault(); dragSession(box, ".ced", row, e.clientY, (i, j) => { work.splice(j, 0, work.splice(i, 1)[0]); paint(); }, handle, e.pointerId); });
+      handle.addEventListener("keydown", e => {
+        if(e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+        e.preventDefault();
+        const i = work.indexOf(m), j = e.key === "ArrowUp" ? i - 1 : i + 1;
+        if(j >= 0 && j < work.length){ work.splice(j, 0, work.splice(i, 1)[0]); paint(); box.querySelectorAll(".handle")[j].focus(); }
+      });
+      return row;
+    }));
+    if(focusLast){ const ins = box.querySelectorAll("input"); ins[ins.length - 1].focus(); }
+  };
+  paint();
+  const add = el("button", {type:"button", class:"link-btn", onclick:() => {
+    if(work.length >= 12){ toast("交通方式最多 12 種"); return; }
+    work.push({id:uid("m"), name:""}); paint(true);
+  }}, icon("plus", 18, 1.8), el("span", {text:"新增交通方式"}));
+  const save = () => {
+    const old = new Map(moveList().map(m => [m.id, m.name]));
+    const next = cleanMoves(work.map(m => ({id:m.id, name:cleanText(m.name, 10) || old.get(m.id) || ""})));
+    if(!next.length) return;                                   // 全空就當作沒改，保留原本的
+    const keep = new Set(next.map(m => m.id));
+    // 被刪掉的交通方式：把用到它的行程清空，不要留下對不到的值
+    for(const t of Store.data.trips) for(const p of t.plans || []) if(p.move && !keep.has(p.move)) p.move = "";
+    Store.data.moves = next;
+    Store.save();
+  };
+  const back = el("button", {type:"button", class:"back", onclick:() => { save(); closeP(); if(after) after(); }}, icon("back", 22, 2), el("span", {text:backLabel}));
+  page.append(el("div", {class:"sheet-h"}, back, el("h2", {text:"交通方式"}), el("span")),
+    el("div", {class:"sub-list"}, el("p", {class:"grp-lab", text:"到下一站可以選的交通方式"}), box,
+      el("div", {style:"padding:8px 4px 0"}, add),
+      el("p", {class:"hint", style:"margin:10px 16px 24px", text:"按住 ≡ 可以換順序，往左滑可以刪除。刪掉的話，原本用這種交通方式的行程會變成沒有填。"})));
+  document.body.append(page); subPage = page;
+  requestAnimationFrame(() => requestAnimationFrame(() => page.classList.add("on")));
+}
+// 日期：只能選這趟旅程範圍內的某一天。用滾輪而不是原生下拉——下拉在電腦上是藍色反白，跟整體玻璃質感不搭
+function dayPick(days, cur){
+  const items = days.map((d, i) => { const dt = parseYmd(d); return {v:d, label:`第 ${i + 1} 天・${dt.getMonth() + 1}/${dt.getDate()} 週${WEEK[dt.getDay()]}`}; });
+  let val = days.includes(cur) ? cur : days[0];
+  const v = el("span", {class:"val"});
+  const sync = () => { const it = items.find(x => x.v === val); v.textContent = it ? it.label : ""; v.classList.toggle("on", ex.isOpen()); };
+  const dw = wheel(items, val, x => { val = x; sync(); }, 228);
+  const ok = el("button", {type:"button", class:"cal-ok", text:"確認", onclick:() => { ex.close(); sync(); }});
+  const ex = expander(el("div", {class:"pk"}, el("div", {class:"wheels", role:"group", "aria-label":"選擇日期"}, dw), el("div", {class:"cal-foot"}, el("span"), ok)));
+  const row = el("button", {type:"button", class:"line go", onclick:() => {
+    if(ex.isOpen()){ ex.close(); sync(); return; }
+    ex.open(); dw.refresh(); sync();
+  }}, el("span", {class:"k", text:"日期"}), v);
+  sync();
+  return {row, panel:ex.el, get value(){ return val; }};
+}
+// 時間：時、分兩個滾輪，也可以不設定（還沒決定幾點的行程照樣放得進去）
+function timePick(hhmm){
+  const has = /^([01]\d|2[0-3]):[0-5]\d$/.test(hhmm || "");
+  const st = {on:has, h:has ? +hhmm.slice(0, 2) : 9, m:has ? +hhmm.slice(3) : 0};
+  const v = el("span", {class:"val"});
+  const sync = () => { v.textContent = st.on ? `${pad(st.h)}:${pad(st.m)}` : "不設定"; v.classList.toggle("on", ex.isOpen()); };
+  const hw = wheel(Array.from({length:24}, (_, i) => ({v:i, label:pad(i)})), st.h, x => { st.h = x; st.on = true; sync(); }, 64);
+  const mw = wheel(Array.from({length:60}, (_, i) => ({v:i, label:pad(i)})), st.m, x => { st.m = x; st.on = true; sync(); }, 64);
+  const clr = el("button", {type:"button", class:"link-btn", onclick:() => { st.on = false; ex.close(); sync(); }}, el("span", {text:"不設定時間"}));
+  const ok = el("button", {type:"button", class:"cal-ok", text:"確認", onclick:() => { st.on = true; ex.close(); sync(); }});
+  const ex = expander(el("div", {class:"pk"}, el("div", {class:"wheels", role:"group", "aria-label":"選擇時間"}, hw, el("span", {class:"colon", text:":"}), mw),
+    el("div", {class:"cal-foot"}, clr, ok)));
+  const row = el("button", {type:"button", class:"line go", onclick:() => {
+    if(ex.isOpen()){ ex.close(); sync(); return; }
+    ex.open(); [hw, mw].forEach(w => w.refresh()); sync();
+  }}, el("span", {class:"k", text:"時間"}), v);
+  sync();
+  return {row, panel:ex.el, get value(){ return st.on ? `${pad(st.h)}:${pad(st.m)}` : ""; }};
+}
+// 一站的編輯畫面：地點、日期、時間、備註、照片、到下一站怎麼去
+function openPlan(t, p, after){
+  const redraw = after || render;
+  const isNew = !p, days = tripDays(t);
+  if(isNew){
+    const day = days.includes(S.planDay) ? S.planDay : days[0];
+    p = {id:uid("l"), day, name:"", time:"", note:"", move:"", mins:0,
+      pos:plansOf(t, day).reduce((m, x) => Math.max(m, x.pos), 0) + 1};
+  }
+  const name = el("input", {id:"pl-name", maxLength:40, value:p.name || "", placeholder:"淺草寺、一蘭拉麵…", autocomplete:"off"});
+  const dp = dayPick(days, p.day);
+  const tp = timePick(p.time);
+  const note = el("textarea", {id:"pl-note", class:"note-in", maxLength:1000, rows:3, placeholder:"要帶什麼、幾點前要到、訂位號碼…", "aria-label":"備註"});
+  note.value = p.note || "";
+  const grow = () => { note.style.height = "auto"; note.style.height = Math.min(note.scrollHeight + 2, 360) + "px"; };
+  note.addEventListener("input", grow); requestAnimationFrame(grow);
+  // 在 Google 地圖找這個地點：名稱空的時候不顯示
+  const mapRow = el("div");
+  const paintMap = () => {
+    const q = cleanText(name.value, 40);
+    mapRow.replaceChildren(q ? el("a", {class:"lk map-lk", href:mapUrl(q), target:"_blank", rel:"noopener noreferrer"},
+      icon("pin", 15, 1.8), el("span", {text:`在 Google 地圖找「${q}」`})) : "");
+  };
+  name.addEventListener("input", paintMap); paintMap();
+  // ---- 到下一站：交通方式 ＋ 花費時間 ----
+  let move = moveIds().includes(p.move) ? p.move : "";
+  let mins = Math.max(0, Math.min(1440, p.mins || 0));
+  const pills = el("div", {class:"mvs", role:"group", "aria-label":"交通方式"});
+  const minsOut = el("b", {class:"mv-v num"});
+  const paintMove = () => {
+    pills.replaceChildren(...moveList().map(m => el("button", {type:"button", class:"mv" + (move === m.id ? " on" : ""),
+      "aria-pressed":String(move === m.id), text:m.name, onclick:() => { move = move === m.id ? "" : m.id; paintMove(); }})),
+      el("button", {type:"button", class:"mv edit", onclick:() => openMoves(isNew ? "新增行程" : "行程", () => { if(!moveIds().includes(move)) move = ""; paintMove(); })}, icon("sliders", 15, 1.8), el("span", {text:"編輯"})));
+    minsOut.textContent = mins > 0 ? planMins(mins) : "未填";
+  };
+  const bump = n => el("button", {type:"button", class:"mv-b", text:n > 0 ? `＋${planMins(n)}` : "清除",
+    onclick:() => { mins = n > 0 ? Math.min(1440, mins + n) : 0; paintMove(); }});
+  paintMove();
+  const moveBox = el("div", null,
+    el("p", {class:"grp-lab", text:"到下一站"}),
+    el("div", {class:"grp"}, el("div", {class:"line mvline"}, pills),
+      el("div", {class:"line"}, el("span", {class:"k", text:"花費時間"}), minsOut),
+      el("div", {class:"line mv-bs"}, bump(10), bump(30), bump(60), bump(0))),
+    el("p", {class:"hint", style:"margin:6px 16px 0", text:"這是從這一站到下一站的交通；最後一站可以不填。"}));
+  const phBox = () => { const b = photoBlock(t, p, {onChange:() => { const o = document.getElementById("pl-photos"); if(o) o.replaceWith(phBox()); }}); b.id = "pl-photos"; return b; };
+  if(!isNew && CLOUD && !Store.guest) Cloud.loadPhotos(t, p.id).then(() => { const b = document.getElementById("pl-photos"); if(b) b.replaceWith(phBox()); });
+  const del = isNew ? null : el("button", {type:"button", class:"menu-btn red", text:"刪除這一站"});
+  const body = el("div", null,
+    el("div", {class:"grp"}, line("地點", name), dp.row, dp.panel, tp.row, tp.panel), mapRow,
+    el("p", {class:"grp-lab", text:"備註"}), el("div", {class:"grp"}, note, liveNoteLinks(note)),
+    el("p", {class:"grp-lab", text:`照片（最多 ${MAX_PHOTOS} 張）`}), el("div", {style:"padding:8px 2px 0"}, phBox()),
+    moveBox,
+    del ? el("div", {class:"grp", style:"margin-top:24px"}, del) : null);
+  const {close} = openSheet({title:isNew ? "新增行程" : "行程", done:isNew ? "新增" : "完成", body, onDone:() => {
+    const n = cleanText(name.value, 40);
+    if(!n){ toast("請輸入地點"); name.focus(); return; }
+    const newDay = days.includes(dp.value) ? dp.value : p.day;
+    if(newDay !== p.day){ p.day = newDay; p.pos = plansOf(t, newDay).reduce((m, x) => Math.max(m, x.pos), 0) + 1; }
+    p.name = n; p.time = tp.value; p.note = cleanMulti(note.value, 1000);
+    p.move = move; p.mins = mins;
+    if(isNew) t.plans.push(p);
+    const dayChanged = S.planDay !== p.day;
+    S.planDay = p.day;
+    Store.save(); close();
+    dayChanged ? render() : redraw();        // 換到別天才整頁重畫（滑塊要重新定位），同一天只重畫清單
+  }});
+  if(del) twoStep(del, "刪除這一站", () => { close(); removePlan(t, p, after); });
+  if(isNew) setTimeout(() => name.focus({preventScroll:true}), 420);
+}
+
+/* ---------- 分頁設定：拖著 ≡ 排順序，右邊的開關決定要不要顯示（FR-T01）---------- */
+function openTabs(){
+  const on = tripTabs().map(x => x[0]);
+  // 開著的照使用者的順序排在前面，關掉的接在後面
+  const work = [...on.map(id => ({id, on:true})), ...ALL_TABS.filter(x => !on.includes(x[0])).map(x => ({id:x[0], on:false}))];
+  const box = el("div", {class:"grp"});
+  const err = el("p", {class:"err", role:"alert"});
+  const paint = () => {
+    box.replaceChildren(...work.map(w => {
+      const handle = el("button", {type:"button", class:"handle", "aria-label":`調整「${tabName(w.id)}」的順序`}, icon("grip", 18, 1.8));
+      const sw = el("input", {type:"checkbox", class:"switch", id:`tb-${w.id}`, checked:w.on});
+      sw.addEventListener("change", () => {
+        if(!sw.checked && work.filter(x => x.on).length <= 1){ sw.checked = true; err.textContent = "至少要留一個分頁"; return; }
+        w.on = sw.checked; err.textContent = "";
+      });
+      return el("div", {class:"ced tbed", "data-id":w.id}, handle, el("label", {for:`tb-${w.id}`, class:"grow", text:tabName(w.id)}), sw);
+    }));
+    enableSort(box, (i, j) => { work.splice(j, 0, work.splice(i, 1)[0]); paint(); }, ".ced.tbed", "input, button:not(.handle)");
+  };
+  paint();
+  const body = el("div", null,
+    el("p", {class:"grp-lab", text:"旅程裡要顯示哪些分頁"}), box,
+    el("p", {class:"hint", style:"margin:10px 16px 0", text:"按住 ≡ 可以上下拖動換順序。關掉的分頁只是不顯示，裡面的資料都還在。"}), err);
+  const {close} = openSheet({title:"分頁設定", done:"儲存", body, onDone:() => {
+    const ids = work.filter(w => w.on).map(w => w.id);
+    if(!ids.length){ err.textContent = "至少要留一個分頁"; return; }
+    Store.data.tabs = ids;
+    if(!ids.includes(S.tab)) S.tab = ids[0];
+    Store.save(); close(); render(); toast("分頁已更新");
+  }});
+}
+/* ---------- 把清單複製到其他旅程（FR-L06）----------
+   每種清單分開勾，不會一次全部帶過去；項目一律以「還沒完成」的狀態複製，
+   類別同名就沿用、沒有就幫對方建一個。照片不複製（太佔空間，而且多半是上一趟的東西）。 */
+function openCopyLists(t){
+  const others = Store.data.trips.filter(x => x.id !== t.id);
+  if(!others.length){ toast("只有這一趟旅程，還沒有地方可以複製"); return; }
+  const sel = el("select", {id:"cp-to"}, others.map(x => el("option", {value:x.id, text:`${x.name} · ${x.start.slice(5).replace("-", "/")}`})));
+  const picks = new Map();
+  const rows = LISTS.map(([key, full]) => {
+    const n = (t.items || []).filter(i => i.list === key && !i.parent).length;
+    const cb = el("input", {type:"checkbox", class:"switch", id:`cp-${key}`, checked:n > 0, disabled:!n});
+    picks.set(key, cb);
+    return el("div", {class:"line"}, el("label", {for:`cp-${key}`, text:full}),
+      el("span", {class:"hint", style:"flex:1;text-align:right;margin-right:12px", text:n ? `${n} 項` : "沒有項目"}), cb);
+  });
+  const err = el("p", {class:"err", role:"alert"});
+  const body = el("div", null,
+    el("p", {class:"grp-lab", text:"複製到哪一趟"}), el("div", {class:"grp"}, line("旅程", sel)),
+    el("p", {class:"grp-lab", text:"要複製哪些清單"}), el("div", {class:"grp"}, rows),
+    el("p", {class:"hint", style:"margin:10px 16px 0", text:"項目會以「還沒完成」的狀態複製過去，照片不會一起複製。"}), err);
+  const {close} = openSheet({title:"複製清單", done:"複製", body, onDone:() => {
+    const to = Store.trip(sel.value);
+    if(!to){ err.textContent = "找不到那趟旅程"; return; }
+    const keys = LISTS.map(([k]) => k).filter(k => picks.get(k).checked && !picks.get(k).disabled);
+    if(!keys.length){ err.textContent = "至少要勾一種清單"; return; }
+    ensureLists(to);
+    let n = 0;
+    for(const key of keys){
+      // 類別：同名就用對方現有的，沒有才新增（連同種類和顏色一起帶過去）
+      const catMap = new Map();
+      for(const c of (t.lists[key] || [])){
+        let hit = (to.lists[key] || []).find(x => x.name === c.name);
+        if(!hit){ hit = newCat({name:c.name, ...(c.kind ? {kind:c.kind} : {}), ...(c.color ? {color:c.color} : {})}); to.lists[key].push(hit); }
+        catMap.set(c.id, hit.id);
+      }
+      const tops = (t.items || []).filter(i => i.list === key && !i.parent).sort((a, b) => a.pos - b.pos);
+      let pos = (to.items || []).filter(i => i.list === key && !i.parent).reduce((m, i) => Math.max(m, i.pos), 0);
+      for(const src of tops){
+        const copy = cloneItem(src, key, catMap.get(src.cat) || (to.lists[key][0] || {}).id, ++pos);
+        to.items.push(copy); n++;
+        let kp = 0;
+        for(const kid of kidsOf(t, src).sort((a, b) => a.pos - b.pos)){
+          const kc = cloneItem(kid, key, copy.cat, ++kp); kc.parent = copy.id; to.items.push(kc); n++;
+        }
+      }
+    }
+    fixKids(to); Store.save(); close(); render();
+    toast(`已複製 ${n} 項到「${to.name}」`);
+  }});
+}
+// 複製一個項目：名稱、備註、規格、數量、單價、送給誰都帶著；打勾、已收錢、照片不帶
+function cloneItem(src, list, cat, pos){
+  const o = {id:uid("i"), list, cat, name:src.name, note:src.note || "", done:false, pos};
+  if(src.spec) o.spec = src.spec;
+  if((src.qty || 1) > 1) o.qty = src.qty;
+  if(src.price > 0) o.price = src.price;
+  if(src.discount > 0) o.discount = src.discount;
+  if(src.mode) o.mode = src.mode;
+  const w = whoList(src); if(w.length) o.whos = w.slice();
+  return o;
 }
 // 類別：新增、改名、刪除、排序（FR-L02）
 function openCats(t, k){
@@ -3287,15 +3921,15 @@ function viewGallery(srcs, start, caption, acts){
   srcs = srcs.filter(x => AVATAR_RE.test(x)); if(!srcs.length) return;
   const x = el("button", {type:"button", class:"x", "aria-label":"關閉"}, icon("x", 20, 2));
   const track = el("div", {class:"gv"}, srcs.map(src => el("div", null, el("img", {src, alt:caption || ""}))));
-  const n = el("div", {class:"gv-n"});
+  const n = el("div", {class:"gv-n"}, el("span"));
   const tn = srcs.length > 1 ? el("div", {class:"gv-tn"}, srcs.map((src, i) => el("button", {type:"button", "aria-label":`第 ${i + 1} 張`, onclick:e => { e.stopPropagation(); go2(i); }}, el("img", {src, alt:""})))) : null;
   let cur = start;
   const cover = acts && acts.cover && srcs.length > 1 ? el("button", {type:"button", text:"設為第一張"}) : null;
   const del = acts && acts.remove ? el("button", {type:"button", text:"刪除這張"}) : null;
   const bar = cover || del ? el("div", {class:"gv-bar"}, cover, del) : null;
-  const v = el("div", {class:"viewer", role:"dialog", "aria-modal":"true", "aria-label":caption || "照片"}, track, n, caption ? el("p", {class:srcs.length > 1 || bar ? "gv-p" : "", text:caption}) : null, tn, bar, x);
+  const v = el("div", {class:"viewer", role:"dialog", "aria-modal":"true", "aria-label":caption || "照片"}, track, n, caption ? el("p", {class:srcs.length > 1 || bar ? "gv-p" : ""}, el("span", {text:caption})) : null, tn, bar, x);
   const paint = () => {
-    n.textContent = srcs.length > 1 ? `${cur + 1} / ${srcs.length}` : "";
+    n.firstChild.textContent = srcs.length > 1 ? `${cur + 1} / ${srcs.length}` : "";
     if(tn) [...tn.children].forEach((b, i) => b.classList.toggle("on", i === cur));
     if(cover) cover.hidden = cur === 0;
   };
@@ -3351,7 +3985,9 @@ function shopRow(t, p, kids, paintTop, rebuild){
 }
 function shopLine(t, p){
   const k = kidsOf(t, p), d = k.filter(x => x.done).length, sum = k.reduce((s, x) => s + lineTotal(x), 0);
-  return `已買 ${d}/${k.length} 項` + (sum ? ` · ${fmt(Math.max(0, sum - (p.discount || 0)), t.cur)}` : "");
+  // 備註也要顯示：以前只有「單一商品」那種會顯示備註，店家這種不會，兩邊規則不一樣
+  return `已買 ${d}/${k.length} 項` + (sum ? ` · ${fmt(Math.max(0, sum - (p.discount || 0)), t.cur)}` : "")
+    + (p.note ? ` · ${p.note.split("\n")[0]}` : "");
 }
 // 一項的頁面（兩層的第二層）：
 //   照片（大圖左右滑＋縮圖＋加照片）→ 規格／數量／單價（直接填、自動存）→ 備註 → 這裡要買的東西（可以拖動，打勾的沉到下面）
@@ -3364,11 +4000,14 @@ function renderShop(t, p){
   const qty = kids.reduce((s, x) => s + (x.qty || 1), 0), sum = kids.reduce((s, x) => s + lineTotal(x), 0);
   const gotSum = got.reduce((s, x) => s + lineTotal(x), 0), disc = p.discount || 0, pay = Math.max(0, sum - disc);
   const back = () => go("trip", {tripId:t.id, tab:"lists", listKind:"shop"});
-  const sub = kids.length ? `已買 ${got.length} / ${kids.length} 項` : [catName, (kind === "proxy" || kind === "gift") && p.who ? `給${p.who}` : ""].filter(Boolean).join(" · ");
+  const subEl = el("p");
+  const paintSub = () => { subEl.textContent = kids.length ? `已買 ${got.length} / ${kids.length} 項`
+    : [catName, whoSub(kind, p)].filter(Boolean).join(" · "); };
+  paintSub();
   const head = el("header", {class:"gut"}, el("div", {class:"col"},
     el("div", {class:"top"}, el("button", {type:"button", class:"back", onclick:back}, icon("back", 22, 2), el("span", {text:"購物清單"})),
       el("button", {type:"button", class:"text-btn", "aria-label":"更多：改名稱、換類別", onclick:() => openItemMenu(t, p)}, icon("more", 20, 2.2))),
-    el("div", {class:"head"}, el("h1", {text:p.name}), el("p", {text:sub}))));
+    el("div", {class:"head"}, el("h1", {text:p.name}), subEl)));
   // ---- 先選用法：單一商品（規格、單價、照片）或 列出各項商品（像一家店）；已經有商品或資料的項目自動判斷 ----
   const hasPh0 = photosOf(t, p).length > 0 || (p.pcount || 0) > 0;
   const mode = kids.length ? "store" : (p.mode || ((p.spec || p.price > 0 || (p.qty || 1) > 1 || hasPh0) ? "single" : ""));
@@ -3402,7 +4041,12 @@ function renderShop(t, p){
     price.addEventListener("input", () => { cleanAmount(price, t.cur); autosave(applyF)(); });
     [spec, qtyIn, price].forEach(x => x.addEventListener("blur", () => { flush(); applyF(); Store.save(); }));
     const rows = [line("規格", spec), line("數量", qtyIn), line("單價", price, el("span", {class:"suffix", text:t.cur}))];
-    if(kind === "proxy" || kind === "gift") rows.push(el("div", {class:"line chipline"}, el("label", {text:"給誰"}), whoChips(p.who, v => { p.who = v; Store.save(); render(); })));
+    if(kind === "proxy" || kind === "gift"){
+      const L = WHO_LAB[kind];
+      // 選人不整頁重畫（重畫會把正在打的字洗掉），只更新標題下面那一行
+      rows.push(el("div", {class:"line chipline"}, el("label", {text:L.field}),
+        whoChips(whoList(p), v => { setWhos(p, v); Store.save(); paintSub(); }, L.field)));
+    }
     if(kind === "proxy"){
       const paid = el("input", {type:"checkbox", class:"switch", id:"pg-paid", checked:!!p.paid});
       paid.addEventListener("change", () => { p.paid = paid.checked; Store.save(); });
@@ -3443,7 +4087,7 @@ function renderShop(t, p){
   const commit = refocus => {
     const v = cleanText(inp.value, 60); if(!v) return;
     const pos = kids.reduce((m, x) => Math.max(m, x.pos), 0) + 1;
-    t.items.push({id:uid("i"), list:p.list, cat:p.cat, parent:p.id, name:v, spec:"", qty:1, price:0, note:"", done:false, pos, who:"", paid:false});
+    t.items.push({id:uid("i"), list:p.list, cat:p.cat, parent:p.id, name:v, spec:"", qty:1, price:0, note:"", done:false, pos, paid:false});
     inp.value = ""; p.done = false; p.mode = "store"; Store.save(); render();
     if(refocus){ const n = document.getElementById("add-kid"); if(n) n.focus({preventScroll:true}); }
   };
@@ -3478,7 +4122,7 @@ function renderShop(t, p){
       gotBox ? el("button", {type:"button", class:"card got-fold" + (gotOpen ? " on" : ""), "aria-expanded":String(gotOpen), onclick:() => { S.gotOpen = S.gotOpen === p.id ? null : p.id; render(); }},
         el("span", {class:"gf-ck"}, icon("check", 12, 2.6)), el("span", {class:"gf-t", text:`已買到 ${got.length} 項`}), el("span", {class:"num gf-v", text:gotSum ? fmt(gotSum, t.cur) : ""}), el("span", {class:"gf-ch"}, icon("chev", 16, 2))) : null,
       gotOpen ? gotBox : null] : []),
-    el("p", {class:"grp-lab", text:"備註"}), el("div", {class:"grp"}, note),
+    el("p", {class:"grp-lab", text:"備註"}), el("div", {class:"grp"}, note, liveNoteLinks(note)),
     mode === "store" ? opArea : null,
     switchBtn);
   return el("main", {class:"screen shop"}, head, el("section", {class:"band gut"}, body));
@@ -3493,7 +4137,7 @@ function kidRow(t, p, x){
   });
   const kind = catKind(t, p), bits = [];
   if(x.price > 0) bits.push(`${x.qty || 1} × ${fmt(x.price, t.cur)}`); else if((x.qty || 1) > 1) bits.push(`${x.qty} 件`);
-  if((kind === "proxy" || kind === "gift") && x.who) bits.push(`給${x.who}`);
+  const kws = whoSub(kind, x); if(kws) bits.push(kws);
   if(x.note) bits.push(x.note.split("\n")[0]);
   // 小計放在「數量 × 單價」同一行的右邊，名稱和規格可以用整列的寬度，不會被擠到換行
   const amt = x.price > 0 ? el("span", {class:"kamt num"}, kind === "proxy" ? el("small", {class:x.paid ? "ok" : "due", text:x.paid ? "已收" : "未收"}) : null, document.createTextNode(fmt(lineTotal(x), t.cur))) : null;
@@ -3507,12 +4151,14 @@ function kidRow(t, p, x){
   return row;
 }
 // 同一組裡長按拖動排序（店家裡的商品用）
-function enableSort(box, onMove){
-  box.querySelectorAll(".li.sitem").forEach(row => {
+function enableSort(box, onMove, sel = ".li.sitem", skip = ".ck, .pic"){
+  box.querySelectorAll(sel).forEach(row => {
+    if(row._sortBound) return;        // 動態新增的列會再呼叫一次，已經綁過的不要重綁
+    row._sortBound = true;
     row.addEventListener("pointerdown", e => {
-      if(e.button > 0 || !e.isPrimary || e.target.closest(".ck, .pic")) return;
+      if(e.button > 0 || !e.isPrimary || (skip && e.target.closest(skip))) return;
       const sx = e.clientX, sy = e.clientY, pid = e.pointerId;
-      if(e.target.closest(".kgrip")){ e.preventDefault(); box._suppressClick = true; dragSession(box, ".li.sitem", row, sy, onMove, row, pid); return; }
+      if(e.target.closest(".kgrip, .handle")){ e.preventDefault(); box._suppressClick = true; dragSession(box, sel, row, sy, onMove, row, pid); return; }
       let timer;
       const stop = () => { clearTimeout(timer); row.classList.remove("pressing"); row.removeEventListener("pointermove", mv); row.removeEventListener("pointerup", stop); row.removeEventListener("pointercancel", stop); };
       const mv = ev => { if(ev.pointerId === pid && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 8) stop(); };
@@ -3522,32 +4168,45 @@ function enableSort(box, onMove){
         stop(); box._suppressClick = true;
         try{ if(navigator.vibrate) navigator.vibrate(12); }catch(err){}
         if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
-        dragSession(box, ".li.sitem", row, sy, onMove, row, pid);
+        dragSession(box, sel, row, sy, onMove, row, pid);
       }, 380);
     });
   });
+  if(box._sortBox) return;
+  box._sortBox = true;
   box.addEventListener("click", e => { if(box._suppressClick){ e.preventDefault(); e.stopPropagation(); box._suppressClick = false; } }, true);
-  box.addEventListener("contextmenu", e => { if(e.target.closest(".li.sitem")) e.preventDefault(); });
+  box.addEventListener("contextmenu", e => { if(e.target.closest(sel)) e.preventDefault(); });
 }
-// 給誰：用過的名字列成小膠囊，可以新增（頁面上和編輯表單共用）
-function whoChips(cur, onPick){
-  let who = cur || "";
-  const names = [...new Set(Store.data.trips.flatMap(x => (x.items || []).map(i => i.who)).filter(Boolean))];
-  if(who && !names.includes(who)) names.push(who);
-  const chips = el("div", {class:"chips", role:"group", "aria-label":"給誰"});
+// 送給誰／幫誰買：用過的名字列成小膠囊，可以複選，也可以新增
+// cur 可以是陣列（多個人）或舊的單一字串；onPick 收到的一律是陣列
+function whoChips(cur, onPick, label = "給誰"){
+  let picked = cleanWhos(Array.isArray(cur) ? cur : (cur ? [cur] : []));
+  const names = [...new Set([...whoNames(), ...itemWhos(), ...picked])];
+  rememberWho(names);                                      // 舊版只存在項目上的名字，趁這時候收進帳號裡
+  const chips = el("div", {class:"chips", role:"group", "aria-label":label});
+  const fire = () => onPick(picked.slice());
   const paint = () => {
     const add = el("button", {type:"button", class:"chip add"}, icon("plus", 14, 2), el("span", {text:"新增"}));
     add.addEventListener("click", () => {
       const inp = el("input", {class:"chip-in", maxLength:12, placeholder:"名字", autocomplete:"off", enterkeyhint:"done", "aria-label":"新增名字"});
-      let ended = false;                                     // Enter 之後會再觸發一次 blur，只處理第一次
-      const done = () => { if(ended) return; ended = true; const v = cleanText(inp.value, 12); if(v){ if(!names.includes(v)) names.push(v); who = v; onPick(who); } paint(); };
+      let ended = false;                                   // Enter 之後會再觸發一次 blur，只處理第一次
+      const done = () => {
+        if(ended) return; ended = true;
+        const v = cleanText(inp.value, 12);
+        if(v){ if(!names.includes(v)) names.push(v); if(!picked.includes(v) && picked.length < 10) picked.push(v); rememberWho([v]); fire(); }
+        paint();
+      };
       inp.addEventListener("keydown", e => { if(e.key === "Enter" && !e.isComposing){ e.preventDefault(); done(); } if(e.key === "Escape"){ ended = true; paint(); } });
       inp.addEventListener("blur", done);
       add.replaceWith(inp); inp.focus();
     });
-    chips.replaceChildren(...names.map(n => el("button", {type:"button", class:"chip", "aria-pressed":String(n === who), text:n, onclick:() => { who = who === n ? "" : n; onPick(who); paint(); }})), add);
+    chips.replaceChildren(...names.map(n => el("button", {type:"button", class:"chip", "aria-pressed":String(picked.includes(n)), text:n, onclick:() => {
+      if(picked.includes(n)) picked = picked.filter(x => x !== n);
+      else if(picked.length < 10) picked.push(n);
+      fire(); paint();
+    }})), add);
   };
-  paint(); chips.get = () => who;
+  paint(); chips.get = () => picked.slice();
   return chips;
 }
 // 「⋯」：比較少用的——改名稱、換類別、刪除
@@ -3565,6 +4224,9 @@ function openItemMenu(t, p){
 }
 
 /* ---------- 帳號 ---------- */
+// 帳號頁裡的「分頁設定」：顯示目前開著哪幾個
+const tabsBtn = () => el("button", {type:"button", class:"menu-btn", onclick:openTabs},
+  el("span", {class:"grow", text:"分頁設定"}), el("span", {class:"e", text:tripTabs().map(x => x[1]).join("・")}), el("span", {class:"chev"}, icon("chev", 18, 2)));
 function openMe(){
   if(Store.guest){ openGuestMe(); return; }
   const u = Store.data.user;
@@ -3574,7 +4236,7 @@ function openMe(){
   const body = el("div", null, el("div", {class:"grp"},
     el("button", {type:"button", class:"me", "aria-label":"編輯個人資料", onclick:() => openProfile()}, pic,
       el("div", {class:"grow"}, el("b", {text:nickOf(u)}), el("span", {class:"e", text:u.email})), el("span", {class:"chev"}, icon("chev", 18, 2))),
-    reset, out),
+    tabsBtn(), reset, out),
     CLOUD ? el("p", {class:"hint", style:"margin:8px 16px 0", text:"登出時會一併清除這台裝置上的資料副本，雲端的資料不受影響。"}) : null,
     CLOUD ? el("div", {class:"grp"}, el("button", {type:"button", class:"menu-btn red", style:"border-top:0", onclick:openDeleteAccount, text:"刪除帳號"})) : null,
     CLOUD ? el("p", {class:"hint", style:"margin:8px 16px 0", text:"刪除帳號會永久刪除所有旅程與記帳，無法復原。"}) : null,
@@ -3595,7 +4257,7 @@ function openGuestMe(){
   const n = Store.data.trips.length;
   const body = el("div", null,
     el("div", {class:"grp"}, el("button", {type:"button", class:"me", "aria-label":"編輯個人資料", onclick:() => openProfile()}, pic,
-      el("div", {class:"grow"}, el("b", {text:nickOf(Store.data.user)}), el("span", {class:"e", text:"訪客・資料只存在這台裝置"})), el("span", {class:"chev"}, icon("chev", 18, 2))), bind),
+      el("div", {class:"grow"}, el("b", {text:nickOf(Store.data.user)}), el("span", {class:"e", text:"訪客・資料只存在這台裝置"})), el("span", {class:"chev"}, icon("chev", 18, 2))), tabsBtn(), bind),
     el("p", {class:"hint", style:"margin:8px 16px 0", text:"綁定後，這台裝置上的旅程會一起搬上雲端，換手機也不會不見。"}),
     el("div", {class:"grp"}, Object.assign(leave, {style:"border-top:0"})),
     el("p", {class:"hint", style:"margin:8px 16px 0", text:n ? `訪客資料沒有備份，清除後這 ${n} 趟旅程會永久消失。` : "訪客資料沒有備份，清除後無法復原。"}),

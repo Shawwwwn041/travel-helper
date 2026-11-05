@@ -1,8 +1,8 @@
 rules_version = '2';
 
-// 旅遊小幫手的資料庫規則
+// 拾旅的資料庫規則
 // 原則：1) 沒寫到的一律拒絕  2) 只有本人能讀寫自己的資料  3) 寫進來的資料要通過格式檢查
-// 資料結構：users/{uid}/trips/{tripId}/ 底下有 items（清單）、photos（照片）、expenses（記帳）
+// 資料結構：users/{uid}/trips/{tripId}/ 底下有 items（清單）、plans（行程）、photos（照片）、expenses（記帳）
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -33,10 +33,17 @@ service cloud.firestore {
       allow create, update: if isOwner(uid) && validUser(request.resource.data);
 
       function validUser(d) {
-        return d.keys().hasOnly(['name', 'nick', 'avatar', 'lastPick', 'updatedAt'])
+        return d.keys().hasOnly(['name', 'nick', 'avatar', 'lastPick', 'whoNames', 'tabs', 'moves', 'updatedAt'])
           && text(d.get('name', ''), 60)
           // 暱稱：最多 12 字
           && text(d.get('nick', ''), 12)
+          // 送給誰／幫誰買用過的名字（最多 40 個）
+          && (!('whoNames' in d) || (d.whoNames is list && d.whoNames.size() <= 40))
+          // 旅程分頁的順序與開關：只能是這五個，不能重複塞別的東西
+          && (!('tabs' in d) || (d.tabs is list && d.tabs.size() <= 5
+                && d.tabs.hasOnly(['ledger', 'lists', 'plan', 'stats', 'conv'])))
+          // 自訂的交通方式（最多 12 種，每種是 {id, name}）
+          && (!('moves' in d) || (d.moves is list && d.moves.size() <= 12))
           // 頭貼：只能是手機上重新壓過的小張 JPEG（data URL），不能是外部網址
           && (!('avatar' in d) || (d.avatar is string && d.avatar.size() <= 60000
                 && d.avatar.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')))
@@ -76,15 +83,17 @@ service cloud.firestore {
 
           function validItem(d) {
             return d.keys().hasAll(['list', 'cat', 'name', 'done', 'pos'])
-              && d.keys().hasOnly(['list', 'cat', 'name', 'note', 'photo', 'who', 'price', 'paid', 'parent', 'spec', 'qty', 'discount', 'mode', 'thumb', 'pcount', 'done', 'pos', 'createdAt', 'updatedAt'])
+              && d.keys().hasOnly(['list', 'cat', 'name', 'note', 'photo', 'who', 'whos', 'price', 'paid', 'parent', 'spec', 'qty', 'discount', 'mode', 'thumb', 'pcount', 'done', 'pos', 'createdAt', 'updatedAt'])
               && d.list in ['todo', 'pack', 'shop']
               && d.cat is string && d.cat.size() >= 1 && d.cat.size() <= 40
               && d.name is string && d.name.size() >= 1 && d.name.size() <= 60
               && text(d.get('note', ''), 1000)
               && d.done is bool
               && d.pos is number
-              // 代買／伴手禮：給誰（最多 12 字）、金額（最小單位的整數）、收錢了沒
+              // 代買／伴手禮：送給誰／幫誰買（最多 10 個人）、金額（最小單位的整數）、收錢了沒
+              // who 是舊版的單一對象，留著讓還沒更新的資料能讀寫；新版一律寫 whos
               && text(d.get('who', ''), 12)
+              && (!('whos' in d) || (d.whos is list && d.whos.size() <= 10))
               && (!('price' in d) || (d.price is int && d.price > 0 && d.price < 100000000000000))
               && d.get('paid', false) is bool
               // 兩層購物清單：店家裡的商品記住屬於哪一家店（parent），有規格、數量；店家可以填折扣
@@ -105,7 +114,34 @@ service cloud.firestore {
           }
         }
 
-        // ---- 清單的照片：每張一份文件，記住屬於哪一項 ----
+        // ---- 行程：一天一天的時間軸，每一站一份文件 ----
+        match /plans/{planId} {
+          allow read, delete: if isOwner(uid);
+          allow create, update: if isOwner(uid) && idOk(planId) && validPlan(request.resource.data);
+
+          function validPlan(d) {
+            return d.keys().hasAll(['day', 'name', 'pos'])
+              && d.keys().hasOnly(['day', 'name', 'note', 'time', 'move', 'mins', 'thumb', 'pcount', 'pos', 'createdAt', 'updatedAt'])
+              && day(d.day)
+              && d.name is string && d.name.size() >= 1 && d.name.size() <= 40
+              && text(d.get('note', ''), 1000)
+              && d.pos is number
+              // 時間：24 小時制的 hh:mm，沒決定幾點就不寫這個欄位
+              && (!('time' in d) || (d.time is string && d.time.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')))
+              // 到下一站的交通方式與路程時間（最多 24 小時）
+              // 交通方式是使用者自己那份清單裡的代號，所以只檢查格式，不比對固定選項
+              && (!('move' in d) || (d.move is string && d.move.size() <= 24 && d.move.matches('^[A-Za-z0-9_-]+$')))
+              && (!('mins' in d) || (d.mins is int && d.mins > 0 && d.mins <= 1440))
+              // 時間軸上的小縮圖（144px）和照片張數（最多 10 張）
+              && (!('thumb' in d) || (d.thumb is string && d.thumb.size() <= 30000
+                    && d.thumb.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')))
+              && (!('pcount' in d) || (d.pcount is int && d.pcount >= 0 && d.pcount <= 10))
+              && (d.get('createdAt', null) == null || d.createdAt is timestamp)
+              && (d.get('updatedAt', null) == null || d.updatedAt is timestamp);
+          }
+        }
+
+        // ---- 清單與行程的照片：每張一份文件，記住屬於哪一項 ----
         match /photos/{photoId} {
           allow read, delete: if isOwner(uid);
           allow create, update: if isOwner(uid) && idOk(photoId) && validPhoto(request.resource.data);
