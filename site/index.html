@@ -3,10 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fMofmQeWuTQYBxbq+PYQmmiVxLOq/JuoZx+lg8xs/Uw=' 'sha256-x6dLyySMvERxUfvbNOQmKkrK+rOxKg/aP13qAnzzUzM=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src 'self' https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-dqdLVTNXh+/dgiri3xweHjQpAD7FaEqhRNXtX85ob1k=' 'sha256-n10AOIPcdJO3A47DcsEURCdOdePVkHpx00GNUxQBBEk=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; manifest-src 'self'; connect-src 'self' https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src 'self' https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>拾旅</title>
 <meta name="description" content="拾旅｜出國記帳、預算、清單與匯率換算。">
+<meta name="build" content="8a0f1e6d98">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="拾旅">
 
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
@@ -17,7 +22,7 @@
 <meta property="og:image" content="https://shilu-trip.web.app/icons/og.png?v=2">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#ffffff">
-<script>window.TH_CLOUD=true;</script>
+<script>window.TH_BUILD="8a0f1e6d98";window.TH_CLOUD=true;</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -3124,6 +3129,23 @@ function seedWhos(){
   const list = whoNames();
   for(const n of a) if(!list.includes(n)) list.push(n);
 }
+/* ---------- 自動更新 ----------
+   加到 iPhone 主畫面之後是獨立視窗，沒有重新整理按鈕，使用者只能刪掉圖示重加。
+   所以程式自己比對版本：抓一份不經快取的本頁，版本不一樣就重新載入（帶 ?v= 確保拿到新的）。 */
+let upAt = 0;
+async function checkUpdate(){
+  if(!window.TH_BUILD || sheetOpen || subPage) return;        // 正在填東西時不要把人家的字洗掉
+  if(Date.now() - upAt < 300000) return;                      // 最多五分鐘查一次
+  upAt = Date.now();
+  try{
+    const r = await fetch(location.pathname + "?_=" + Date.now(), {cache:"no-store"});
+    if(!r.ok) return;
+    const m = (await r.text()).match(/name="build" content="([^"]+)"/);
+    if(m && m[1] && m[1] !== window.TH_BUILD) location.replace(location.pathname + "?v=" + m[1] + location.hash);
+  }catch(e){}
+}
+addEventListener("load", () => setTimeout(checkUpdate, 3000));
+addEventListener("visibilitychange", () => { if(!document.hidden) checkUpdate(); });
 // 改名／刪除：名字簿和所有項目上的紀錄要一起改，不然會對不起來
 function renameWho(from, to){
   const a = whoNames(), i = a.indexOf(from);
