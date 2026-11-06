@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-W+NzPPpJUzTTjIhXeHdJxbHzS2g0xPr4ToeYHuj9bdg=' 'sha256-2Cajx+xaSgK//AsKykRfUWZ/xK70LIFdSIoyF5AFhKQ=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src 'self' https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fMofmQeWuTQYBxbq+PYQmmiVxLOq/JuoZx+lg8xs/Uw=' 'sha256-2Cajx+xaSgK//AsKykRfUWZ/xK70LIFdSIoyF5AFhKQ=' https://www.gstatic.com https://apis.google.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://cdn.jsdelivr.net https://latest.currency-api.pages.dev https://*.googleapis.com https://www.gstatic.com; frame-src 'self' https://travel-helper-992ae.firebaseapp.com https://accounts.google.com https://apis.google.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>拾旅（測試版）</title>
 <meta name="description" content="拾旅｜出國記帳、預算、清單與匯率換算。">
@@ -710,6 +710,10 @@ body.is-dragging,body.is-dragging *{cursor:grabbing !important;-webkit-user-sele
 .note-in{display:block;width:100%;min-height:96px;padding:12px 16px;border:0;background:transparent;font:inherit;font-size:1rem;line-height:1.6;color:var(--ink);resize:none;outline:none;field-sizing:content}
 .note-in::placeholder{color:var(--faint)}
 /* 備註裡的網址：做成一顆一顆可以按的小膠囊 */
+/* 長按名字後的就地編輯：輸入框＋刪除 */
+.chip-ed{display:inline-flex;align-items:center;gap:4px}
+.chip-x{display:grid;place-items:center;width:28px;height:28px;border:0;border-radius:50%;background:rgba(120,120,128,.14);color:var(--muted);font-size:.8125rem;line-height:1;cursor:pointer;transition:background .2s,color .2s}
+.chip-x:active{background:var(--bad);color:#fff}
 .note-lk{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 14px}
 .note-lk .lk{display:inline-flex;align-items:center;gap:6px;max-width:100%;height:32px;padding:0 12px;border-radius:99px;background:rgba(0,0,0,.045);color:var(--pri);font-size:.875rem;text-decoration:none;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.07)}
 .note-lk .lk span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -2252,17 +2256,23 @@ function renderTrip(t){
     el("div", {class:"top"}, el("button", {type:"button", class:"back", onclick:() => go("home")}, icon("back", 22, 2), el("span", {text:"我的旅程"})), el("button", {type:"button", class:"text-btn", onclick:() => openTripForm(t), text:"編輯"})),
     el("div", {class:"head"}, el("h1", {text:t.name}), el("p", {text:`${range(t)} · ${ph.label}`}))));
   const body = el("div", {class:"col"});
-  fixTab();
-  if(S.tab === "ledger") body.append(...ledger(t));
-  else if(S.tab === "stats") body.append(...stats(t));
-  else if(S.tab === "conv") body.append(...converter(t));
-  else if(S.tab === "plan") body.append(...planTab(t));
-  else body.append(...lists(t));
-  const band = el("section", {class:"band gut", style:"padding-top:0"}, segNav(), body);
-  if(S.tab === "ledger"){
-    fab = el("button", {type:"button", class:"fab", onclick:() => openExpense(t)}, icon("plus", 20, 2), el("span", {text:"記一筆"}));
-    document.body.append(fab);
-  }
+  // 換分頁時只重畫這一塊，標題和分頁列留在原地（整頁重畫會閃，滑塊也沒辦法滑過去）
+  const paintBody = () => {
+    fixTab();
+    if(fab){ fab.remove(); fab = null; }
+    body.replaceChildren();
+    if(S.tab === "ledger") body.append(...ledger(t));
+    else if(S.tab === "stats") body.append(...stats(t));
+    else if(S.tab === "conv") body.append(...converter(t));
+    else if(S.tab === "plan") body.append(...planTab(t));
+    else body.append(...lists(t));
+    if(S.tab === "ledger"){
+      fab = el("button", {type:"button", class:"fab", onclick:() => openExpense(t)}, icon("plus", 20, 2), el("span", {text:"記一筆"}));
+      document.body.append(fab);
+    }
+  };
+  paintBody();
+  const band = el("section", {class:"band gut", style:"padding-top:0"}, segNav(paintBody), body);
   return el("main", {class:"screen"}, head, band);
 }
 // 分頁：玻璃膠囊＋白色滑塊，從上一個分頁滑到新的分頁
@@ -2311,7 +2321,8 @@ function tripTabs(){
 // 目前這一頁被關掉時，自動退到第一個開著的分頁
 function fixTab(){ const ids = tripTabs().map(x => x[0]); if(!ids.includes(S.tab)) S.tab = ids[0]; }
 // 玻璃滑塊分頁列（旅程頁、首頁共用）：點一下切換，或按住滑塊左右拖
-function segNav(tabs = tripTabs(), key = "tab", label = "旅程分頁"){
+// onPick 有給的話就「原地換內容」（不重畫整頁），畫面才不會一閃一閃
+function segNav(onPick, tabs = tripTabs(), key = "tab", label = "旅程分頁"){
   const thumb = el("span", {class:"thumb", "aria-hidden":"true"});
   let noSlide = false;
   const cap = el("div", {class:"cap" + (tabs.length >= 5 ? " tight" : ""), role:"tablist", "aria-label":label}, thumb, tabs.map(([id, text]) =>
@@ -2319,7 +2330,14 @@ function segNav(tabs = tripTabs(), key = "tab", label = "旅程分頁"){
       if(cap._suppress && ev.isTrusted) return;
       if(S[key] === id){ window.scrollTo({top:0, behavior:"smooth"}); return; }
       const y = Math.min(scrollY, document.querySelector(".band").offsetTop);
-      S.prevTab = noSlide ? null : S[key]; noSlide = false; S[key] = id; render(); window.scrollTo(0, y);
+      const prev = S[key]; S[key] = id;
+      if(onPick){
+        onPick();
+        cap.querySelectorAll('[role="tab"]').forEach(b => b.setAttribute("aria-selected", String(b.dataset.id === id)));
+        thumb.classList.add("ready"); put(cap.querySelector(`[data-id="${id}"]`));
+      } else { S.prevTab = noSlide ? null : prev; render(); }
+      noSlide = false;
+      window.scrollTo(0, y);
     }})));
   const put = b => { thumb.style.width = b.offsetWidth + "px"; thumb.style.translate = `${b.offsetLeft}px 0`; };
   segDrag(cap, thumb, b => { noSlide = true; b.click(); });
@@ -3106,6 +3124,25 @@ function seedWhos(){
   const list = whoNames();
   for(const n of a) if(!list.includes(n)) list.push(n);
 }
+// 改名／刪除：名字簿和所有項目上的紀錄要一起改，不然會對不起來
+function renameWho(from, to){
+  const a = whoNames(), i = a.indexOf(from);
+  if(i >= 0){ if(a.includes(to)) a.splice(i, 1); else a[i] = to; }
+  for(const t of Store.data.trips) for(const it of t.items || []){
+    const w = whoList(it);
+    if(w.includes(from)) setWhos(it, w.map(x => x === from ? to : x));
+  }
+  Store.save();
+}
+function removeWho(n){
+  const a = whoNames(), i = a.indexOf(n);
+  if(i >= 0) a.splice(i, 1);
+  for(const t of Store.data.trips) for(const it of t.items || []){
+    const w = whoList(it);
+    if(w.includes(n)) setWhos(it, w.filter(x => x !== n));
+  }
+  Store.save();
+}
 function rememberWho(names){
   const a = whoNames(); let add = false;
   for(const n of cleanWhos(names)) if(!a.includes(n)){ a.push(n); add = true; }
@@ -3113,7 +3150,8 @@ function rememberWho(names){
   if(add) Store.save();
 }
 // 伴手禮是「送給誰」、代買是「幫誰買」，欄位名稱和列上的字都要分開
-const WHO_LAB = {gift:{field:"送給誰", row:"送", hint:"可以選好幾個人"}, proxy:{field:"幫誰買", row:"幫", hint:"選好幾個人就平分金額"}};
+const WHO_LAB = {gift:{field:"送給誰", row:"送", hint:"可以選好幾個人；長按名字可以改名或刪除"},
+  proxy:{field:"幫誰買", row:"幫", hint:"選好幾個人就平分金額；長按名字可以改名或刪除"}};
 const whoSub = (kind, it) => { const a = whoList(it); return a.length ? (WHO_LAB[kind] ? WHO_LAB[kind].row : "給") + a.join("、") : ""; };
 // 代買分給好幾個人時，每人該付的錢＝平分
 const whoShare = (it, n) => { const a = whoList(it); return a.length > 1 ? n / a.length : n; };
@@ -4181,10 +4219,30 @@ function enableSort(box, onMove, sel = ".li.sitem", skip = ".ck, .pic"){
 // cur 可以是陣列（多個人）或舊的單一字串；onPick 收到的一律是陣列
 function whoChips(cur, onPick, label = "給誰"){
   let picked = cleanWhos(Array.isArray(cur) ? cur : (cur ? [cur] : []));
-  const names = [...new Set([...whoNames(), ...itemWhos(), ...picked])];
-  rememberWho(names);                                      // 舊版只存在項目上的名字，趁這時候收進帳號裡
+  rememberWho([...whoNames(), ...itemWhos(), ...picked]);   // 舊版只存在項目上的名字，趁這時候收進帳號裡
   const chips = el("div", {class:"chips", role:"group", "aria-label":label});
   const fire = () => onPick(picked.slice());
+  // 長按名字：就地改名，旁邊的 ✕ 是刪除（打錯字不用重建一個）
+  const editName = (n, chipEl) => {
+    const inp = el("input", {class:"chip-in", maxLength:12, value:n, autocomplete:"off", enterkeyhint:"done", "aria-label":`改「${n}」這個名字`});
+    const del = el("button", {type:"button", class:"chip-x", "aria-label":`刪除「${n}」`}, el("span", {text:"✕"}));
+    let ended = false;
+    const finish = save => {
+      if(ended) return; ended = true;
+      const v = save ? cleanText(inp.value, 12) : "";
+      if(v && v !== n){ renameWho(n, v); picked = picked.map(x => x === n ? v : x); fire(); }
+      paint();
+    };
+    inp.addEventListener("keydown", e => { if(e.key === "Enter" && !e.isComposing){ e.preventDefault(); finish(true); } if(e.key === "Escape") finish(false); });
+    inp.addEventListener("blur", () => finish(true));
+    // 用 pointerdown：等到 click 的時候 blur 已經先把輸入框收掉了
+    del.addEventListener("pointerdown", e => {
+      e.preventDefault(); ended = true;
+      removeWho(n); picked = picked.filter(x => x !== n); fire(); paint();
+    });
+    chipEl.replaceWith(el("span", {class:"chip-ed"}, inp, del));
+    inp.focus(); inp.select();
+  };
   const paint = () => {
     const add = el("button", {type:"button", class:"chip add"}, icon("plus", 14, 2), el("span", {text:"新增"}));
     add.addEventListener("click", () => {
@@ -4200,11 +4258,26 @@ function whoChips(cur, onPick, label = "給誰"){
       inp.addEventListener("blur", done);
       add.replaceWith(inp); inp.focus();
     });
-    chips.replaceChildren(...names.map(n => el("button", {type:"button", class:"chip", "aria-pressed":String(picked.includes(n)), text:n, onclick:() => {
-      if(picked.includes(n)) picked = picked.filter(x => x !== n);
-      else if(picked.length < 10) picked.push(n);
-      fire(); paint();
-    }})), add);
+    const names = [...new Set([...whoNames(), ...picked])];
+    chips.replaceChildren(...names.map(n => {
+      const c = el("button", {type:"button", class:"chip", "aria-pressed":String(picked.includes(n)), text:n, onclick:() => {
+        if(c._lp){ c._lp = false; return; }                // 長按剛觸發過，放開的這一下不要當成選取
+        if(picked.includes(n)) picked = picked.filter(x => x !== n);
+        else if(picked.length < 10) picked.push(n);
+        fire(); paint();
+      }});
+      let tm = null, sx = 0, sy = 0;
+      const cancel = () => { clearTimeout(tm); tm = null; };
+      c.addEventListener("pointerdown", e => {
+        if(e.button > 0) return;
+        sx = e.clientX; sy = e.clientY;
+        tm = setTimeout(() => { tm = null; c._lp = true; editName(n, c); }, 500);
+      });
+      c.addEventListener("pointermove", e => { if(tm && Math.hypot(e.clientX - sx, e.clientY - sy) > 8) cancel(); });
+      ["pointerup", "pointercancel", "pointerleave"].forEach(ev => c.addEventListener(ev, cancel));
+      c.addEventListener("contextmenu", e => { e.preventDefault(); cancel(); c._lp = true; editName(n, c); });
+      return c;
+    }), add);
   };
   paint(); chips.get = () => picked.slice();
   return chips;
